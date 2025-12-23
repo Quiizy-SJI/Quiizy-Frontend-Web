@@ -1418,7 +1418,7 @@ closeModal() &#123;
     position="top-right"
     [duration]="4000"
     [showProgress]="true"
-    (dismiss)="hideToast()"&gt;
+    (dismissed)="hideToast()"&gt;
   &lt;/ui-toast&gt;
 &#125;
 
@@ -2092,7 +2092,7 @@ simulateLoading() &#123;
       position="top-right"
       [duration]="4000"
       [showProgress]="true"
-      (dismiss)="hideToast()"
+      (dismissed)="hideToast()"
     ></ui-toast>
   }
 

@@ -96,6 +96,7 @@ export class ToastComponent implements OnInit, OnDestroy {
   @Input() showProgress = true;
   @Input() actionLabel?: string;
   @Input() customClass?: string;
+  @Input() position: 'top-right' | 'top-left' | 'top-center' | 'bottom-right' | 'bottom-left' | 'bottom-center' = 'top-right';
 
   @Output() dismissed = new EventEmitter<void>();
   @Output() actionClicked = new EventEmitter<void>();
@@ -106,6 +107,7 @@ export class ToastComponent implements OnInit, OnDestroy {
     return cn(
       'toast',
       colorClass('toast', this.color),
+      `toast--${this.position}`,
       this.customClass
     );
   }

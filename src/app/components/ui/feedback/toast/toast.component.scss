@@ -12,58 +12,92 @@
   background: var(--surface-raised);
   border-radius: 12px;
   box-shadow: var(--elevation-4);
-  position: relative;
+  position: fixed;
   overflow: hidden;
   animation: toast-in 0.3s ease-out;
-}
+  z-index: 9999;
 
-.toast {
+  // ==========================================
+  // POSITION VARIANTS
+  // ==========================================
+  &.toast--top-right {
+    top: 1rem;
+    right: 1rem;
+  }
+
+  &.toast--top-left {
+    top: 1rem;
+    left: 1rem;
+  }
+
+  &.toast--top-center {
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  &.toast--bottom-right {
+    bottom: 1rem;
+    right: 1rem;
+  }
+
+  &.toast--bottom-left {
+    bottom: 1rem;
+    left: 1rem;
+  }
+
+  &.toast--bottom-center {
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
   // ==========================================
   // COLOR VARIANTS
   // ==========================================
-  &--primary {
+  &.toast--primary {
     .toast__icon { color: var(--color-primary-500); }
     .toast__progress-bar { background: var(--color-primary-500); }
     .toast__action { color: var(--color-primary-500); }
   }
 
-  &--secondary {
+  &.toast--secondary {
     .toast__icon { color: var(--color-secondary-500); }
     .toast__progress-bar { background: var(--color-secondary-500); }
     .toast__action { color: var(--color-secondary-500); }
   }
 
-  &--accent {
+  &.toast--accent {
     .toast__icon { color: var(--color-accent-500); }
     .toast__progress-bar { background: var(--color-accent-500); }
     .toast__action { color: var(--color-accent-500); }
   }
 
-  &--success {
+  &.toast--success {
     .toast__icon { color: var(--color-success-500); }
     .toast__progress-bar { background: var(--color-success-500); }
     .toast__action { color: var(--color-success-600); }
   }
 
-  &--warning {
+  &.toast--warning {
     .toast__icon { color: var(--color-warning-600); }
     .toast__progress-bar { background: var(--color-warning-500); }
     .toast__action { color: var(--color-warning-600); }
   }
 
-  &--danger {
+  &.toast--danger {
     .toast__icon { color: var(--color-danger-500); }
     .toast__progress-bar { background: var(--color-danger-500); }
     .toast__action { color: var(--color-danger-500); }
   }
 
-  &--info {
+  &.toast--info {
     .toast__icon { color: var(--color-info-500); }
     .toast__progress-bar { background: var(--color-info-500); }
     .toast__action { color: var(--color-info-500); }
   }
 
-  &--neutral {
+  &.toast--neutral {
     .toast__icon { color: var(--text-secondary); }
     .toast__progress-bar { background: var(--text-tertiary); }
     .toast__action { color: var(--text-primary); }
