@@ -3,11 +3,14 @@
 // ============================================
 
 :host {
-  display: flex;
-  align-items: center;
+  display: block;
+  width: 100%;
 }
 
 .divider {
+  display: flex;
+  align-items: center;
+
   // ==========================================
   // ORIENTATION
   // ==========================================
