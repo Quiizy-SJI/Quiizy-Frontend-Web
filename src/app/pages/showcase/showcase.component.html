@@ -2,35 +2,116 @@
   <header class="showcase__header">
     <h1 class="showcase__title">🎨 UI Component Library</h1>
     <p class="showcase__subtitle">A comprehensive collection of customizable Angular components</p>
+    <p class="showcase__description">Each component below includes live examples and usage code. Copy the code snippets to use in your own templates.</p>
   </header>
 
   <!-- Breadcrumb Demo -->
   <section class="showcase__section">
     <h2 class="section-title">Breadcrumbs</h2>
+    <p class="component-description">Breadcrumbs help users navigate hierarchical content by showing their current location within the site structure.</p>
+
+    <div class="component-api">
+      <h4>API Reference</h4>
+      <table class="api-table">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>items</code></td><td><code>BreadcrumbItem[]</code></td><td>-</td><td>Array of breadcrumb items with label and optional href</td></tr>
+          <tr><td><code>separator</code></td><td><code>'chevron' | 'slash' | 'arrow' | 'dot'</code></td><td><code>'chevron'</code></td><td>Separator style between items</td></tr>
+        </tbody>
+      </table>
+    </div>
 
     <div class="demo-group">
       <h3>Chevron Separator (Default)</h3>
-      <ui-breadcrumb [items]="breadcrumbItems" separator="chevron"></ui-breadcrumb>
+      <div class="demo-with-code">
+        <div class="demo-preview">
+          <ui-breadcrumb [items]="breadcrumbItems" separator="chevron"></ui-breadcrumb>
+        </div>
+        <div class="code-block">
+          <pre><code>&lt;ui-breadcrumb
+  [items]="breadcrumbItems"
+  separator="chevron"&gt;
+&lt;/ui-breadcrumb&gt;
+
+// In component.ts:
+breadcrumbItems = [
+  &#123; label: 'Home', href: '/' &#125;,
+  &#123; label: 'Products', href: '/products' &#125;,
+  &#123; label: 'Category' &#125;
+];</code></pre>
+        </div>
+      </div>
     </div>
 
     <div class="demo-group">
       <h3>Slash Separator</h3>
-      <ui-breadcrumb [items]="breadcrumbItems" separator="slash"></ui-breadcrumb>
+      <div class="demo-with-code">
+        <div class="demo-preview">
+          <ui-breadcrumb [items]="breadcrumbItems" separator="slash"></ui-breadcrumb>
+        </div>
+        <div class="code-block">
+          <pre><code>&lt;ui-breadcrumb
+  [items]="breadcrumbItems"
+  separator="slash"&gt;
+&lt;/ui-breadcrumb&gt;</code></pre>
+        </div>
+      </div>
     </div>
 
     <div class="demo-group">
       <h3>Arrow Separator</h3>
-      <ui-breadcrumb [items]="breadcrumbItems" separator="arrow"></ui-breadcrumb>
+      <div class="demo-with-code">
+        <div class="demo-preview">
+          <ui-breadcrumb [items]="breadcrumbItems" separator="arrow"></ui-breadcrumb>
+        </div>
+        <div class="code-block">
+          <pre><code>&lt;ui-breadcrumb
+  [items]="breadcrumbItems"
+  separator="arrow"&gt;
+&lt;/ui-breadcrumb&gt;</code></pre>
+        </div>
+      </div>
     </div>
 
     <div class="demo-group">
       <h3>Dot Separator</h3>
-      <ui-breadcrumb [items]="breadcrumbItems" separator="dot"></ui-breadcrumb>
+      <div class="demo-with-code">
+        <div class="demo-preview">
+          <ui-breadcrumb [items]="breadcrumbItems" separator="dot"></ui-breadcrumb>
+        </div>
+        <div class="code-block">
+          <pre><code>&lt;ui-breadcrumb
+  [items]="breadcrumbItems"
+  separator="dot"&gt;
+&lt;/ui-breadcrumb&gt;</code></pre>
+        </div>
+      </div>
     </div>
 
     <div class="demo-group">
       <h3>Longer Breadcrumb Trail</h3>
-      <ui-breadcrumb [items]="longBreadcrumbItems" separator="chevron"></ui-breadcrumb>
+      <div class="demo-with-code">
+        <div class="demo-preview">
+          <ui-breadcrumb [items]="longBreadcrumbItems" separator="chevron"></ui-breadcrumb>
+        </div>
+        <div class="code-block">
+          <pre><code>&lt;ui-breadcrumb
+  [items]="longBreadcrumbItems"
+  separator="chevron"&gt;
+&lt;/ui-breadcrumb&gt;
+
+// For longer trails:
+longBreadcrumbItems = [
+  &#123; label: 'Home', href: '/' &#125;,
+  &#123; label: 'Dashboard', href: '/dashboard' &#125;,
+  &#123; label: 'Settings', href: '/settings' &#125;,
+  &#123; label: 'Profile', href: '/profile' &#125;,
+  &#123; label: 'Edit' &#125;
+];</code></pre>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -39,22 +120,86 @@
   <!-- Tabs Navigation -->
   <section class="showcase__section">
     <h2 class="section-title">Navigation - Tabs</h2>
+    <p class="component-description">Tabs organize content into separate views where only one view is visible at a time. Use tabs to reduce clutter and group related content.</p>
+
+    <div class="component-api">
+      <h4>API Reference</h4>
+      <table class="api-table">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>tabs</code></td><td><code>TabItem[]</code></td><td>-</td><td>Array of tab items with id, label, and optional icon/disabled</td></tr>
+          <tr><td><code>activeTab</code></td><td><code>string</code></td><td>-</td><td>ID of the currently active tab</td></tr>
+          <tr><td><code>variant</code></td><td><code>'line' | 'enclosed' | 'pills' | 'soft'</code></td><td><code>'line'</code></td><td>Visual style variant</td></tr>
+        </tbody>
+      </table>
+      <table class="api-table">
+        <thead>
+          <tr><th>Output</th><th>Type</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>tabChange</code></td><td><code>EventEmitter&lt;string&gt;</code></td><td>Emits the tab ID when a tab is selected</td></tr>
+        </tbody>
+      </table>
+    </div>
+
     <div class="demo-group">
       <div class="demo-item">
         <h4>Line Tabs</h4>
         <ui-tabs [tabs]="tabItems" [activeTab]="activeTab" variant="line" (tabChange)="onTabChange($event)"></ui-tabs>
+        <div class="code-block code-block--inline">
+          <pre><code>&lt;ui-tabs
+  [tabs]="tabItems"
+  [activeTab]="activeTab"
+  variant="line"
+  (tabChange)="onTabChange($event)"&gt;
+&lt;/ui-tabs&gt;</code></pre>
+        </div>
       </div>
       <div class="demo-item">
         <h4>Enclosed Tabs</h4>
         <ui-tabs [tabs]="tabItems2" [activeTab]="activeTab" variant="enclosed" (tabChange)="onTabChange($event)"></ui-tabs>
+        <div class="code-block code-block--inline">
+          <pre><code>&lt;ui-tabs
+  [tabs]="tabItems2"
+  [activeTab]="activeTab"
+  variant="enclosed"
+  (tabChange)="onTabChange($event)"&gt;
+&lt;/ui-tabs&gt;</code></pre>
+        </div>
       </div>
       <div class="demo-item">
         <h4>Pills Tabs</h4>
         <ui-tabs [tabs]="tabItems3" [activeTab]="activeTab" variant="pills" (tabChange)="onTabChange($event)"></ui-tabs>
+        <div class="code-block code-block--inline">
+          <pre><code>&lt;ui-tabs
+  [tabs]="tabItems3"
+  [activeTab]="activeTab"
+  variant="pills"
+  (tabChange)="onTabChange($event)"&gt;
+&lt;/ui-tabs&gt;</code></pre>
+        </div>
       </div>
       <div class="demo-item">
         <h4>Soft Tabs</h4>
         <ui-tabs [tabs]="tabItems4" [activeTab]="activeTab" variant="soft" (tabChange)="onTabChange($event)"></ui-tabs>
+        <div class="code-block code-block--inline">
+          <pre><code>&lt;ui-tabs
+  [tabs]="tabItems4"
+  [activeTab]="activeTab"
+  variant="soft"
+  (tabChange)="onTabChange($event)"&gt;
+&lt;/ui-tabs&gt;
+
+// TabItem interface:
+interface TabItem &#123;
+  id: string;
+  label: string;
+  icon?: string;
+  disabled?: boolean;
+&#125;</code></pre>
+        </div>
       </div>
     </div>
   </section>
@@ -64,125 +209,292 @@
   <!-- Button Section -->
   <section class="showcase__section">
     <h2 class="section-title">Buttons</h2>
+    <p class="component-description">Buttons trigger actions and are essential interactive elements. They come in multiple variants, colors, and sizes to suit different UI needs.</p>
+
+    <div class="component-api">
+      <h4>API Reference</h4>
+      <table class="api-table">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>variant</code></td><td><code>'solid' | 'outline' | 'ghost' | 'soft' | 'link'</code></td><td><code>'solid'</code></td><td>Visual style variant</td></tr>
+          <tr><td><code>color</code></td><td><code>'primary' | 'secondary' | 'accent' | 'success' | 'warning' | 'danger' | 'info' | 'neutral'</code></td><td><code>'primary'</code></td><td>Color scheme</td></tr>
+          <tr><td><code>size</code></td><td><code>'xs' | 'sm' | 'md' | 'lg' | 'xl'</code></td><td><code>'md'</code></td><td>Button size</td></tr>
+          <tr><td><code>disabled</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Disables the button</td></tr>
+          <tr><td><code>loading</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Shows loading spinner</td></tr>
+        </tbody>
+      </table>
+    </div>
 
     <div class="demo-group">
       <h3>Button Variants</h3>
-      <div class="demo-row">
-        @for (variant of buttonVariants; track variant) {
-          <ui-button [variant]="variant" color="primary">{{ variant | titlecase }}</ui-button>
-        }
+      <div class="demo-with-code">
+        <div class="demo-preview">
+          <div class="demo-row">
+            @for (variant of buttonVariants; track variant) {
+              <ui-button [variant]="variant" color="primary">{{ variant | titlecase }}</ui-button>
+            }
+          </div>
+        </div>
+        <div class="code-block">
+          <pre><code>&lt;!-- Solid (default) --&gt;
+&lt;ui-button variant="solid" color="primary"&gt;Solid&lt;/ui-button&gt;
+
+&lt;!-- Outline --&gt;
+&lt;ui-button variant="outline" color="primary"&gt;Outline&lt;/ui-button&gt;
+
+&lt;!-- Ghost --&gt;
+&lt;ui-button variant="ghost" color="primary"&gt;Ghost&lt;/ui-button&gt;
+
+&lt;!-- Soft --&gt;
+&lt;ui-button variant="soft" color="primary"&gt;Soft&lt;/ui-button&gt;
+
+&lt;!-- Link --&gt;
+&lt;ui-button variant="link" color="primary"&gt;Link&lt;/ui-button&gt;</code></pre>
+        </div>
       </div>
     </div>
 
     <div class="demo-group">
       <h3>Button Colors</h3>
-      <div class="demo-row">
-        @for (color of colors; track color) {
-          <ui-button variant="solid" [color]="color">{{ color | titlecase }}</ui-button>
-        }
+      <div class="demo-with-code">
+        <div class="demo-preview">
+          <div class="demo-row">
+            @for (color of colors; track color) {
+              <ui-button variant="solid" [color]="color">{{ color | titlecase }}</ui-button>
+            }
+          </div>
+        </div>
+        <div class="code-block">
+          <pre><code>&lt;ui-button color="primary"&gt;Primary&lt;/ui-button&gt;
+&lt;ui-button color="secondary"&gt;Secondary&lt;/ui-button&gt;
+&lt;ui-button color="accent"&gt;Accent&lt;/ui-button&gt;
+&lt;ui-button color="success"&gt;Success&lt;/ui-button&gt;
+&lt;ui-button color="warning"&gt;Warning&lt;/ui-button&gt;
+&lt;ui-button color="danger"&gt;Danger&lt;/ui-button&gt;
+&lt;ui-button color="info"&gt;Info&lt;/ui-button&gt;
+&lt;ui-button color="neutral"&gt;Neutral&lt;/ui-button&gt;</code></pre>
+        </div>
       </div>
     </div>
 
     <div class="demo-group">
       <h3>Button Sizes</h3>
-      <div class="demo-row demo-row--align-center">
-        @for (size of sizes; track size) {
-          <ui-button variant="solid" color="primary" [size]="size">{{ size | uppercase }}</ui-button>
-        }
+      <div class="demo-with-code">
+        <div class="demo-preview">
+          <div class="demo-row demo-row--align-center">
+            @for (size of sizes; track size) {
+              <ui-button variant="solid" color="primary" [size]="size">{{ size | uppercase }}</ui-button>
+            }
+          </div>
+        </div>
+        <div class="code-block">
+          <pre><code>&lt;ui-button size="xs"&gt;XS&lt;/ui-button&gt;
+&lt;ui-button size="sm"&gt;SM&lt;/ui-button&gt;
+&lt;ui-button size="md"&gt;MD&lt;/ui-button&gt;  &lt;!-- default --&gt;
+&lt;ui-button size="lg"&gt;LG&lt;/ui-button&gt;
+&lt;ui-button size="xl"&gt;XL&lt;/ui-button&gt;</code></pre>
+        </div>
       </div>
     </div>
 
     <div class="demo-group">
       <h3>Button States</h3>
-      <div class="demo-row">
-        <ui-button variant="solid" color="primary">Normal</ui-button>
-        <ui-button variant="solid" color="primary" [disabled]="true">Disabled</ui-button>
-        <ui-button variant="solid" color="primary" [loading]="true">Loading</ui-button>
+      <div class="demo-with-code">
+        <div class="demo-preview">
+          <div class="demo-row">
+            <ui-button variant="solid" color="primary">Normal</ui-button>
+            <ui-button variant="solid" color="primary" [disabled]="true">Disabled</ui-button>
+            <ui-button variant="solid" color="primary" [loading]="true">Loading</ui-button>
+          </div>
+        </div>
+        <div class="code-block">
+          <pre><code>&lt;!-- Normal state --&gt;
+&lt;ui-button&gt;Normal&lt;/ui-button&gt;
+
+&lt;!-- Disabled state --&gt;
+&lt;ui-button [disabled]="true"&gt;Disabled&lt;/ui-button&gt;
+
+&lt;!-- Loading state --&gt;
+&lt;ui-button [loading]="true"&gt;Loading&lt;/ui-button&gt;</code></pre>
+        </div>
       </div>
-      <div class="demo-row" style="margin-top: 1rem;">
-        <ui-button variant="outline" color="secondary" [uiTooltip]="'Helpful information appears here!'" tooltipPosition="top">Hover for Tooltip ⬆</ui-button>
-        <ui-button variant="soft" color="accent" [uiTooltip]="'Bottom tooltip'" tooltipPosition="bottom">Tooltip Below ⬇</ui-button>
-        <ui-button variant="ghost" color="info" [uiTooltip]="'Left tooltip'" tooltipPosition="left">← Tooltip Left</ui-button>
-        <ui-button variant="solid" color="success" [uiTooltip]="'Right tooltip'" tooltipPosition="right">Tooltip Right →</ui-button>
+      <h4 style="margin-top: 1.5rem;">Buttons with Tooltips</h4>
+      <div class="demo-with-code">
+        <div class="demo-preview">
+          <div class="demo-row">
+            <ui-button variant="outline" color="secondary" [uiTooltip]="'Helpful information appears here!'" tooltipPosition="top">Hover for Tooltip ⬆</ui-button>
+            <ui-button variant="soft" color="accent" [uiTooltip]="'Bottom tooltip'" tooltipPosition="bottom">Tooltip Below ⬇</ui-button>
+            <ui-button variant="ghost" color="info" [uiTooltip]="'Left tooltip'" tooltipPosition="left">← Tooltip Left</ui-button>
+            <ui-button variant="solid" color="success" [uiTooltip]="'Right tooltip'" tooltipPosition="right">Tooltip Right →</ui-button>
+          </div>
+        </div>
+        <div class="code-block">
+          <pre><code>&lt;ui-button
+  [uiTooltip]="'Helpful info'"
+  tooltipPosition="top"&gt;
+  Hover for Tooltip
+&lt;/ui-button&gt;
+
+&lt;!-- Positions: 'top' | 'bottom' | 'left' | 'right' --&gt;</code></pre>
+        </div>
       </div>
     </div>
 
     <div class="demo-group">
       <h3>Button Group</h3>
-      <div class="demo-row">
-        <ui-button-group>
-          <ui-button variant="outline" color="primary">Left</ui-button>
-          <ui-button variant="outline" color="primary">Center</ui-button>
-          <ui-button variant="outline" color="primary">Right</ui-button>
-        </ui-button-group>
+      <p class="component-hint">Use button groups to combine related buttons into a single visual unit.</p>
+      <div class="demo-with-code">
+        <div class="demo-preview">
+          <div class="demo-row">
+            <ui-button-group>
+              <ui-button variant="outline" color="primary">Left</ui-button>
+              <ui-button variant="outline" color="primary">Center</ui-button>
+              <ui-button variant="outline" color="primary">Right</ui-button>
+            </ui-button-group>
+          </div>
+        </div>
+        <div class="code-block">
+          <pre><code>&lt;ui-button-group&gt;
+  &lt;ui-button variant="outline" color="primary"&gt;Left&lt;/ui-button&gt;
+  &lt;ui-button variant="outline" color="primary"&gt;Center&lt;/ui-button&gt;
+  &lt;ui-button variant="outline" color="primary"&gt;Right&lt;/ui-button&gt;
+&lt;/ui-button-group&gt;</code></pre>
+        </div>
       </div>
     </div>
 
     <div class="demo-group">
       <h3>Icon Buttons - Variants</h3>
-      <div class="demo-row demo-row--align-center">
-        <ui-icon-button color="primary" variant="solid" ariaLabel="Home" tooltip="Solid">
-          <mat-icon>home</mat-icon>
-        </ui-icon-button>
-        <ui-icon-button color="secondary" variant="outline" ariaLabel="Settings" tooltip="Outline">
-          <mat-icon>settings</mat-icon>
-        </ui-icon-button>
-        <ui-icon-button color="danger" variant="ghost" ariaLabel="Delete" tooltip="Ghost">
-          <mat-icon>delete</mat-icon>
-        </ui-icon-button>
-        <ui-icon-button color="accent" variant="soft" ariaLabel="Edit" tooltip="Soft">
-          <mat-icon>edit</mat-icon>
-        </ui-icon-button>
+      <p class="component-hint">Icon buttons are compact buttons that contain only an icon. Perfect for toolbars and action menus.</p>
+      <div class="demo-with-code">
+        <div class="demo-preview">
+          <div class="demo-row demo-row--align-center">
+            <ui-icon-button color="primary" variant="solid" ariaLabel="Home" tooltip="Solid">
+              <mat-icon>home</mat-icon>
+            </ui-icon-button>
+            <ui-icon-button color="secondary" variant="outline" ariaLabel="Settings" tooltip="Outline">
+              <mat-icon>settings</mat-icon>
+            </ui-icon-button>
+            <ui-icon-button color="danger" variant="ghost" ariaLabel="Delete" tooltip="Ghost">
+              <mat-icon>delete</mat-icon>
+            </ui-icon-button>
+            <ui-icon-button color="accent" variant="soft" ariaLabel="Edit" tooltip="Soft">
+              <mat-icon>edit</mat-icon>
+            </ui-icon-button>
+          </div>
+        </div>
+        <div class="code-block">
+          <pre><code>&lt;ui-icon-button
+  color="primary"
+  variant="solid"
+  ariaLabel="Home"
+  tooltip="Solid"&gt;
+  &lt;mat-icon&gt;home&lt;/mat-icon&gt;
+&lt;/ui-icon-button&gt;
+
+&lt;ui-icon-button
+  color="secondary"
+  variant="outline"
+  ariaLabel="Settings"&gt;
+  &lt;mat-icon&gt;settings&lt;/mat-icon&gt;
+&lt;/ui-icon-button&gt;</code></pre>
+        </div>
       </div>
     </div>
 
     <div class="demo-group">
       <h3>Icon Buttons - Sizes</h3>
-      <div class="demo-row demo-row--align-center">
-        <ui-icon-button color="primary" size="xs" ariaLabel="Extra Small" tooltip="XS">
-          <mat-icon>star</mat-icon>
-        </ui-icon-button>
-        <ui-icon-button color="primary" size="sm" ariaLabel="Small" tooltip="SM">
-          <mat-icon>star</mat-icon>
-        </ui-icon-button>
-        <ui-icon-button color="primary" size="md" ariaLabel="Medium" tooltip="MD">
-          <mat-icon>star</mat-icon>
-        </ui-icon-button>
-        <ui-icon-button color="primary" size="lg" ariaLabel="Large" tooltip="LG">
-          <mat-icon>star</mat-icon>
-        </ui-icon-button>
-        <ui-icon-button color="primary" size="xl" ariaLabel="Extra Large" tooltip="XL">
-          <mat-icon>star</mat-icon>
-        </ui-icon-button>
+      <div class="demo-with-code">
+        <div class="demo-preview">
+          <div class="demo-row demo-row--align-center">
+            <ui-icon-button color="primary" size="xs" ariaLabel="Extra Small" tooltip="XS">
+              <mat-icon>star</mat-icon>
+            </ui-icon-button>
+            <ui-icon-button color="primary" size="sm" ariaLabel="Small" tooltip="SM">
+              <mat-icon>star</mat-icon>
+            </ui-icon-button>
+            <ui-icon-button color="primary" size="md" ariaLabel="Medium" tooltip="MD">
+              <mat-icon>star</mat-icon>
+            </ui-icon-button>
+            <ui-icon-button color="primary" size="lg" ariaLabel="Large" tooltip="LG">
+              <mat-icon>star</mat-icon>
+            </ui-icon-button>
+            <ui-icon-button color="primary" size="xl" ariaLabel="Extra Large" tooltip="XL">
+              <mat-icon>star</mat-icon>
+            </ui-icon-button>
+          </div>
+        </div>
+        <div class="code-block">
+          <pre><code>&lt;ui-icon-button size="xs"&gt;...&lt;/ui-icon-button&gt;
+&lt;ui-icon-button size="sm"&gt;...&lt;/ui-icon-button&gt;
+&lt;ui-icon-button size="md"&gt;...&lt;/ui-icon-button&gt;
+&lt;ui-icon-button size="lg"&gt;...&lt;/ui-icon-button&gt;
+&lt;ui-icon-button size="xl"&gt;...&lt;/ui-icon-button&gt;</code></pre>
+        </div>
       </div>
     </div>
 
     <div class="demo-group">
       <h3>Icon Buttons - States</h3>
-      <div class="demo-row demo-row--align-center">
-        <ui-icon-button color="primary" ariaLabel="Normal" tooltip="Normal">
-          <mat-icon>check_circle</mat-icon>
-        </ui-icon-button>
-        <ui-icon-button color="primary" [disabled]="true" ariaLabel="Disabled" tooltip="Disabled">
-          <mat-icon>block</mat-icon>
-        </ui-icon-button>
-        <ui-icon-button color="primary" [loading]="true" ariaLabel="Loading" tooltip="Loading">
-          <mat-icon>sync</mat-icon>
-        </ui-icon-button>
-        <ui-icon-button color="success" [rounded]="false" ariaLabel="Square" tooltip="Square (not rounded)">
-          <mat-icon>crop_square</mat-icon>
-        </ui-icon-button>
+      <div class="demo-with-code">
+        <div class="demo-preview">
+          <div class="demo-row demo-row--align-center">
+            <ui-icon-button color="primary" ariaLabel="Normal" tooltip="Normal">
+              <mat-icon>check_circle</mat-icon>
+            </ui-icon-button>
+            <ui-icon-button color="primary" [disabled]="true" ariaLabel="Disabled" tooltip="Disabled">
+              <mat-icon>block</mat-icon>
+            </ui-icon-button>
+            <ui-icon-button color="primary" [loading]="true" ariaLabel="Loading" tooltip="Loading">
+              <mat-icon>sync</mat-icon>
+            </ui-icon-button>
+            <ui-icon-button color="success" [rounded]="false" ariaLabel="Square" tooltip="Square (not rounded)">
+              <mat-icon>crop_square</mat-icon>
+            </ui-icon-button>
+          </div>
+        </div>
+        <div class="code-block">
+          <pre><code>&lt;!-- Normal --&gt;
+&lt;ui-icon-button ariaLabel="Check"&gt;
+  &lt;mat-icon&gt;check_circle&lt;/mat-icon&gt;
+&lt;/ui-icon-button&gt;
+
+&lt;!-- Disabled --&gt;
+&lt;ui-icon-button [disabled]="true"&gt;...&lt;/ui-icon-button&gt;
+
+&lt;!-- Loading --&gt;
+&lt;ui-icon-button [loading]="true"&gt;...&lt;/ui-icon-button&gt;
+
+&lt;!-- Square (not rounded) --&gt;
+&lt;ui-icon-button [rounded]="false"&gt;...&lt;/ui-icon-button&gt;</code></pre>
+        </div>
       </div>
     </div>
 
     <div class="demo-group">
       <h3>Icon Buttons - All Colors</h3>
-      <div class="demo-row demo-row--align-center">
-        @for (color of colors; track color) {
-          <ui-icon-button [color]="color" [ariaLabel]="color" [tooltip]="color | titlecase">
-            <mat-icon>favorite</mat-icon>
-          </ui-icon-button>
-        }
+      <div class="demo-with-code">
+        <div class="demo-preview">
+          <div class="demo-row demo-row--align-center">
+            @for (color of colors; track color) {
+              <ui-icon-button [color]="color" [ariaLabel]="color" [tooltip]="color | titlecase">
+                <mat-icon>favorite</mat-icon>
+              </ui-icon-button>
+            }
+          </div>
+        </div>
+        <div class="code-block">
+          <pre><code>&lt;ui-icon-button color="primary"&gt;...&lt;/ui-icon-button&gt;
+&lt;ui-icon-button color="secondary"&gt;...&lt;/ui-icon-button&gt;
+&lt;ui-icon-button color="accent"&gt;...&lt;/ui-icon-button&gt;
+&lt;ui-icon-button color="success"&gt;...&lt;/ui-icon-button&gt;
+&lt;ui-icon-button color="warning"&gt;...&lt;/ui-icon-button&gt;
+&lt;ui-icon-button color="danger"&gt;...&lt;/ui-icon-button&gt;
+&lt;ui-icon-button color="info"&gt;...&lt;/ui-icon-button&gt;
+&lt;ui-icon-button color="neutral"&gt;...&lt;/ui-icon-button&gt;</code></pre>
+        </div>
       </div>
     </div>
   </section>
@@ -192,50 +504,118 @@
   <!-- Badges Section -->
   <section class="showcase__section">
     <h2 class="section-title">Badges</h2>
+    <p class="component-description">Badges are small status indicators that highlight key information like counts, statuses, or labels.</p>
+
+    <div class="component-api">
+      <h4>API Reference</h4>
+      <table class="api-table">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>variant</code></td><td><code>'solid' | 'outline' | 'subtle' | 'dot'</code></td><td><code>'solid'</code></td><td>Visual style variant</td></tr>
+          <tr><td><code>color</code></td><td><code>'primary' | 'secondary' | 'accent' | 'success' | 'warning' | 'danger' | 'info' | 'neutral'</code></td><td><code>'primary'</code></td><td>Color scheme</td></tr>
+          <tr><td><code>size</code></td><td><code>'xs' | 'sm' | 'md' | 'lg' | 'xl'</code></td><td><code>'md'</code></td><td>Badge size</td></tr>
+        </tbody>
+      </table>
+    </div>
 
     <div class="demo-group">
       <h3>Badge Variants</h3>
-      <div class="demo-row">
-        <ui-badge variant="solid" color="primary">Solid</ui-badge>
-        <ui-badge variant="outline" color="primary">Outline</ui-badge>
-        <ui-badge variant="subtle" color="primary">Subtle</ui-badge>
-        <ui-badge variant="dot" color="primary">With Dot</ui-badge>
+      <div class="demo-with-code">
+        <div class="demo-preview">
+          <div class="demo-row">
+            <ui-badge variant="solid" color="primary">Solid</ui-badge>
+            <ui-badge variant="outline" color="primary">Outline</ui-badge>
+            <ui-badge variant="subtle" color="primary">Subtle</ui-badge>
+            <ui-badge variant="dot" color="primary">With Dot</ui-badge>
+          </div>
+        </div>
+        <div class="code-block">
+          <pre><code>&lt;ui-badge variant="solid" color="primary"&gt;Solid&lt;/ui-badge&gt;
+&lt;ui-badge variant="outline" color="primary"&gt;Outline&lt;/ui-badge&gt;
+&lt;ui-badge variant="subtle" color="primary"&gt;Subtle&lt;/ui-badge&gt;
+&lt;ui-badge variant="dot" color="primary"&gt;With Dot&lt;/ui-badge&gt;</code></pre>
+        </div>
       </div>
     </div>
 
     <div class="demo-group">
       <h3>Badge Colors</h3>
-      <div class="demo-row">
-        @for (color of colors; track color) {
-          <ui-badge variant="solid" [color]="color">{{ color | titlecase }}</ui-badge>
-        }
+      <div class="demo-with-code">
+        <div class="demo-preview">
+          <div class="demo-row">
+            @for (color of colors; track color) {
+              <ui-badge variant="solid" [color]="color">{{ color | titlecase }}</ui-badge>
+            }
+          </div>
+        </div>
+        <div class="code-block">
+          <pre><code>&lt;ui-badge color="primary"&gt;Primary&lt;/ui-badge&gt;
+&lt;ui-badge color="secondary"&gt;Secondary&lt;/ui-badge&gt;
+&lt;ui-badge color="accent"&gt;Accent&lt;/ui-badge&gt;
+&lt;ui-badge color="success"&gt;Success&lt;/ui-badge&gt;
+&lt;ui-badge color="warning"&gt;Warning&lt;/ui-badge&gt;
+&lt;ui-badge color="danger"&gt;Danger&lt;/ui-badge&gt;
+&lt;ui-badge color="info"&gt;Info&lt;/ui-badge&gt;
+&lt;ui-badge color="neutral"&gt;Neutral&lt;/ui-badge&gt;</code></pre>
+        </div>
       </div>
     </div>
 
     <div class="demo-group">
       <h3>Badge Sizes</h3>
-      <div class="demo-row demo-row--align-center">
-        @for (size of sizes; track size) {
-          <ui-badge variant="solid" color="accent" [size]="size">{{ size | uppercase }}</ui-badge>
-        }
+      <div class="demo-with-code">
+        <div class="demo-preview">
+          <div class="demo-row demo-row--align-center">
+            @for (size of sizes; track size) {
+              <ui-badge variant="solid" color="accent" [size]="size">{{ size | uppercase }}</ui-badge>
+            }
+          </div>
+        </div>
+        <div class="code-block">
+          <pre><code>&lt;ui-badge size="xs"&gt;XS&lt;/ui-badge&gt;
+&lt;ui-badge size="sm"&gt;SM&lt;/ui-badge&gt;
+&lt;ui-badge size="md"&gt;MD&lt;/ui-badge&gt;
+&lt;ui-badge size="lg"&gt;LG&lt;/ui-badge&gt;
+&lt;ui-badge size="xl"&gt;XL&lt;/ui-badge&gt;</code></pre>
+        </div>
       </div>
     </div>
 
     <div class="demo-group">
       <h3>Badge with Outline Variants</h3>
-      <div class="demo-row">
-        @for (color of colors; track color) {
-          <ui-badge variant="outline" [color]="color">{{ color | titlecase }}</ui-badge>
-        }
+      <div class="demo-with-code">
+        <div class="demo-preview">
+          <div class="demo-row">
+            @for (color of colors; track color) {
+              <ui-badge variant="outline" [color]="color">{{ color | titlecase }}</ui-badge>
+            }
+          </div>
+        </div>
+        <div class="code-block">
+          <pre><code>&lt;ui-badge variant="outline" color="primary"&gt;Primary&lt;/ui-badge&gt;
+&lt;ui-badge variant="outline" color="success"&gt;Success&lt;/ui-badge&gt;
+&lt;ui-badge variant="outline" color="danger"&gt;Danger&lt;/ui-badge&gt;</code></pre>
+        </div>
       </div>
     </div>
 
     <div class="demo-group">
       <h3>Subtle Badges</h3>
-      <div class="demo-row">
-        @for (color of colors; track color) {
-          <ui-badge variant="subtle" [color]="color">{{ color | titlecase }}</ui-badge>
-        }
+      <div class="demo-with-code">
+        <div class="demo-preview">
+          <div class="demo-row">
+            @for (color of colors; track color) {
+              <ui-badge variant="subtle" [color]="color">{{ color | titlecase }}</ui-badge>
+            }
+          </div>
+        </div>
+        <div class="code-block">
+          <pre><code>&lt;ui-badge variant="subtle" color="primary"&gt;Primary&lt;/ui-badge&gt;
+&lt;ui-badge variant="subtle" color="success"&gt;Success&lt;/ui-badge&gt;
+&lt;ui-badge variant="subtle" color="warning"&gt;Warning&lt;/ui-badge&gt;</code></pre>
+        </div>
       </div>
     </div>
   </section>
@@ -245,6 +625,7 @@
   <!-- Form Components Section -->
   <section class="showcase__section">
     <h2 class="section-title">Form Components</h2>
+    <p class="component-description">Form components enable user input and data collection. All form components support Angular's ngModel for two-way data binding.</p>
 
     <div class="demo-grid">
       <div class="demo-group">
@@ -265,6 +646,17 @@
           placeholder="Enter text..."
           variant="underlined"
         ></ui-input>
+        <div class="code-block code-block--inline">
+          <pre><code>&lt;ui-input
+  label="Outlined Input"
+  placeholder="Enter text..."
+  variant="outlined"
+  [(ngModel)]="inputValue"&gt;
+&lt;/ui-input&gt;
+
+&lt;ui-input variant="filled"&gt;&lt;/ui-input&gt;
+&lt;ui-input variant="underlined"&gt;&lt;/ui-input&gt;</code></pre>
+        </div>
       </div>
 
       <div class="demo-group">
@@ -294,6 +686,13 @@
           placeholder="XL size..."
           size="xl"
         ></ui-input>
+        <div class="code-block code-block--inline">
+          <pre><code>&lt;ui-input size="xs"&gt;&lt;/ui-input&gt;
+&lt;ui-input size="sm"&gt;&lt;/ui-input&gt;
+&lt;ui-input size="md"&gt;&lt;/ui-input&gt;
+&lt;ui-input size="lg"&gt;&lt;/ui-input&gt;
+&lt;ui-input size="xl"&gt;&lt;/ui-input&gt;</code></pre>
+        </div>
       </div>
 
       <div class="demo-group">
@@ -315,6 +714,19 @@
           placeholder="Disabled"
           [disabled]="true"
         ></ui-input>
+        <div class="code-block code-block--inline">
+          <pre><code>&lt;ui-input
+  validationState="valid"
+  helperText="This field is valid!"&gt;
+&lt;/ui-input&gt;
+
+&lt;ui-input
+  validationState="invalid"
+  errorMessage="This field has an error"&gt;
+&lt;/ui-input&gt;
+
+&lt;ui-input [disabled]="true"&gt;&lt;/ui-input&gt;</code></pre>
+        </div>
       </div>
 
       <div class="demo-group">
@@ -339,6 +751,16 @@
           <span slot="prefix">$</span>
           <span slot="suffix">USD</span>
         </ui-input>
+        <div class="code-block code-block--inline">
+          <pre><code>&lt;ui-input type="password"&gt;&lt;/ui-input&gt;
+
+&lt;ui-input [clearable]="true"&gt;&lt;/ui-input&gt;
+
+&lt;ui-input [prefix]="true" [suffix]="true"&gt;
+  &lt;span slot="prefix"&gt;$&lt;/span&gt;
+  &lt;span slot="suffix"&gt;USD&lt;/span&gt;
+&lt;/ui-input&gt;</code></pre>
+        </div>
       </div>
 
       <div class="demo-group">
@@ -351,6 +773,16 @@
           [showCharacterCount]="true"
           [maxlength]="200"
         ></ui-textarea>
+        <div class="code-block code-block--inline">
+          <pre><code>&lt;ui-textarea
+  label="Description"
+  placeholder="Enter description..."
+  [(ngModel)]="textareaValue"
+  [rows]="4"
+  [showCharacterCount]="true"
+  [maxlength]="200"&gt;
+&lt;/ui-textarea&gt;</code></pre>
+        </div>
       </div>
 
       <div class="demo-group">
@@ -363,6 +795,23 @@
           [searchable]="true"
           [clearable]="true"
         ></ui-select>
+        <div class="code-block code-block--inline">
+          <pre><code>&lt;ui-select
+  label="Framework"
+  placeholder="Select a framework..."
+  [options]="selectOptions"
+  [(ngModel)]="selectedOption"
+  [searchable]="true"
+  [clearable]="true"&gt;
+&lt;/ui-select&gt;
+
+// Options format:
+selectOptions = [
+  &#123; value: 'angular', label: 'Angular' &#125;,
+  &#123; value: 'react', label: 'React' &#125;,
+  &#123; value: 'vue', label: 'Vue' &#125;
+];</code></pre>
+        </div>
       </div>
 
       <div class="demo-group">
@@ -389,6 +838,16 @@
           <ui-checkbox label="Success" color="success" [(ngModel)]="demoCheckboxSuccess"></ui-checkbox>
           <ui-checkbox label="Warning" color="warning" [(ngModel)]="demoCheckboxWarning"></ui-checkbox>
           <ui-checkbox label="Danger" color="danger" [(ngModel)]="demoCheckboxDanger"></ui-checkbox>
+        </div>
+        <div class="code-block code-block--inline">
+          <pre><code>&lt;ui-checkbox
+  label="Accept terms"
+  [(ngModel)]="checkboxValue"
+  color="primary"&gt;
+&lt;/ui-checkbox&gt;
+
+&lt;ui-checkbox [indeterminate]="true"&gt;&lt;/ui-checkbox&gt;
+&lt;ui-checkbox [disabled]="true"&gt;&lt;/ui-checkbox&gt;</code></pre>
         </div>
       </div>
 
@@ -417,6 +876,16 @@
           <ui-toggle label="Warning" color="warning" [(ngModel)]="demoToggleWarning"></ui-toggle>
           <ui-toggle label="Danger" color="danger" [(ngModel)]="demoToggleDanger"></ui-toggle>
         </div>
+        <div class="code-block code-block--inline">
+          <pre><code>&lt;ui-toggle
+  label="Enable notifications"
+  [(ngModel)]="toggleValue"
+  color="success"&gt;
+&lt;/ui-toggle&gt;
+
+&lt;ui-toggle [showIcons]="true"&gt;&lt;/ui-toggle&gt;
+&lt;ui-toggle [disabled]="true"&gt;&lt;/ui-toggle&gt;</code></pre>
+        </div>
       </div>
 
       <div class="demo-group">
@@ -441,6 +910,24 @@
           value="option3"
           [disabled]="true"
         ></ui-radio>
+        <div class="code-block code-block--inline">
+          <pre><code>&lt;ui-radio
+  label="Option 1"
+  name="demo-radio"
+  value="option1"
+  [(ngModel)]="radioValue"
+  color="primary"&gt;
+&lt;/ui-radio&gt;
+
+&lt;ui-radio
+  label="Option 2"
+  name="demo-radio"
+  value="option2"
+  [(ngModel)]="radioValue"&gt;
+&lt;/ui-radio&gt;
+
+&lt;ui-radio [disabled]="true"&gt;&lt;/ui-radio&gt;</code></pre>
+        </div>
       </div>
     </div>
   </section>
@@ -450,6 +937,24 @@
   <!-- Cards Section -->
   <section class="showcase__section">
     <h2 class="section-title">Cards</h2>
+    <p class="component-description">Cards are flexible containers that group related content and actions. They provide visual separation and hierarchy to your UI.</p>
+
+    <div class="component-api">
+      <h4>API Reference</h4>
+      <table class="api-table">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>variant</code></td><td><code>'elevated' | 'outlined' | 'filled' | 'glass'</code></td><td><code>'elevated'</code></td><td>Visual style variant</td></tr>
+          <tr><td><code>size</code></td><td><code>'sm' | 'md' | 'lg'</code></td><td><code>'md'</code></td><td>Card padding size</td></tr>
+          <tr><td><code>title</code></td><td><code>string</code></td><td>-</td><td>Card header title</td></tr>
+          <tr><td><code>subtitle</code></td><td><code>string</code></td><td>-</td><td>Card header subtitle</td></tr>
+          <tr><td><code>clickable</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Makes the card interactive</td></tr>
+          <tr><td><code>hoverable</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Enables hover lift effect</td></tr>
+        </tbody>
+      </table>
+    </div>
 
     <div class="demo-group">
       <h3>Card Variants</h3>
@@ -489,6 +994,24 @@
         <p>This card is fully interactive! Notice the scale effect on hover and the different active state.</p>
       </ui-card>
     </div>
+    <div class="code-block" style="margin-top: 1rem;">
+      <pre><code>&lt;ui-card
+  title="Elevated Card"
+  subtitle="Floating with shadow"
+  variant="elevated"&gt;
+  &lt;p&gt;Card content goes here...&lt;/p&gt;
+&lt;/ui-card&gt;
+
+&lt;ui-card variant="outlined"&gt;...&lt;/ui-card&gt;
+&lt;ui-card variant="filled"&gt;...&lt;/ui-card&gt;
+
+&lt;!-- Clickable card --&gt;
+&lt;ui-card
+  [clickable]="true"
+  (cardClick)="onCardClick()"&gt;
+  ...
+&lt;/ui-card&gt;</code></pre>
+    </div>
 
     <div class="demo-group">
       <h3>Card Sizes</h3>
@@ -518,6 +1041,11 @@
         <p>Extra spacious padding for prominent content.</p>
       </ui-card>
     </div>
+    <div class="code-block" style="margin-top: 1rem;">
+      <pre><code>&lt;ui-card size="sm"&gt;...&lt;/ui-card&gt;
+&lt;ui-card size="md"&gt;...&lt;/ui-card&gt;  &lt;!-- default --&gt;
+&lt;ui-card size="lg"&gt;...&lt;/ui-card&gt;</code></pre>
+    </div>
 
     <div class="demo-group">
       <h3>Card with Hoverable Effect</h3>
@@ -541,6 +1069,10 @@
         <p>This card stays in place without hover effects.</p>
       </ui-card>
     </div>
+    <div class="code-block" style="margin-top: 1rem;">
+      <pre><code>&lt;ui-card [hoverable]="true"&gt;...&lt;/ui-card&gt;
+&lt;ui-card [hoverable]="false"&gt;...&lt;/ui-card&gt;</code></pre>
+    </div>
 
     <div class="demo-group">
       <h3>Glass Card (Blur Effect)</h3>
@@ -554,8 +1086,14 @@
         <p>This card has a glass/frosted effect, perfect for overlaying on images or colored backgrounds.</p>
       </ui-card>
     </div>
+    <div class="code-block" style="margin-top: 1rem;">
+      <pre><code>&lt;ui-card variant="glass"&gt;
+  &lt;p&gt;Glass effect card content&lt;/p&gt;
+&lt;/ui-card&gt;</code></pre>
+    </div>
 
     <h3 style="margin-top: 2rem;">Stat Cards</h3>
+    <p class="component-description">Stat cards display key metrics with optional trends and progress indicators.</p>
     <div class="demo-grid demo-grid--stats">
       <ui-stat-card
         label="Total Users"
@@ -595,6 +1133,35 @@
         color="info"
       ></ui-stat-card>
     </div>
+    <div class="code-block" style="margin-top: 1rem;">
+      <pre><code>&lt;ui-stat-card
+  label="Total Users"
+  [value]="12847"
+  [showTrend]="true"
+  [trendValue]="12.5"
+  trendDirection="up"
+  description="vs last month"
+  color="primary"&gt;
+&lt;/ui-stat-card&gt;
+
+&lt;!-- With currency format --&gt;
+&lt;ui-stat-card
+  label="Revenue"
+  [value]="48520"
+  format="currency"
+  [showTrend]="true"
+  [trendValue]="-3.2"
+  trendDirection="down"&gt;
+&lt;/ui-stat-card&gt;
+
+&lt;!-- With progress bar --&gt;
+&lt;ui-stat-card
+  label="Active Sessions"
+  [value]="342"
+  [showProgress]="true"
+  [progress]="68"&gt;
+&lt;/ui-stat-card&gt;</code></pre>
+    </div>
 
     <h3 style="margin-top: 2rem;">Stat Cards - All Colors</h3>
     <div class="demo-grid demo-grid--stats">
@@ -616,94 +1183,258 @@
   <!-- Alerts Section -->
   <section class="showcase__section">
     <h2 class="section-title">Alerts</h2>
+    <p class="component-description">Alerts provide contextual feedback messages for user actions. Use different colors and variants to convey the importance and type of message.</p>
+
+    <div class="component-api">
+      <h4>API Reference</h4>
+      <table class="api-table">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>variant</code></td><td><code>'soft' | 'filled' | 'outlined' | 'accent'</code></td><td><code>'soft'</code></td><td>Visual style variant</td></tr>
+          <tr><td><code>color</code></td><td><code>'info' | 'success' | 'warning' | 'danger' | 'primary'</code></td><td><code>'info'</code></td><td>Color scheme based on message type</td></tr>
+          <tr><td><code>title</code></td><td><code>string</code></td><td>-</td><td>Alert title/header</td></tr>
+          <tr><td><code>dismissible</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Shows close button</td></tr>
+        </tbody>
+      </table>
+    </div>
 
     <div class="demo-group">
       <h3>Alert Colors - Soft Variant</h3>
-      <ui-alert color="info" variant="soft" title="Information">
-        This is an informational message for the user.
-      </ui-alert>
-      <ui-alert color="success" variant="soft" title="Success!">
-        Your changes have been saved successfully.
-      </ui-alert>
-      <ui-alert color="warning" variant="soft" title="Warning">
-        Please review your input before submitting.
-      </ui-alert>
-      <ui-alert color="danger" variant="soft" title="Error">
-        Something went wrong. Please try again.
-      </ui-alert>
+      <div class="demo-with-code">
+        <div class="demo-preview demo-preview--vertical">
+          <ui-alert color="info" variant="soft" title="Information">
+            This is an informational message for the user.
+          </ui-alert>
+          <ui-alert color="success" variant="soft" title="Success!">
+            Your changes have been saved successfully.
+          </ui-alert>
+          <ui-alert color="warning" variant="soft" title="Warning">
+            Please review your input before submitting.
+          </ui-alert>
+          <ui-alert color="danger" variant="soft" title="Error">
+            Something went wrong. Please try again.
+          </ui-alert>
+        </div>
+        <div class="code-block">
+          <pre><code>&lt;ui-alert color="info" variant="soft" title="Information"&gt;
+  This is an informational message.
+&lt;/ui-alert&gt;
+
+&lt;ui-alert color="success" variant="soft" title="Success!"&gt;
+  Your changes have been saved.
+&lt;/ui-alert&gt;
+
+&lt;ui-alert color="warning" variant="soft" title="Warning"&gt;
+  Please review your input.
+&lt;/ui-alert&gt;
+
+&lt;ui-alert color="danger" variant="soft" title="Error"&gt;
+  Something went wrong.
+&lt;/ui-alert&gt;</code></pre>
+        </div>
+      </div>
     </div>
 
     <div class="demo-group">
       <h3>Alert Colors - Filled Variant</h3>
-      <ui-alert color="info" variant="filled" title="Information">
-        This is a filled info alert with strong presence.
-      </ui-alert>
-      <ui-alert color="success" variant="filled" title="Success!">
-        Operation completed successfully!
-      </ui-alert>
-      <ui-alert color="warning" variant="filled" title="Warning">
-        This action cannot be undone.
-      </ui-alert>
-      <ui-alert color="danger" variant="filled" title="Critical Error">
-        System failure detected.
-      </ui-alert>
+      <div class="demo-with-code">
+        <div class="demo-preview demo-preview--vertical">
+          <ui-alert color="info" variant="filled" title="Information">
+            This is a filled info alert with strong presence.
+          </ui-alert>
+          <ui-alert color="success" variant="filled" title="Success!">
+            Operation completed successfully!
+          </ui-alert>
+          <ui-alert color="warning" variant="filled" title="Warning">
+            This action cannot be undone.
+          </ui-alert>
+          <ui-alert color="danger" variant="filled" title="Critical Error">
+            System failure detected.
+          </ui-alert>
+        </div>
+        <div class="code-block">
+          <pre><code>&lt;ui-alert color="info" variant="filled" title="Information"&gt;
+  Filled info alert with strong presence.
+&lt;/ui-alert&gt;
+
+&lt;ui-alert color="success" variant="filled"&gt;...&lt;/ui-alert&gt;
+&lt;ui-alert color="warning" variant="filled"&gt;...&lt;/ui-alert&gt;
+&lt;ui-alert color="danger" variant="filled"&gt;...&lt;/ui-alert&gt;</code></pre>
+        </div>
+      </div>
     </div>
 
     <div class="demo-group">
       <h3>Alert Colors - Outlined Variant</h3>
-      <ui-alert color="info" variant="outlined" title="Note">
-        This is an outlined info alert.
-      </ui-alert>
-      <ui-alert color="success" variant="outlined" title="Completed">
-        Task has been completed.
-      </ui-alert>
-      <ui-alert color="warning" variant="outlined" title="Caution">
-        Proceed with caution.
-      </ui-alert>
-      <ui-alert color="danger" variant="outlined" title="Alert">
-        Please fix the following errors.
-      </ui-alert>
+      <div class="demo-with-code">
+        <div class="demo-preview demo-preview--vertical">
+          <ui-alert color="info" variant="outlined" title="Note">
+            This is an outlined info alert.
+          </ui-alert>
+          <ui-alert color="success" variant="outlined" title="Completed">
+            Task has been completed.
+          </ui-alert>
+          <ui-alert color="warning" variant="outlined" title="Caution">
+            Proceed with caution.
+          </ui-alert>
+          <ui-alert color="danger" variant="outlined" title="Alert">
+            Please fix the following errors.
+          </ui-alert>
+        </div>
+        <div class="code-block">
+          <pre><code>&lt;ui-alert color="info" variant="outlined"&gt;
+  Outlined alert with border.
+&lt;/ui-alert&gt;</code></pre>
+        </div>
+      </div>
     </div>
 
     <div class="demo-group">
       <h3>Alert Colors - Accent Variant</h3>
-      <ui-alert color="info" variant="accent" title="Tip">
-        This is an accent info alert with left border.
-      </ui-alert>
-      <ui-alert color="success" variant="accent" title="Done">
-        Your profile has been updated.
-      </ui-alert>
-      <ui-alert color="warning" variant="accent" title="Reminder">
-        Don't forget to save your work.
-      </ui-alert>
-      <ui-alert color="danger" variant="accent" title="Urgent" [dismissible]="true">
-        Your session will expire soon. Click X to dismiss.
-      </ui-alert>
+      <div class="demo-with-code">
+        <div class="demo-preview demo-preview--vertical">
+          <ui-alert color="info" variant="accent" title="Tip">
+            This is an accent info alert with left border.
+          </ui-alert>
+          <ui-alert color="success" variant="accent" title="Done">
+            Your profile has been updated.
+          </ui-alert>
+          <ui-alert color="warning" variant="accent" title="Reminder">
+            Don't forget to save your work.
+          </ui-alert>
+          <ui-alert color="danger" variant="accent" title="Urgent" [dismissible]="true">
+            Your session will expire soon. Click X to dismiss.
+          </ui-alert>
+        </div>
+        <div class="code-block">
+          <pre><code>&lt;ui-alert color="info" variant="accent" title="Tip"&gt;
+  Accent alert with left border.
+&lt;/ui-alert&gt;
+
+&lt;!-- Dismissible alert --&gt;
+&lt;ui-alert
+  color="danger"
+  variant="accent"
+  [dismissible]="true"&gt;
+  Click X to dismiss.
+&lt;/ui-alert&gt;</code></pre>
+        </div>
+      </div>
     </div>
 
     <div class="demo-group">
       <h3>Dismissible Alerts</h3>
-      <ui-alert color="primary" variant="soft" title="Notification" [dismissible]="true">
-        This alert can be dismissed by clicking the X button.
-      </ui-alert>
+      <div class="demo-with-code">
+        <div class="demo-preview">
+          <ui-alert color="primary" variant="soft" title="Notification" [dismissible]="true">
+            This alert can be dismissed by clicking the X button.
+          </ui-alert>
+        </div>
+        <div class="code-block">
+          <pre><code>&lt;ui-alert
+  color="primary"
+  variant="soft"
+  title="Notification"
+  [dismissible]="true"&gt;
+  This alert can be dismissed.
+&lt;/ui-alert&gt;</code></pre>
+        </div>
+      </div>
     </div>
 
     <div class="demo-group">
       <h3>Modals</h3>
-      <div class="demo-row">
-        <ui-button variant="solid" color="primary" (click)="openModal('sm')">Small Modal</ui-button>
-        <ui-button variant="solid" color="secondary" (click)="openModal('md')">Medium Modal</ui-button>
-        <ui-button variant="solid" color="accent" (click)="openModal('lg')">Large Modal</ui-button>
+      <p class="component-description">Modals are dialog overlays that focus user attention on important content or actions.</p>
+      <div class="demo-with-code">
+        <div class="demo-preview">
+          <div class="demo-row">
+            <ui-button variant="solid" color="primary" (click)="openModal('sm')">Small Modal</ui-button>
+            <ui-button variant="solid" color="secondary" (click)="openModal('md')">Medium Modal</ui-button>
+            <ui-button variant="solid" color="accent" (click)="openModal('lg')">Large Modal</ui-button>
+          </div>
+        </div>
+        <div class="code-block">
+          <pre><code>&lt;!-- Trigger button --&gt;
+&lt;ui-button (click)="openModal('md')"&gt;Open Modal&lt;/ui-button&gt;
+
+&lt;!-- Modal component --&gt;
+&#64;if (isModalOpen()) &#123;
+  &lt;ui-modal
+    [isOpen]="isModalOpen()"
+    [size]="modalSize"
+    title="Example Modal"
+    [showCloseButton]="true"
+    (close)="closeModal()"&gt;
+    &lt;p&gt;Modal content goes here.&lt;/p&gt;
+    &lt;div style="margin-top: 1.5rem;"&gt;
+      &lt;ui-button (click)="closeModal()"&gt;Cancel&lt;/ui-button&gt;
+      &lt;ui-button (click)="confirm()"&gt;Confirm&lt;/ui-button&gt;
+    &lt;/div&gt;
+  &lt;/ui-modal&gt;
+&#125;
+
+// In component.ts:
+isModalOpen = signal(false);
+modalSize: 'sm' | 'md' | 'lg' | 'xl' = 'md';
+
+openModal(size: 'sm' | 'md' | 'lg') &#123;
+  this.modalSize = size;
+  this.isModalOpen.set(true);
+&#125;
+
+closeModal() &#123;
+  this.isModalOpen.set(false);
+&#125;</code></pre>
+        </div>
       </div>
     </div>
 
     <div class="demo-group">
       <h3>Toast Notifications</h3>
-      <div class="demo-row">
-        <ui-button variant="soft" color="success" (click)="showToastNotification('success')">Success Toast</ui-button>
-        <ui-button variant="soft" color="danger" (click)="showToastNotification('danger')">Error Toast</ui-button>
-        <ui-button variant="soft" color="warning" (click)="showToastNotification('warning')">Warning Toast</ui-button>
-        <ui-button variant="soft" color="info" (click)="showToastNotification('info')">Info Toast</ui-button>
+      <p class="component-description">Toasts provide brief, non-blocking notifications that auto-dismiss.</p>
+      <div class="demo-with-code">
+        <div class="demo-preview">
+          <div class="demo-row">
+            <ui-button variant="soft" color="success" (click)="showToastNotification('success')">Success Toast</ui-button>
+            <ui-button variant="soft" color="danger" (click)="showToastNotification('danger')">Error Toast</ui-button>
+            <ui-button variant="soft" color="warning" (click)="showToastNotification('warning')">Warning Toast</ui-button>
+            <ui-button variant="soft" color="info" (click)="showToastNotification('info')">Info Toast</ui-button>
+          </div>
+        </div>
+        <div class="code-block">
+          <pre><code>&lt;!-- Trigger buttons --&gt;
+&lt;ui-button (click)="showToastNotification('success')"&gt;
+  Success Toast
+&lt;/ui-button&gt;
+
+&lt;!-- Toast component --&gt;
+&#64;if (showToast()) &#123;
+  &lt;ui-toast
+    [message]="'Operation completed!'"
+    [color]="toastColor"
+    [title]="'Success!'"
+    position="top-right"
+    [duration]="4000"
+    [showProgress]="true"
+    (dismiss)="hideToast()"&gt;
+  &lt;/ui-toast&gt;
+&#125;
+
+// In component.ts:
+showToast = signal(false);
+toastColor: 'success' | 'danger' | 'warning' | 'info' = 'success';
+
+showToastNotification(color: string) &#123;
+  this.toastColor = color;
+  this.showToast.set(true);
+&#125;
+
+hideToast() &#123;
+  this.showToast.set(false);
+&#125;</code></pre>
+        </div>
       </div>
     </div>
   </section>
@@ -713,6 +1444,26 @@
   <!-- Table Section -->
   <section class="showcase__section">
     <h2 class="section-title">Data Table</h2>
+    <p class="component-description">Tables display structured data with support for sorting, selection, pagination, and custom styling.</p>
+
+    <div class="component-api">
+      <h4>API Reference</h4>
+      <table class="api-table">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>columns</code></td><td><code>TableColumn[]</code></td><td>-</td><td>Array of column definitions</td></tr>
+          <tr><td><code>data</code></td><td><code>any[]</code></td><td>-</td><td>Data rows to display</td></tr>
+          <tr><td><code>variant</code></td><td><code>'default' | 'striped' | 'bordered'</code></td><td><code>'default'</code></td><td>Table visual style</td></tr>
+          <tr><td><code>size</code></td><td><code>'sm' | 'md' | 'lg'</code></td><td><code>'md'</code></td><td>Row height</td></tr>
+          <tr><td><code>selectable</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Enable row selection</td></tr>
+          <tr><td><code>showPagination</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Show pagination controls</td></tr>
+          <tr><td><code>loading</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Show loading state</td></tr>
+          <tr><td><code>emptyMessage</code></td><td><code>string</code></td><td>-</td><td>Message when no data</td></tr>
+        </tbody>
+      </table>
+    </div>
 
     <div class="demo-group">
       <h3>Striped Table (with Selection & Pagination)</h3>
@@ -726,6 +1477,33 @@
         (sortChange)="onTableSort($event)"
         (selectionChange)="onTableSelectionChange($event)"
       ></ui-table>
+      <div class="code-block" style="margin-top: 1rem;">
+        <pre><code>&lt;ui-table
+  [columns]="tableColumns"
+  [data]="tableData"
+  [selectable]="true"
+  variant="striped"
+  [showPagination]="true"
+  [pagination]="tablePagination"
+  (sortChange)="onTableSort($event)"
+  (selectionChange)="onTableSelectionChange($event)"&gt;
+&lt;/ui-table&gt;
+
+// Column definition:
+tableColumns: TableColumn[] = [
+  &#123; key: 'id', label: 'ID', sortable: true &#125;,
+  &#123; key: 'name', label: 'Name', sortable: true &#125;,
+  &#123; key: 'email', label: 'Email' &#125;,
+  &#123; key: 'status', label: 'Status' &#125;
+];
+
+// Pagination config:
+tablePagination = &#123;
+  page: 1,
+  pageSize: 5,
+  total: 20
+&#125;;</code></pre>
+      </div>
     </div>
 
     <div class="demo-group">
@@ -736,6 +1514,14 @@
         variant="bordered"
         [rowClickable]="true"
       ></ui-table>
+      <div class="code-block" style="margin-top: 1rem;">
+        <pre><code>&lt;ui-table
+  [columns]="tableColumns"
+  [data]="tableData"
+  variant="bordered"
+  [rowClickable]="true"&gt;
+&lt;/ui-table&gt;</code></pre>
+      </div>
     </div>
 
     <div class="demo-group">
@@ -747,6 +1533,14 @@
         size="sm"
         [compact]="true"
       ></ui-table>
+      <div class="code-block" style="margin-top: 1rem;">
+        <pre><code>&lt;ui-table
+  [columns]="tableColumns"
+  [data]="tableData"
+  size="sm"
+  [compact]="true"&gt;
+&lt;/ui-table&gt;</code></pre>
+      </div>
     </div>
 
     <div class="demo-group">
@@ -757,6 +1551,13 @@
         variant="striped"
         [loading]="true"
       ></ui-table>
+      <div class="code-block" style="margin-top: 1rem;">
+        <pre><code>&lt;ui-table
+  [columns]="tableColumns"
+  [data]="[]"
+  [loading]="true"&gt;
+&lt;/ui-table&gt;</code></pre>
+      </div>
     </div>
 
     <div class="demo-group">
@@ -767,6 +1568,13 @@
         variant="bordered"
         emptyMessage="No records found. Try adjusting your filters."
       ></ui-table>
+      <div class="code-block" style="margin-top: 1rem;">
+        <pre><code>&lt;ui-table
+  [columns]="tableColumns"
+  [data]="[]"
+  emptyMessage="No records found."&gt;
+&lt;/ui-table&gt;</code></pre>
+      </div>
     </div>
   </section>
 
@@ -775,120 +1583,224 @@
   <!-- Display Components Section -->
   <section class="showcase__section">
     <h2 class="section-title">Display Components</h2>
+    <p class="component-description">Display components enhance UI presentation with avatars, links, and visual separators.</p>
 
     <div class="demo-group">
       <h3>Avatar Sizes</h3>
-      <div class="demo-row demo-row--align-center">
-        <ui-avatar
-          src="https://i.pravatar.cc/150?img=1"
-          alt="User 1"
-          size="xs"
-        ></ui-avatar>
-        <ui-avatar
-          src="https://i.pravatar.cc/150?img=2"
-          alt="User 2"
-          size="sm"
-        ></ui-avatar>
-        <ui-avatar
-          src="https://i.pravatar.cc/150?img=3"
-          alt="User 3"
-          size="md"
-        ></ui-avatar>
-        <ui-avatar
-          src="https://i.pravatar.cc/150?img=4"
-          alt="User 4"
-          size="lg"
-        ></ui-avatar>
-        <ui-avatar
-          src="https://i.pravatar.cc/150?img=5"
-          alt="User 5"
-          size="xl"
-        ></ui-avatar>
+      <div class="demo-with-code">
+        <div class="demo-preview">
+          <div class="demo-row demo-row--align-center">
+            <ui-avatar
+              src="https://i.pravatar.cc/150?img=1"
+              alt="User 1"
+              size="xs"
+            ></ui-avatar>
+            <ui-avatar
+              src="https://i.pravatar.cc/150?img=2"
+              alt="User 2"
+              size="sm"
+            ></ui-avatar>
+            <ui-avatar
+              src="https://i.pravatar.cc/150?img=3"
+              alt="User 3"
+              size="md"
+            ></ui-avatar>
+            <ui-avatar
+              src="https://i.pravatar.cc/150?img=4"
+              alt="User 4"
+              size="lg"
+            ></ui-avatar>
+            <ui-avatar
+              src="https://i.pravatar.cc/150?img=5"
+              alt="User 5"
+              size="xl"
+            ></ui-avatar>
+          </div>
+        </div>
+        <div class="code-block">
+          <pre><code>&lt;ui-avatar
+  src="https://example.com/avatar.jpg"
+  alt="User Name"
+  size="xs"&gt;
+&lt;/ui-avatar&gt;
+
+&lt;!-- Sizes: 'xs' | 'sm' | 'md' | 'lg' | 'xl' --&gt;</code></pre>
+        </div>
       </div>
     </div>
 
     <div class="demo-group">
       <h3>Avatar Shapes</h3>
-      <div class="demo-row demo-row--align-center">
-        <ui-avatar initials="CR" color="primary" shape="circle" size="lg"></ui-avatar>
-        <ui-avatar initials="RD" color="secondary" shape="rounded" size="lg"></ui-avatar>
-        <ui-avatar initials="SQ" color="accent" shape="square" size="lg"></ui-avatar>
+      <div class="demo-with-code">
+        <div class="demo-preview">
+          <div class="demo-row demo-row--align-center">
+            <ui-avatar initials="CR" color="primary" shape="circle" size="lg"></ui-avatar>
+            <ui-avatar initials="RD" color="secondary" shape="rounded" size="lg"></ui-avatar>
+            <ui-avatar initials="SQ" color="accent" shape="square" size="lg"></ui-avatar>
+          </div>
+        </div>
+        <div class="code-block">
+          <pre><code>&lt;ui-avatar shape="circle"&gt;&lt;/ui-avatar&gt;
+&lt;ui-avatar shape="rounded"&gt;&lt;/ui-avatar&gt;
+&lt;ui-avatar shape="square"&gt;&lt;/ui-avatar&gt;</code></pre>
+        </div>
       </div>
     </div>
 
     <div class="demo-group">
       <h3>Avatar with Initials (All Colors)</h3>
-      <div class="demo-row demo-row--align-center">
-        @for (color of colors; track color) {
-          <ui-avatar [initials]="color.slice(0,2).toUpperCase()" [color]="color" size="md"></ui-avatar>
-        }
+      <div class="demo-with-code">
+        <div class="demo-preview">
+          <div class="demo-row demo-row--align-center">
+            @for (color of colors; track color) {
+              <ui-avatar [initials]="color.slice(0,2).toUpperCase()" [color]="color" size="md"></ui-avatar>
+            }
+          </div>
+        </div>
+        <div class="code-block">
+          <pre><code>&lt;ui-avatar
+  initials="JD"
+  color="primary"
+  size="md"&gt;
+&lt;/ui-avatar&gt;
+
+&lt;!-- Colors: 'primary' | 'secondary' | 'accent' |
+             'success' | 'warning' | 'danger' |
+             'info' | 'neutral' --&gt;</code></pre>
+        </div>
       </div>
     </div>
 
     <div class="demo-group">
       <h3>Avatar with Status Badge</h3>
-      <div class="demo-row demo-row--align-center">
-        <ui-avatar
-          src="https://i.pravatar.cc/150?img=10"
-          size="lg"
-          [showBadge]="true"
-          badgeColor="success"
-        ></ui-avatar>
-        <ui-avatar
-          initials="JD"
-          size="lg"
-          color="primary"
-          [showBadge]="true"
-          badgeColor="warning"
-        ></ui-avatar>
-        <ui-avatar
-          initials="OF"
-          size="lg"
-          color="neutral"
-          [showBadge]="true"
-          badgeColor="danger"
-        ></ui-avatar>
-        <ui-avatar
-          src="https://i.pravatar.cc/150?img=15"
-          size="lg"
-          [showBadge]="true"
-          badgeColor="info"
-        ></ui-avatar>
+      <div class="demo-with-code">
+        <div class="demo-preview">
+          <div class="demo-row demo-row--align-center">
+            <ui-avatar
+              src="https://i.pravatar.cc/150?img=10"
+              size="lg"
+              [showBadge]="true"
+              badgeColor="success"
+            ></ui-avatar>
+            <ui-avatar
+              initials="JD"
+              size="lg"
+              color="primary"
+              [showBadge]="true"
+              badgeColor="warning"
+            ></ui-avatar>
+            <ui-avatar
+              initials="OF"
+              size="lg"
+              color="neutral"
+              [showBadge]="true"
+              badgeColor="danger"
+            ></ui-avatar>
+            <ui-avatar
+              src="https://i.pravatar.cc/150?img=15"
+              size="lg"
+              [showBadge]="true"
+              badgeColor="info"
+            ></ui-avatar>
+          </div>
+        </div>
+        <div class="code-block">
+          <pre><code>&lt;ui-avatar
+  src="https://example.com/avatar.jpg"
+  size="lg"
+  [showBadge]="true"
+  badgeColor="success"&gt;
+&lt;/ui-avatar&gt;
+
+&lt;!-- Badge indicates online/offline status --&gt;
+&lt;!-- badgeColor: 'success' (online),
+                'warning' (away),
+                'danger' (busy),
+                'info' (custom) --&gt;</code></pre>
+        </div>
       </div>
     </div>
 
     <div class="demo-group">
       <h3>Links</h3>
-      <div class="demo-row">
-        <ui-link href="/">Default Link</ui-link>
-        <ui-link href="/" color="primary">Primary Link</ui-link>
-        <ui-link href="/" color="secondary">Secondary Link</ui-link>
-        <ui-link href="/" color="accent" underline="always">Always Underlined</ui-link>
-        <ui-link href="https://google.com" [external]="true">External Link ↗</ui-link>
-      </div>
-      <div class="demo-row" style="margin-top: 0.5rem;">
-        <ui-link href="/" color="success">Success Link</ui-link>
-        <ui-link href="/" color="warning">Warning Link</ui-link>
-        <ui-link href="/" color="danger">Danger Link</ui-link>
-        <ui-link href="/" color="info">Info Link</ui-link>
-        <ui-link href="/" underline="none">No Underline</ui-link>
+      <div class="demo-with-code">
+        <div class="demo-preview">
+          <div class="demo-row">
+            <ui-link href="/">Default Link</ui-link>
+            <ui-link href="/" color="primary">Primary Link</ui-link>
+            <ui-link href="/" color="secondary">Secondary Link</ui-link>
+            <ui-link href="/" color="accent" underline="always">Always Underlined</ui-link>
+            <ui-link href="https://google.com" [external]="true">External Link ↗</ui-link>
+          </div>
+          <div class="demo-row" style="margin-top: 0.5rem;">
+            <ui-link href="/" color="success">Success Link</ui-link>
+            <ui-link href="/" color="warning">Warning Link</ui-link>
+            <ui-link href="/" color="danger">Danger Link</ui-link>
+            <ui-link href="/" color="info">Info Link</ui-link>
+            <ui-link href="/" underline="none">No Underline</ui-link>
+          </div>
+        </div>
+        <div class="code-block">
+          <pre><code>&lt;ui-link href="/"&gt;Default Link&lt;/ui-link&gt;
+
+&lt;ui-link href="/" color="primary"&gt;Primary&lt;/ui-link&gt;
+
+&lt;ui-link href="/" underline="always"&gt;
+  Always Underlined
+&lt;/ui-link&gt;
+
+&lt;!-- External link (opens in new tab) --&gt;
+&lt;ui-link href="https://google.com" [external]="true"&gt;
+  External Link ↗
+&lt;/ui-link&gt;
+
+&lt;!-- Underline options: 'hover' | 'always' | 'none' --&gt;</code></pre>
+        </div>
       </div>
     </div>
 
     <div class="demo-group">
       <h3>Dividers</h3>
-      <p>Solid divider:</p>
-      <ui-divider></ui-divider>
-      <p>Dashed divider:</p>
-      <ui-divider variant="dashed"></ui-divider>
-      <p>Dotted divider:</p>
-      <ui-divider variant="dotted"></ui-divider>
-      <p>Divider with label (left):</p>
-      <ui-divider label="Section Start" labelPosition="left"></ui-divider>
-      <p>Divider with label (center):</p>
-      <ui-divider label="OR" labelPosition="center"></ui-divider>
-      <p>Divider with label (right):</p>
-      <ui-divider label="Section End" labelPosition="right"></ui-divider>
+      <div class="demo-with-code">
+        <div class="demo-preview demo-preview--vertical">
+          <p>Solid divider:</p>
+          <ui-divider></ui-divider>
+          <p>Dashed divider:</p>
+          <ui-divider variant="dashed"></ui-divider>
+          <p>Dotted divider:</p>
+          <ui-divider variant="dotted"></ui-divider>
+          <p>Divider with label (left):</p>
+          <ui-divider label="Section Start" labelPosition="left"></ui-divider>
+          <p>Divider with label (center):</p>
+          <ui-divider label="OR" labelPosition="center"></ui-divider>
+          <p>Divider with label (right):</p>
+          <ui-divider label="Section End" labelPosition="right"></ui-divider>
+        </div>
+        <div class="code-block">
+          <pre><code>&lt;!-- Basic divider --&gt;
+&lt;ui-divider&gt;&lt;/ui-divider&gt;
+
+&lt;!-- Variants --&gt;
+&lt;ui-divider variant="dashed"&gt;&lt;/ui-divider&gt;
+&lt;ui-divider variant="dotted"&gt;&lt;/ui-divider&gt;
+
+&lt;!-- With label --&gt;
+&lt;ui-divider
+  label="Section"
+  labelPosition="left"&gt;
+&lt;/ui-divider&gt;
+
+&lt;ui-divider
+  label="OR"
+  labelPosition="center"&gt;
+&lt;/ui-divider&gt;
+
+&lt;ui-divider
+  label="End"
+  labelPosition="right"&gt;
+&lt;/ui-divider&gt;</code></pre>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -897,114 +1809,258 @@
   <!-- Loaders Section -->
   <section class="showcase__section">
     <h2 class="section-title">Loading States</h2>
+    <p class="component-description">Loading indicators provide visual feedback during async operations. Use spinners for indeterminate loading and skeletons for content placeholders.</p>
+
+    <div class="component-api">
+      <h4>Spinner API Reference</h4>
+      <table class="api-table">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>size</code></td><td><code>'xs' | 'sm' | 'md' | 'lg' | 'xl'</code></td><td><code>'md'</code></td><td>Spinner size</td></tr>
+          <tr><td><code>color</code></td><td><code>'primary' | 'secondary' | ... </code></td><td><code>'primary'</code></td><td>Spinner color</td></tr>
+        </tbody>
+      </table>
+    </div>
 
     <div class="demo-group">
       <h3>Spinner Sizes</h3>
-      <div class="demo-row demo-row--align-center">
-        <div style="text-align: center;">
-          <ui-spinner size="xs" color="primary"></ui-spinner>
-          <p style="font-size: 0.75rem; margin-top: 0.25rem;">XS</p>
+      <div class="demo-with-code">
+        <div class="demo-preview">
+          <div class="demo-row demo-row--align-center">
+            <div style="text-align: center;">
+              <ui-spinner size="xs" color="primary"></ui-spinner>
+              <p style="font-size: 0.75rem; margin-top: 0.25rem;">XS</p>
+            </div>
+            <div style="text-align: center;">
+              <ui-spinner size="sm" color="primary"></ui-spinner>
+              <p style="font-size: 0.75rem; margin-top: 0.25rem;">SM</p>
+            </div>
+            <div style="text-align: center;">
+              <ui-spinner size="md" color="primary"></ui-spinner>
+              <p style="font-size: 0.75rem; margin-top: 0.25rem;">MD</p>
+            </div>
+            <div style="text-align: center;">
+              <ui-spinner size="lg" color="primary"></ui-spinner>
+              <p style="font-size: 0.75rem; margin-top: 0.25rem;">LG</p>
+            </div>
+            <div style="text-align: center;">
+              <ui-spinner size="xl" color="primary"></ui-spinner>
+              <p style="font-size: 0.75rem; margin-top: 0.25rem;">XL</p>
+            </div>
+          </div>
         </div>
-        <div style="text-align: center;">
-          <ui-spinner size="sm" color="primary"></ui-spinner>
-          <p style="font-size: 0.75rem; margin-top: 0.25rem;">SM</p>
-        </div>
-        <div style="text-align: center;">
-          <ui-spinner size="md" color="primary"></ui-spinner>
-          <p style="font-size: 0.75rem; margin-top: 0.25rem;">MD</p>
-        </div>
-        <div style="text-align: center;">
-          <ui-spinner size="lg" color="primary"></ui-spinner>
-          <p style="font-size: 0.75rem; margin-top: 0.25rem;">LG</p>
-        </div>
-        <div style="text-align: center;">
-          <ui-spinner size="xl" color="primary"></ui-spinner>
-          <p style="font-size: 0.75rem; margin-top: 0.25rem;">XL</p>
+        <div class="code-block">
+          <pre><code>&lt;ui-spinner size="xs"&gt;&lt;/ui-spinner&gt;
+&lt;ui-spinner size="sm"&gt;&lt;/ui-spinner&gt;
+&lt;ui-spinner size="md"&gt;&lt;/ui-spinner&gt;
+&lt;ui-spinner size="lg"&gt;&lt;/ui-spinner&gt;
+&lt;ui-spinner size="xl"&gt;&lt;/ui-spinner&gt;</code></pre>
         </div>
       </div>
     </div>
 
     <div class="demo-group">
       <h3>Spinner Colors</h3>
-      <div class="demo-row demo-row--align-center">
-        @for (color of colors; track color) {
-          <div style="text-align: center;">
-            <ui-spinner size="md" [color]="color"></ui-spinner>
-            <p style="font-size: 0.75rem; margin-top: 0.25rem;">{{ color | titlecase }}</p>
+      <div class="demo-with-code">
+        <div class="demo-preview">
+          <div class="demo-row demo-row--align-center">
+            @for (color of colors; track color) {
+              <div style="text-align: center;">
+                <ui-spinner size="md" [color]="color"></ui-spinner>
+                <p style="font-size: 0.75rem; margin-top: 0.25rem;">{{ color | titlecase }}</p>
+              </div>
+            }
           </div>
-        }
+        </div>
+        <div class="code-block">
+          <pre><code>&lt;ui-spinner color="primary"&gt;&lt;/ui-spinner&gt;
+&lt;ui-spinner color="secondary"&gt;&lt;/ui-spinner&gt;
+&lt;ui-spinner color="success"&gt;&lt;/ui-spinner&gt;
+&lt;ui-spinner color="danger"&gt;&lt;/ui-spinner&gt;</code></pre>
+        </div>
       </div>
+    </div>
+
+    <div class="component-api" style="margin-top: 2rem;">
+      <h4>Skeleton API Reference</h4>
+      <table class="api-table">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>variant</code></td><td><code>'circular' | 'rectangular' | 'text'</code></td><td><code>'text'</code></td><td>Shape variant</td></tr>
+          <tr><td><code>width</code></td><td><code>string</code></td><td><code>'100%'</code></td><td>Element width</td></tr>
+          <tr><td><code>height</code></td><td><code>string</code></td><td><code>'20px'</code></td><td>Element height</td></tr>
+        </tbody>
+      </table>
     </div>
 
     <div class="demo-group">
       <h3>Skeleton Loaders - Basic Shapes</h3>
-      <div class="demo-row demo-row--align-center" style="gap: 2rem;">
-        <div style="text-align: center;">
-          <ui-skeleton variant="circular" width="64px" height="64px"></ui-skeleton>
-          <p style="font-size: 0.75rem; margin-top: 0.5rem;">Circular</p>
+      <div class="demo-with-code">
+        <div class="demo-preview">
+          <div class="demo-row demo-row--align-center" style="gap: 2rem;">
+            <div style="text-align: center;">
+              <ui-skeleton variant="circular" width="64px" height="64px"></ui-skeleton>
+              <p style="font-size: 0.75rem; margin-top: 0.5rem;">Circular</p>
+            </div>
+            <div style="text-align: center;">
+              <ui-skeleton variant="rectangular" width="100px" height="64px"></ui-skeleton>
+              <p style="font-size: 0.75rem; margin-top: 0.5rem;">Rectangular</p>
+            </div>
+            <div style="text-align: center;">
+              <ui-skeleton variant="text" width="150px" height="20px"></ui-skeleton>
+              <p style="font-size: 0.75rem; margin-top: 0.5rem;">Text</p>
+            </div>
+          </div>
         </div>
-        <div style="text-align: center;">
-          <ui-skeleton variant="rectangular" width="100px" height="64px"></ui-skeleton>
-          <p style="font-size: 0.75rem; margin-top: 0.5rem;">Rectangular</p>
-        </div>
-        <div style="text-align: center;">
-          <ui-skeleton variant="text" width="150px" height="20px"></ui-skeleton>
-          <p style="font-size: 0.75rem; margin-top: 0.5rem;">Text</p>
+        <div class="code-block">
+          <pre><code>&lt;!-- Avatar placeholder --&gt;
+&lt;ui-skeleton
+  variant="circular"
+  width="64px"
+  height="64px"&gt;
+&lt;/ui-skeleton&gt;
+
+&lt;!-- Image placeholder --&gt;
+&lt;ui-skeleton
+  variant="rectangular"
+  width="100px"
+  height="64px"&gt;
+&lt;/ui-skeleton&gt;
+
+&lt;!-- Text line placeholder --&gt;
+&lt;ui-skeleton
+  variant="text"
+  width="150px"
+  height="20px"&gt;
+&lt;/ui-skeleton&gt;</code></pre>
         </div>
       </div>
     </div>
 
     <div class="demo-group">
       <h3>Skeleton Card Loading Pattern</h3>
-      <div class="skeleton-demo">
-        <div class="skeleton-row">
-          <ui-skeleton variant="circular" width="48px" height="48px"></ui-skeleton>
-          <div class="skeleton-content">
-            <ui-skeleton variant="text" width="150px"></ui-skeleton>
-            <ui-skeleton variant="text" width="100px" height="12px"></ui-skeleton>
+      <div class="demo-with-code">
+        <div class="demo-preview">
+          <div class="skeleton-demo">
+            <div class="skeleton-row">
+              <ui-skeleton variant="circular" width="48px" height="48px"></ui-skeleton>
+              <div class="skeleton-content">
+                <ui-skeleton variant="text" width="150px"></ui-skeleton>
+                <ui-skeleton variant="text" width="100px" height="12px"></ui-skeleton>
+              </div>
+            </div>
+            <ui-skeleton variant="rectangular" width="100%" height="120px"></ui-skeleton>
+            <ui-skeleton variant="text" width="100%"></ui-skeleton>
+            <ui-skeleton variant="text" width="80%"></ui-skeleton>
+            <ui-skeleton variant="text" width="60%"></ui-skeleton>
           </div>
         </div>
-        <ui-skeleton variant="rectangular" width="100%" height="120px"></ui-skeleton>
-        <ui-skeleton variant="text" width="100%"></ui-skeleton>
-        <ui-skeleton variant="text" width="80%"></ui-skeleton>
-        <ui-skeleton variant="text" width="60%"></ui-skeleton>
+        <div class="code-block">
+          <pre><code>&lt;!-- Card skeleton pattern --&gt;
+&lt;div class="skeleton-card"&gt;
+  &lt;!-- Header with avatar --&gt;
+  &lt;div class="skeleton-header"&gt;
+    &lt;ui-skeleton variant="circular"
+      width="48px" height="48px"&gt;&lt;/ui-skeleton&gt;
+    &lt;div&gt;
+      &lt;ui-skeleton variant="text"
+        width="150px"&gt;&lt;/ui-skeleton&gt;
+      &lt;ui-skeleton variant="text"
+        width="100px" height="12px"&gt;&lt;/ui-skeleton&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;!-- Image placeholder --&gt;
+  &lt;ui-skeleton variant="rectangular"
+    width="100%" height="120px"&gt;&lt;/ui-skeleton&gt;
+
+  &lt;!-- Text content --&gt;
+  &lt;ui-skeleton variant="text" width="100%"&gt;&lt;/ui-skeleton&gt;
+  &lt;ui-skeleton variant="text" width="80%"&gt;&lt;/ui-skeleton&gt;
+  &lt;ui-skeleton variant="text" width="60%"&gt;&lt;/ui-skeleton&gt;
+&lt;/div&gt;</code></pre>
+        </div>
       </div>
     </div>
 
     <div class="demo-group">
       <h3>Skeleton List Loading Pattern</h3>
-      <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 400px;">
-        @for (i of [1, 2, 3, 4]; track i) {
-          <div style="display: flex; gap: 1rem; align-items: center;">
-            <ui-skeleton variant="circular" width="40px" height="40px"></ui-skeleton>
-            <div style="flex: 1; display: flex; flex-direction: column; gap: 0.5rem;">
-              <ui-skeleton variant="text" width="80%"></ui-skeleton>
-              <ui-skeleton variant="text" width="60%" height="12px"></ui-skeleton>
-            </div>
+      <div class="demo-with-code">
+        <div class="demo-preview">
+          <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 400px;">
+            @for (i of [1, 2, 3, 4]; track i) {
+              <div style="display: flex; gap: 1rem; align-items: center;">
+                <ui-skeleton variant="circular" width="40px" height="40px"></ui-skeleton>
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 0.5rem;">
+                  <ui-skeleton variant="text" width="80%"></ui-skeleton>
+                  <ui-skeleton variant="text" width="60%" height="12px"></ui-skeleton>
+                </div>
+              </div>
+            }
           </div>
-        }
+        </div>
+        <div class="code-block">
+          <pre><code>&lt;!-- List item skeleton --&gt;
+&#64;for (i of [1, 2, 3, 4]; track i) &#123;
+  &lt;div class="list-item"&gt;
+    &lt;ui-skeleton variant="circular"
+      width="40px" height="40px"&gt;&lt;/ui-skeleton&gt;
+    &lt;div&gt;
+      &lt;ui-skeleton variant="text"
+        width="80%"&gt;&lt;/ui-skeleton&gt;
+      &lt;ui-skeleton variant="text"
+        width="60%" height="12px"&gt;&lt;/ui-skeleton&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&#125;</code></pre>
+        </div>
       </div>
     </div>
 
     <div class="demo-group">
       <h3>Loading Button Demo</h3>
-      <div class="demo-row">
-        <ui-button
-          variant="solid"
-          color="primary"
-          [loading]="isLoading"
-          (click)="simulateLoading()"
-        >
-          {{ isLoading ? 'Loading...' : 'Click to Load' }}
-        </ui-button>
-        <ui-button
-          variant="outline"
-          color="secondary"
-          [loading]="isLoading"
-          (click)="simulateLoading()"
-        >
-          {{ isLoading ? 'Please wait...' : 'Load Data' }}
-        </ui-button>
+      <div class="demo-with-code">
+        <div class="demo-preview">
+          <div class="demo-row">
+            <ui-button
+              variant="solid"
+              color="primary"
+              [loading]="isLoading"
+              (click)="simulateLoading()"
+            >
+              {{ isLoading ? 'Loading...' : 'Click to Load' }}
+            </ui-button>
+            <ui-button
+              variant="outline"
+              color="secondary"
+              [loading]="isLoading"
+              (click)="simulateLoading()"
+            >
+              {{ isLoading ? 'Please wait...' : 'Load Data' }}
+            </ui-button>
+          </div>
+        </div>
+        <div class="code-block">
+          <pre><code>&lt;ui-button
+  [loading]="isLoading"
+  (click)="simulateLoading()"&gt;
+  &#123;&#123; isLoading ? 'Loading...' : 'Click to Load' &#125;&#125;
+&lt;/ui-button&gt;
+
+// In component.ts:
+isLoading = false;
+
+simulateLoading() &#123;
+  this.isLoading = true;
+  setTimeout(() =&gt; &#123;
+    this.isLoading = false;
+  &#125;, 2000);
+&#125;</code></pre>
+        </div>
       </div>
     </div>
   </section>
