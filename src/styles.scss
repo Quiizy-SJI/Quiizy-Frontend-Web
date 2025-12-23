@@ -1,6 +1,9 @@
 // ============================================
 // IMPORTS
 // ============================================
+// Sass modules
+@use 'sass:color';
+
 // Material Design 3 Icons
 @use '@fontsource/material-icons-outlined' as *;
 
@@ -118,11 +121,11 @@ $border-radius: 12px;
 // These mixins generate full color scales from base colors
 
 @function lighten-color($color, $percentage) {
-  @return mix(white, $color, $percentage);
+  @return color.mix(white, $color, $percentage);
 }
 
 @function darken-color($color, $percentage) {
-  @return mix(black, $color, $percentage);
+  @return color.mix(black, $color, $percentage);
 }
 
 // Generate color scale
@@ -352,13 +355,13 @@ img {
   --border-danger: var(--color-danger-200);
   --border-success: var(--color-success-200);
 
-  // ELEVATION SYSTEM
+  // ELEVATION SYSTEM - Enhanced visibility
   --elevation-0: none;
-  --elevation-1: 0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 3px 0 rgba(0, 0, 0, 0.02);
-  --elevation-2: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 4px 8px 0 rgba(0, 0, 0, 0.03);
-  --elevation-3: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 10px 15px -3px rgba(0, 0, 0, 0.04);
-  --elevation-4: 0 10px 15px -3px rgba(0, 0, 0, 0.06), 0 20px 25px -5px rgba(0, 0, 0, 0.05);
-  --elevation-5: 0 25px 50px -12px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.02);
+  --elevation-1: 0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 1px 2px -1px rgba(0, 0, 0, 0.06);
+  --elevation-2: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.08);
+  --elevation-3: 0 10px 15px -3px rgba(0, 0, 0, 0.12), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --elevation-4: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.12);
+  --elevation-5: 0 25px 50px -12px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.05);
 
   --shadow-primary: 0 4px 14px 0 rgba(53, 114, 239, 0.15);
   --shadow-secondary: 0 4px 14px 0 rgba(139, 92, 246, 0.15);
