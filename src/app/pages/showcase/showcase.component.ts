@@ -28,8 +28,7 @@ import {
   SkeletonComponent,
   AvatarComponent,
   DividerComponent,
-  TooltipDirective,
-  TooltipContentComponent
+  TooltipDirective
 } from '../../components/ui';
 
 import type { TableColumn, DropdownOption, TabItem } from '../../components/ui';
@@ -64,8 +63,7 @@ import type { TableColumn, DropdownOption, TabItem } from '../../components/ui';
     SkeletonComponent,
     AvatarComponent,
     DividerComponent,
-    TooltipDirective,
-    TooltipContentComponent
+    TooltipDirective
   ],
   templateUrl: './showcase.component.html',
   styleUrl: './showcase.component.scss'
@@ -79,6 +77,20 @@ export class ShowcaseComponent {
   radioValue = 'option1';
   toggleValue = false;
   passwordValue = '';
+
+  // Demo checkbox/toggle states for color demos
+  demoCheckboxPrimary = true;
+  demoCheckboxSecondary = true;
+  demoCheckboxAccent = true;
+  demoCheckboxSuccess = true;
+  demoCheckboxWarning = true;
+  demoCheckboxDanger = true;
+  demoTogglePrimary = true;
+  demoToggleSecondary = true;
+  demoToggleAccent = true;
+  demoToggleSuccess = true;
+  demoToggleWarning = true;
+  demoToggleDanger = true;
 
   // Modal state
   isModalOpen = signal(false);
@@ -136,6 +148,15 @@ export class ShowcaseComponent {
     { label: 'Home', href: '/' },
     { label: 'Components', href: '/components' },
     { label: 'Showcase', active: true }
+  ];
+
+  longBreadcrumbItems = [
+    { label: 'Home', href: '/' },
+    { label: 'Dashboard', href: '/dashboard' },
+    { label: 'Settings', href: '/settings' },
+    { label: 'Users', href: '/users' },
+    { label: 'Profile', href: '/profile' },
+    { label: 'Edit', active: true }
   ];
 
   // Table data
@@ -202,5 +223,9 @@ export class ShowcaseComponent {
     setTimeout(() => {
       this.isLoading = false;
     }, 2000);
+  }
+
+  onCardClick() {
+    alert('Card clicked! This is an interactive card.');
   }
 }

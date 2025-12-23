@@ -5,7 +5,34 @@
   </header>
 
   <!-- Breadcrumb Demo -->
-  <ui-breadcrumb [items]="breadcrumbItems" separator="chevron"></ui-breadcrumb>
+  <section class="showcase__section">
+    <h2 class="section-title">Breadcrumbs</h2>
+
+    <div class="demo-group">
+      <h3>Chevron Separator (Default)</h3>
+      <ui-breadcrumb [items]="breadcrumbItems" separator="chevron"></ui-breadcrumb>
+    </div>
+
+    <div class="demo-group">
+      <h3>Slash Separator</h3>
+      <ui-breadcrumb [items]="breadcrumbItems" separator="slash"></ui-breadcrumb>
+    </div>
+
+    <div class="demo-group">
+      <h3>Arrow Separator</h3>
+      <ui-breadcrumb [items]="breadcrumbItems" separator="arrow"></ui-breadcrumb>
+    </div>
+
+    <div class="demo-group">
+      <h3>Dot Separator</h3>
+      <ui-breadcrumb [items]="breadcrumbItems" separator="dot"></ui-breadcrumb>
+    </div>
+
+    <div class="demo-group">
+      <h3>Longer Breadcrumb Trail</h3>
+      <ui-breadcrumb [items]="longBreadcrumbItems" separator="chevron"></ui-breadcrumb>
+    </div>
+  </section>
 
   <ui-divider></ui-divider>
 
@@ -71,7 +98,12 @@
         <ui-button variant="solid" color="primary">Normal</ui-button>
         <ui-button variant="solid" color="primary" [disabled]="true">Disabled</ui-button>
         <ui-button variant="solid" color="primary" [loading]="true">Loading</ui-button>
-        <ui-button variant="solid" color="primary" [fullWidth]="false" [uiTooltip]="'Click me!'" tooltipPosition="top">With Tooltip</ui-button>
+      </div>
+      <div class="demo-row" style="margin-top: 1rem;">
+        <ui-button variant="outline" color="secondary" [uiTooltip]="'Helpful information appears here!'" tooltipPosition="top">Hover for Tooltip ⬆</ui-button>
+        <ui-button variant="soft" color="accent" [uiTooltip]="'Bottom tooltip'" tooltipPosition="bottom">Tooltip Below ⬇</ui-button>
+        <ui-button variant="ghost" color="info" [uiTooltip]="'Left tooltip'" tooltipPosition="left">← Tooltip Left</ui-button>
+        <ui-button variant="solid" color="success" [uiTooltip]="'Right tooltip'" tooltipPosition="right">Tooltip Right →</ui-button>
       </div>
     </div>
 
@@ -87,20 +119,70 @@
     </div>
 
     <div class="demo-group">
-      <h3>Icon Buttons (Material 3)</h3>
+      <h3>Icon Buttons - Variants</h3>
       <div class="demo-row demo-row--align-center">
-        <ui-icon-button color="primary" ariaLabel="Home" tooltip="Home">
+        <ui-icon-button color="primary" variant="solid" ariaLabel="Home" tooltip="Solid">
           <mat-icon>home</mat-icon>
         </ui-icon-button>
-        <ui-icon-button color="secondary" variant="outline" ariaLabel="Settings" tooltip="Settings">
+        <ui-icon-button color="secondary" variant="outline" ariaLabel="Settings" tooltip="Outline">
           <mat-icon>settings</mat-icon>
         </ui-icon-button>
-        <ui-icon-button color="danger" variant="ghost" ariaLabel="Delete" tooltip="Delete">
+        <ui-icon-button color="danger" variant="ghost" ariaLabel="Delete" tooltip="Ghost">
           <mat-icon>delete</mat-icon>
         </ui-icon-button>
-        <ui-icon-button color="accent" variant="soft" ariaLabel="Edit" tooltip="Edit">
+        <ui-icon-button color="accent" variant="soft" ariaLabel="Edit" tooltip="Soft">
           <mat-icon>edit</mat-icon>
         </ui-icon-button>
+      </div>
+    </div>
+
+    <div class="demo-group">
+      <h3>Icon Buttons - Sizes</h3>
+      <div class="demo-row demo-row--align-center">
+        <ui-icon-button color="primary" size="xs" ariaLabel="Extra Small" tooltip="XS">
+          <mat-icon>star</mat-icon>
+        </ui-icon-button>
+        <ui-icon-button color="primary" size="sm" ariaLabel="Small" tooltip="SM">
+          <mat-icon>star</mat-icon>
+        </ui-icon-button>
+        <ui-icon-button color="primary" size="md" ariaLabel="Medium" tooltip="MD">
+          <mat-icon>star</mat-icon>
+        </ui-icon-button>
+        <ui-icon-button color="primary" size="lg" ariaLabel="Large" tooltip="LG">
+          <mat-icon>star</mat-icon>
+        </ui-icon-button>
+        <ui-icon-button color="primary" size="xl" ariaLabel="Extra Large" tooltip="XL">
+          <mat-icon>star</mat-icon>
+        </ui-icon-button>
+      </div>
+    </div>
+
+    <div class="demo-group">
+      <h3>Icon Buttons - States</h3>
+      <div class="demo-row demo-row--align-center">
+        <ui-icon-button color="primary" ariaLabel="Normal" tooltip="Normal">
+          <mat-icon>check_circle</mat-icon>
+        </ui-icon-button>
+        <ui-icon-button color="primary" [disabled]="true" ariaLabel="Disabled" tooltip="Disabled">
+          <mat-icon>block</mat-icon>
+        </ui-icon-button>
+        <ui-icon-button color="primary" [loading]="true" ariaLabel="Loading" tooltip="Loading">
+          <mat-icon>sync</mat-icon>
+        </ui-icon-button>
+        <ui-icon-button color="success" [rounded]="false" ariaLabel="Square" tooltip="Square (not rounded)">
+          <mat-icon>crop_square</mat-icon>
+        </ui-icon-button>
+      </div>
+    </div>
+
+    <div class="demo-group">
+      <h3>Icon Buttons - All Colors</h3>
+      <div class="demo-row demo-row--align-center">
+        @for (color of colors; track color) {
+          <ui-icon-button [color]="color" [ariaLabel]="color" [tooltip]="color | titlecase">
+            <mat-icon>favorite</mat-icon>
+          </ui-icon-button>
+        }
       </div>
     </div>
   </section>
@@ -138,6 +220,24 @@
         }
       </div>
     </div>
+
+    <div class="demo-group">
+      <h3>Badge with Outline Variants</h3>
+      <div class="demo-row">
+        @for (color of colors; track color) {
+          <ui-badge variant="outline" [color]="color">{{ color | titlecase }}</ui-badge>
+        }
+      </div>
+    </div>
+
+    <div class="demo-group">
+      <h3>Subtle Badges</h3>
+      <div class="demo-row">
+        @for (color of colors; track color) {
+          <ui-badge variant="subtle" [color]="color">{{ color | titlecase }}</ui-badge>
+        }
+      </div>
+    </div>
   </section>
 
   <ui-divider label="Forms"></ui-divider>
@@ -164,6 +264,35 @@
           label="Underlined Input"
           placeholder="Enter text..."
           variant="underlined"
+        ></ui-input>
+      </div>
+
+      <div class="demo-group">
+        <h3>Input Sizes</h3>
+        <ui-input
+          label="Extra Small"
+          placeholder="XS size..."
+          size="xs"
+        ></ui-input>
+        <ui-input
+          label="Small"
+          placeholder="SM size..."
+          size="sm"
+        ></ui-input>
+        <ui-input
+          label="Medium (Default)"
+          placeholder="MD size..."
+          size="md"
+        ></ui-input>
+        <ui-input
+          label="Large"
+          placeholder="LG size..."
+          size="lg"
+        ></ui-input>
+        <ui-input
+          label="Extra Large"
+          placeholder="XL size..."
+          size="xl"
         ></ui-input>
       </div>
 
@@ -237,7 +366,7 @@
       </div>
 
       <div class="demo-group">
-        <h3>Checkboxes & Toggles</h3>
+        <h3>Checkboxes</h3>
         <ui-checkbox
           label="Accept terms and conditions"
           [(ngModel)]="checkboxValue"
@@ -252,7 +381,19 @@
           label="Disabled checkbox"
           [disabled]="true"
         ></ui-checkbox>
-        <ui-divider variant="dashed"></ui-divider>
+        <h4 style="margin-top: 1rem;">Checkbox Colors</h4>
+        <div class="demo-row">
+          <ui-checkbox label="Primary" color="primary" [(ngModel)]="demoCheckboxPrimary"></ui-checkbox>
+          <ui-checkbox label="Secondary" color="secondary" [(ngModel)]="demoCheckboxSecondary"></ui-checkbox>
+          <ui-checkbox label="Accent" color="accent" [(ngModel)]="demoCheckboxAccent"></ui-checkbox>
+          <ui-checkbox label="Success" color="success" [(ngModel)]="demoCheckboxSuccess"></ui-checkbox>
+          <ui-checkbox label="Warning" color="warning" [(ngModel)]="demoCheckboxWarning"></ui-checkbox>
+          <ui-checkbox label="Danger" color="danger" [(ngModel)]="demoCheckboxDanger"></ui-checkbox>
+        </div>
+      </div>
+
+      <div class="demo-group">
+        <h3>Toggles</h3>
         <ui-toggle
           label="Enable notifications"
           [(ngModel)]="toggleValue"
@@ -263,6 +404,19 @@
           color="primary"
           [showIcons]="true"
         ></ui-toggle>
+        <ui-toggle
+          label="Disabled toggle"
+          [disabled]="true"
+        ></ui-toggle>
+        <h4 style="margin-top: 1rem;">Toggle Colors</h4>
+        <div class="demo-row" style="flex-wrap: wrap; gap: 1rem;">
+          <ui-toggle label="Primary" color="primary" [(ngModel)]="demoTogglePrimary"></ui-toggle>
+          <ui-toggle label="Secondary" color="secondary" [(ngModel)]="demoToggleSecondary"></ui-toggle>
+          <ui-toggle label="Accent" color="accent" [(ngModel)]="demoToggleAccent"></ui-toggle>
+          <ui-toggle label="Success" color="success" [(ngModel)]="demoToggleSuccess"></ui-toggle>
+          <ui-toggle label="Warning" color="warning" [(ngModel)]="demoToggleWarning"></ui-toggle>
+          <ui-toggle label="Danger" color="danger" [(ngModel)]="demoToggleDanger"></ui-toggle>
+        </div>
       </div>
 
       <div class="demo-group">
@@ -297,39 +451,107 @@
   <section class="showcase__section">
     <h2 class="section-title">Cards</h2>
 
+    <div class="demo-group">
+      <h3>Card Variants</h3>
+    </div>
     <div class="demo-grid demo-grid--cards">
       <ui-card
         title="Elevated Card"
-        subtitle="With shadow elevation"
+        subtitle="Floating with shadow"
         variant="elevated"
-        [hoverable]="true"
       >
-        <p>This is an elevated card with hover effect. It has a subtle shadow that increases on hover.</p>
+        <p>This elevated card floats above the surface with a prominent shadow. Hover to see it lift higher!</p>
       </ui-card>
 
       <ui-card
         title="Outlined Card"
-        subtitle="With border"
+        subtitle="Bordered container"
         variant="outlined"
       >
-        <p>This card has a border outline instead of shadow elevation.</p>
+        <p>This card uses a visible border instead of shadow. Hover to see the border change color.</p>
       </ui-card>
 
       <ui-card
         title="Filled Card"
-        subtitle="With background"
+        subtitle="Subtle background"
         variant="filled"
       >
-        <p>This card has a filled background color that distinguishes it from the page.</p>
+        <p>This card has a subtle gray background that distinguishes it from the page surface.</p>
       </ui-card>
 
       <ui-card
         title="Clickable Card"
-        subtitle="Click anywhere"
+        subtitle="Interactive - Click me!"
         variant="elevated"
         [clickable]="true"
+        (cardClick)="onCardClick()"
       >
-        <p>This entire card is clickable. Hover to see the cursor change.</p>
+        <p>This card is fully interactive! Notice the scale effect on hover and the different active state.</p>
+      </ui-card>
+    </div>
+
+    <div class="demo-group">
+      <h3>Card Sizes</h3>
+    </div>
+    <div class="demo-grid demo-grid--cards">
+      <ui-card
+        title="Small Card"
+        variant="outlined"
+        size="sm"
+      >
+        <p>Compact padding for smaller content areas.</p>
+      </ui-card>
+
+      <ui-card
+        title="Medium Card (Default)"
+        variant="outlined"
+        size="md"
+      >
+        <p>Standard padding for most use cases.</p>
+      </ui-card>
+
+      <ui-card
+        title="Large Card"
+        variant="outlined"
+        size="lg"
+      >
+        <p>Extra spacious padding for prominent content.</p>
+      </ui-card>
+    </div>
+
+    <div class="demo-group">
+      <h3>Card with Hoverable Effect</h3>
+    </div>
+    <div class="demo-grid demo-grid--cards">
+      <ui-card
+        title="Hoverable Card"
+        subtitle="Lift on hover"
+        variant="elevated"
+        [hoverable]="true"
+      >
+        <p>Hover over this card to see it lift up with enhanced shadow.</p>
+      </ui-card>
+
+      <ui-card
+        title="Non-Hoverable"
+        subtitle="Static card"
+        variant="elevated"
+        [hoverable]="false"
+      >
+        <p>This card stays in place without hover effects.</p>
+      </ui-card>
+    </div>
+
+    <div class="demo-group">
+      <h3>Glass Card (Blur Effect)</h3>
+    </div>
+    <div class="demo-grid demo-grid--cards" style="background: var(--surface-sunken); padding: 1rem; border-radius: var(--radius-lg);">
+      <ui-card
+        title="Glass Card"
+        subtitle="Frosted glass effect"
+        variant="glass"
+      >
+        <p>This card has a glass/frosted effect, perfect for overlaying on images or colored backgrounds.</p>
       </ui-card>
     </div>
 
@@ -373,6 +595,20 @@
         color="info"
       ></ui-stat-card>
     </div>
+
+    <h3 style="margin-top: 2rem;">Stat Cards - All Colors</h3>
+    <div class="demo-grid demo-grid--stats">
+      @for (color of colors; track color) {
+        <ui-stat-card
+          [label]="color | titlecase"
+          [value]="1234"
+          [color]="color"
+          [showTrend]="true"
+          [trendValue]="5.2"
+          trendDirection="up"
+        ></ui-stat-card>
+      }
+    </div>
   </section>
 
   <ui-divider label="Feedback"></ui-divider>
@@ -382,18 +618,73 @@
     <h2 class="section-title">Alerts</h2>
 
     <div class="demo-group">
-      <h3>Alert Variants</h3>
+      <h3>Alert Colors - Soft Variant</h3>
       <ui-alert color="info" variant="soft" title="Information">
-        This is a soft info alert with a title and description.
+        This is an informational message for the user.
       </ui-alert>
-      <ui-alert color="success" variant="filled" title="Success!">
+      <ui-alert color="success" variant="soft" title="Success!">
         Your changes have been saved successfully.
       </ui-alert>
-      <ui-alert color="warning" variant="outlined" title="Warning">
+      <ui-alert color="warning" variant="soft" title="Warning">
         Please review your input before submitting.
       </ui-alert>
-      <ui-alert color="danger" variant="accent" title="Error" [dismissible]="true">
-        Something went wrong. Please try again later.
+      <ui-alert color="danger" variant="soft" title="Error">
+        Something went wrong. Please try again.
+      </ui-alert>
+    </div>
+
+    <div class="demo-group">
+      <h3>Alert Colors - Filled Variant</h3>
+      <ui-alert color="info" variant="filled" title="Information">
+        This is a filled info alert with strong presence.
+      </ui-alert>
+      <ui-alert color="success" variant="filled" title="Success!">
+        Operation completed successfully!
+      </ui-alert>
+      <ui-alert color="warning" variant="filled" title="Warning">
+        This action cannot be undone.
+      </ui-alert>
+      <ui-alert color="danger" variant="filled" title="Critical Error">
+        System failure detected.
+      </ui-alert>
+    </div>
+
+    <div class="demo-group">
+      <h3>Alert Colors - Outlined Variant</h3>
+      <ui-alert color="info" variant="outlined" title="Note">
+        This is an outlined info alert.
+      </ui-alert>
+      <ui-alert color="success" variant="outlined" title="Completed">
+        Task has been completed.
+      </ui-alert>
+      <ui-alert color="warning" variant="outlined" title="Caution">
+        Proceed with caution.
+      </ui-alert>
+      <ui-alert color="danger" variant="outlined" title="Alert">
+        Please fix the following errors.
+      </ui-alert>
+    </div>
+
+    <div class="demo-group">
+      <h3>Alert Colors - Accent Variant</h3>
+      <ui-alert color="info" variant="accent" title="Tip">
+        This is an accent info alert with left border.
+      </ui-alert>
+      <ui-alert color="success" variant="accent" title="Done">
+        Your profile has been updated.
+      </ui-alert>
+      <ui-alert color="warning" variant="accent" title="Reminder">
+        Don't forget to save your work.
+      </ui-alert>
+      <ui-alert color="danger" variant="accent" title="Urgent" [dismissible]="true">
+        Your session will expire soon. Click X to dismiss.
+      </ui-alert>
+    </div>
+
+    <div class="demo-group">
+      <h3>Dismissible Alerts</h3>
+      <ui-alert color="primary" variant="soft" title="Notification" [dismissible]="true">
+        This alert can be dismissed by clicking the X button.
       </ui-alert>
     </div>
 
@@ -423,16 +714,60 @@
   <section class="showcase__section">
     <h2 class="section-title">Data Table</h2>
 
-    <ui-table
-      [columns]="tableColumns"
-      [data]="tableData"
-      [selectable]="true"
-      variant="striped"
-      [showPagination]="true"
-      [pagination]="tablePagination"
-      (sortChange)="onTableSort($event)"
-      (selectionChange)="onTableSelectionChange($event)"
-    ></ui-table>
+    <div class="demo-group">
+      <h3>Striped Table (with Selection & Pagination)</h3>
+      <ui-table
+        [columns]="tableColumns"
+        [data]="tableData"
+        [selectable]="true"
+        variant="striped"
+        [showPagination]="true"
+        [pagination]="tablePagination"
+        (sortChange)="onTableSort($event)"
+        (selectionChange)="onTableSelectionChange($event)"
+      ></ui-table>
+    </div>
+
+    <div class="demo-group">
+      <h3>Bordered Table</h3>
+      <ui-table
+        [columns]="tableColumns"
+        [data]="tableData"
+        variant="bordered"
+        [rowClickable]="true"
+      ></ui-table>
+    </div>
+
+    <div class="demo-group">
+      <h3>Compact Table (Smaller Size)</h3>
+      <ui-table
+        [columns]="tableColumns"
+        [data]="tableData"
+        variant="default"
+        size="sm"
+        [compact]="true"
+      ></ui-table>
+    </div>
+
+    <div class="demo-group">
+      <h3>Loading State</h3>
+      <ui-table
+        [columns]="tableColumns"
+        [data]="[]"
+        variant="striped"
+        [loading]="true"
+      ></ui-table>
+    </div>
+
+    <div class="demo-group">
+      <h3>Empty State</h3>
+      <ui-table
+        [columns]="tableColumns"
+        [data]="[]"
+        variant="bordered"
+        emptyMessage="No records found. Try adjusting your filters."
+      ></ui-table>
+    </div>
   </section>
 
   <ui-divider label="Display Components"></ui-divider>
@@ -442,7 +777,7 @@
     <h2 class="section-title">Display Components</h2>
 
     <div class="demo-group">
-      <h3>Avatars</h3>
+      <h3>Avatar Sizes</h3>
       <div class="demo-row demo-row--align-center">
         <ui-avatar
           src="https://i.pravatar.cc/150?img=1"
@@ -460,22 +795,65 @@
           size="md"
         ></ui-avatar>
         <ui-avatar
-          initials="JD"
+          src="https://i.pravatar.cc/150?img=4"
+          alt="User 4"
           size="lg"
-          color="primary"
         ></ui-avatar>
         <ui-avatar
-          initials="AS"
+          src="https://i.pravatar.cc/150?img=5"
+          alt="User 5"
           size="xl"
-          color="accent"
+        ></ui-avatar>
+      </div>
+    </div>
+
+    <div class="demo-group">
+      <h3>Avatar Shapes</h3>
+      <div class="demo-row demo-row--align-center">
+        <ui-avatar initials="CR" color="primary" shape="circle" size="lg"></ui-avatar>
+        <ui-avatar initials="RD" color="secondary" shape="rounded" size="lg"></ui-avatar>
+        <ui-avatar initials="SQ" color="accent" shape="square" size="lg"></ui-avatar>
+      </div>
+    </div>
+
+    <div class="demo-group">
+      <h3>Avatar with Initials (All Colors)</h3>
+      <div class="demo-row demo-row--align-center">
+        @for (color of colors; track color) {
+          <ui-avatar [initials]="color.slice(0,2).toUpperCase()" [color]="color" size="md"></ui-avatar>
+        }
+      </div>
+    </div>
+
+    <div class="demo-group">
+      <h3>Avatar with Status Badge</h3>
+      <div class="demo-row demo-row--align-center">
+        <ui-avatar
+          src="https://i.pravatar.cc/150?img=10"
+          size="lg"
           [showBadge]="true"
           badgeColor="success"
         ></ui-avatar>
-      </div>
-      <div class="demo-row demo-row--align-center" style="margin-top: 1rem;">
-        <ui-avatar initials="AB" color="primary" shape="circle"></ui-avatar>
-        <ui-avatar initials="CD" color="secondary" shape="rounded"></ui-avatar>
-        <ui-avatar initials="EF" color="accent" shape="square"></ui-avatar>
+        <ui-avatar
+          initials="JD"
+          size="lg"
+          color="primary"
+          [showBadge]="true"
+          badgeColor="warning"
+        ></ui-avatar>
+        <ui-avatar
+          initials="OF"
+          size="lg"
+          color="neutral"
+          [showBadge]="true"
+          badgeColor="danger"
+        ></ui-avatar>
+        <ui-avatar
+          src="https://i.pravatar.cc/150?img=15"
+          size="lg"
+          [showBadge]="true"
+          badgeColor="info"
+        ></ui-avatar>
       </div>
     </div>
 
@@ -488,6 +866,13 @@
         <ui-link href="/" color="accent" underline="always">Always Underlined</ui-link>
         <ui-link href="https://google.com" [external]="true">External Link ↗</ui-link>
       </div>
+      <div class="demo-row" style="margin-top: 0.5rem;">
+        <ui-link href="/" color="success">Success Link</ui-link>
+        <ui-link href="/" color="warning">Warning Link</ui-link>
+        <ui-link href="/" color="danger">Danger Link</ui-link>
+        <ui-link href="/" color="info">Info Link</ui-link>
+        <ui-link href="/" underline="none">No Underline</ui-link>
+      </div>
     </div>
 
     <div class="demo-group">
@@ -498,8 +883,12 @@
       <ui-divider variant="dashed"></ui-divider>
       <p>Dotted divider:</p>
       <ui-divider variant="dotted"></ui-divider>
-      <p>Divider with label:</p>
+      <p>Divider with label (left):</p>
+      <ui-divider label="Section Start" labelPosition="left"></ui-divider>
+      <p>Divider with label (center):</p>
       <ui-divider label="OR" labelPosition="center"></ui-divider>
+      <p>Divider with label (right):</p>
+      <ui-divider label="Section End" labelPosition="right"></ui-divider>
     </div>
   </section>
 
@@ -510,18 +899,63 @@
     <h2 class="section-title">Loading States</h2>
 
     <div class="demo-group">
-      <h3>Spinners</h3>
+      <h3>Spinner Sizes</h3>
       <div class="demo-row demo-row--align-center">
-        <ui-spinner size="xs" color="primary"></ui-spinner>
-        <ui-spinner size="sm" color="secondary"></ui-spinner>
-        <ui-spinner size="md" color="accent"></ui-spinner>
-        <ui-spinner size="lg" color="success"></ui-spinner>
-        <ui-spinner size="xl" color="danger"></ui-spinner>
+        <div style="text-align: center;">
+          <ui-spinner size="xs" color="primary"></ui-spinner>
+          <p style="font-size: 0.75rem; margin-top: 0.25rem;">XS</p>
+        </div>
+        <div style="text-align: center;">
+          <ui-spinner size="sm" color="primary"></ui-spinner>
+          <p style="font-size: 0.75rem; margin-top: 0.25rem;">SM</p>
+        </div>
+        <div style="text-align: center;">
+          <ui-spinner size="md" color="primary"></ui-spinner>
+          <p style="font-size: 0.75rem; margin-top: 0.25rem;">MD</p>
+        </div>
+        <div style="text-align: center;">
+          <ui-spinner size="lg" color="primary"></ui-spinner>
+          <p style="font-size: 0.75rem; margin-top: 0.25rem;">LG</p>
+        </div>
+        <div style="text-align: center;">
+          <ui-spinner size="xl" color="primary"></ui-spinner>
+          <p style="font-size: 0.75rem; margin-top: 0.25rem;">XL</p>
+        </div>
       </div>
     </div>
 
     <div class="demo-group">
-      <h3>Skeleton Loaders</h3>
+      <h3>Spinner Colors</h3>
+      <div class="demo-row demo-row--align-center">
+        @for (color of colors; track color) {
+          <div style="text-align: center;">
+            <ui-spinner size="md" [color]="color"></ui-spinner>
+            <p style="font-size: 0.75rem; margin-top: 0.25rem;">{{ color | titlecase }}</p>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="demo-group">
+      <h3>Skeleton Loaders - Basic Shapes</h3>
+      <div class="demo-row demo-row--align-center" style="gap: 2rem;">
+        <div style="text-align: center;">
+          <ui-skeleton variant="circular" width="64px" height="64px"></ui-skeleton>
+          <p style="font-size: 0.75rem; margin-top: 0.5rem;">Circular</p>
+        </div>
+        <div style="text-align: center;">
+          <ui-skeleton variant="rectangular" width="100px" height="64px"></ui-skeleton>
+          <p style="font-size: 0.75rem; margin-top: 0.5rem;">Rectangular</p>
+        </div>
+        <div style="text-align: center;">
+          <ui-skeleton variant="text" width="150px" height="20px"></ui-skeleton>
+          <p style="font-size: 0.75rem; margin-top: 0.5rem;">Text</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="demo-group">
+      <h3>Skeleton Card Loading Pattern</h3>
       <div class="skeleton-demo">
         <div class="skeleton-row">
           <ui-skeleton variant="circular" width="48px" height="48px"></ui-skeleton>
@@ -538,15 +972,40 @@
     </div>
 
     <div class="demo-group">
+      <h3>Skeleton List Loading Pattern</h3>
+      <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 400px;">
+        @for (i of [1, 2, 3, 4]; track i) {
+          <div style="display: flex; gap: 1rem; align-items: center;">
+            <ui-skeleton variant="circular" width="40px" height="40px"></ui-skeleton>
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 0.5rem;">
+              <ui-skeleton variant="text" width="80%"></ui-skeleton>
+              <ui-skeleton variant="text" width="60%" height="12px"></ui-skeleton>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="demo-group">
       <h3>Loading Button Demo</h3>
-      <ui-button
-        variant="solid"
-        color="primary"
-        [loading]="isLoading"
-        (click)="simulateLoading()"
-      >
-        {{ isLoading ? 'Loading...' : 'Click to Load' }}
-      </ui-button>
+      <div class="demo-row">
+        <ui-button
+          variant="solid"
+          color="primary"
+          [loading]="isLoading"
+          (click)="simulateLoading()"
+        >
+          {{ isLoading ? 'Loading...' : 'Click to Load' }}
+        </ui-button>
+        <ui-button
+          variant="outline"
+          color="secondary"
+          [loading]="isLoading"
+          (click)="simulateLoading()"
+        >
+          {{ isLoading ? 'Please wait...' : 'Load Data' }}
+        </ui-button>
+      </div>
     </div>
   </section>
 
