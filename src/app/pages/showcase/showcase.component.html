@@ -87,12 +87,20 @@
     </div>
 
     <div class="demo-group">
-      <h3>Icon Buttons</h3>
+      <h3>Icon Buttons (Material 3)</h3>
       <div class="demo-row demo-row--align-center">
-        <ui-icon-button icon="🏠" color="primary" [uiTooltip]="'Home'" tooltipPosition="bottom"></ui-icon-button>
-        <ui-icon-button icon="⚙️" color="secondary" variant="outline" [uiTooltip]="'Settings'" tooltipPosition="bottom"></ui-icon-button>
-        <ui-icon-button icon="🗑️" color="danger" variant="ghost" [uiTooltip]="'Delete'" tooltipPosition="bottom"></ui-icon-button>
-        <ui-icon-button icon="✏️" color="accent" variant="soft" [uiTooltip]="'Edit'" tooltipPosition="bottom"></ui-icon-button>
+        <ui-icon-button color="primary" ariaLabel="Home" tooltip="Home">
+          <mat-icon>home</mat-icon>
+        </ui-icon-button>
+        <ui-icon-button color="secondary" variant="outline" ariaLabel="Settings" tooltip="Settings">
+          <mat-icon>settings</mat-icon>
+        </ui-icon-button>
+        <ui-icon-button color="danger" variant="ghost" ariaLabel="Delete" tooltip="Delete">
+          <mat-icon>delete</mat-icon>
+        </ui-icon-button>
+        <ui-icon-button color="accent" variant="soft" ariaLabel="Edit" tooltip="Edit">
+          <mat-icon>edit</mat-icon>
+        </ui-icon-button>
       </div>
     </div>
   </section>

@@ -1,12 +1,13 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 import { cn, sizeClass, colorClass } from '../../utils/class-utils';
 import type { Size, ColorVariant } from '../../types/component.types';
 
 @Component({
   selector: 'ui-icon-button',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MatIconModule],
   template: `
     <button
       [type]="type"
@@ -19,11 +20,7 @@ import type { Size, ColorVariant } from '../../types/component.types';
       (click)="handleClick($event)"
     >
       @if (loading) {
-        <span class="icon-btn__spinner">
-          <svg viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="10" />
-          </svg>
-        </span>
+        <mat-icon class="icon-btn__spinner">progress_activity</mat-icon>
       } @else {
         <ng-content></ng-content>
       }

@@ -1,6 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
 
 // Import all UI components
 import {
@@ -39,6 +40,7 @@ import type { TableColumn, DropdownOption, TabItem } from '../../components/ui';
   imports: [
     CommonModule,
     FormsModule,
+    MatIconModule,
     ButtonComponent,
     ButtonGroupComponent,
     IconButtonComponent,
