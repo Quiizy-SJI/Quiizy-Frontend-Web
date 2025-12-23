@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, HostBinding } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { cn } from '../../utils/class-utils';
@@ -9,34 +9,36 @@ import type { TabItem } from '../../types/component.types';
   standalone: true,
   imports: [CommonModule, RouterModule],
   template: `
-    <div class="tabs__list" role="tablist">
-      @for (tab of tabs; track tab.id) {
-        <button
-          type="button"
-          [id]="'tab-' + tab.id"
-          role="tab"
-          [attr.aria-selected]="activeTab === tab.id"
-          [attr.aria-controls]="'panel-' + tab.id"
-          [disabled]="tab.disabled"
-          [class]="getTabClasses(tab)"
-          (click)="selectTab(tab)"
-        >
-          @if (tab.icon) {
-            <span class="tabs__icon">
-              <!-- Icon would be rendered here -->
-            </span>
-          }
-          <span class="tabs__label">{{ tab.label }}</span>
-          @if (tab.badge) {
-            <span class="tabs__badge">{{ tab.badge }}</span>
-          }
-        </button>
-      }
-      <div class="tabs__indicator" [style.transform]="indicatorTransform" [style.width]="indicatorWidth"></div>
-    </div>
+    <div [class]="tabsClasses">
+      <div class="tabs__list" role="tablist">
+        @for (tab of tabs; track tab.id) {
+          <button
+            type="button"
+            [id]="'tab-' + tab.id"
+            role="tab"
+            [attr.aria-selected]="activeTab === tab.id"
+            [attr.aria-controls]="'panel-' + tab.id"
+            [disabled]="tab.disabled"
+            [class]="getTabClasses(tab)"
+            (click)="selectTab(tab)"
+          >
+            @if (tab.icon) {
+              <span class="tabs__icon">
+                <!-- Icon would be rendered here -->
+              </span>
+            }
+            <span class="tabs__label">{{ tab.label }}</span>
+            @if (tab.badge) {
+              <span class="tabs__badge">{{ tab.badge }}</span>
+            }
+          </button>
+        }
+        <div class="tabs__indicator" [style.transform]="indicatorTransform" [style.width]="indicatorWidth"></div>
+      </div>
 
-    <div class="tabs__content">
-      <ng-content></ng-content>
+      <div class="tabs__content">
+        <ng-content></ng-content>
+      </div>
     </div>
   `,
   styleUrl: './tabs.component.scss',
@@ -54,8 +56,7 @@ export class TabsComponent {
 
   @Output() tabChange = new EventEmitter<string | number>();
 
-  @HostBinding('class')
-  get hostClasses(): string {
+  get tabsClasses(): string {
     return cn(
       'tabs',
       `tabs--${this.variant}`,
