@@ -10,24 +10,89 @@
   background: var(--surface-base);
   border-radius: 16px;
   box-shadow: var(--elevation-2);
-}
 
-.stat-card {
-  // Color variants for icon
-  @each $color in (primary, secondary, accent, success, warning, danger, info, neutral) {
-    &--#{$color} {
-      .stat-card__icon {
-        background: var(--color-#{$color}-100);
-        color: var(--color-#{$color}-600);
-      }
-
-      .stat-card__progress-bar {
-        background: var(--color-#{$color}-500);
-      }
+  // Color variants
+  &.stat-card--primary {
+    .stat-card__icon {
+      background: var(--color-primary-100);
+      color: var(--color-primary-600);
+    }
+    .stat-card__progress-bar {
+      background: var(--color-primary-500);
     }
   }
 
-  &--compact {
+  &.stat-card--secondary {
+    .stat-card__icon {
+      background: var(--color-secondary-100);
+      color: var(--color-secondary-600);
+    }
+    .stat-card__progress-bar {
+      background: var(--color-secondary-500);
+    }
+  }
+
+  &.stat-card--accent {
+    .stat-card__icon {
+      background: var(--color-accent-100);
+      color: var(--color-accent-600);
+    }
+    .stat-card__progress-bar {
+      background: var(--color-accent-500);
+    }
+  }
+
+  &.stat-card--success {
+    .stat-card__icon {
+      background: var(--color-success-100);
+      color: var(--color-success-600);
+    }
+    .stat-card__progress-bar {
+      background: var(--color-success-500);
+    }
+  }
+
+  &.stat-card--warning {
+    .stat-card__icon {
+      background: var(--color-warning-100);
+      color: var(--color-warning-600);
+    }
+    .stat-card__progress-bar {
+      background: var(--color-warning-500);
+    }
+  }
+
+  &.stat-card--danger {
+    .stat-card__icon {
+      background: var(--color-danger-100);
+      color: var(--color-danger-600);
+    }
+    .stat-card__progress-bar {
+      background: var(--color-danger-500);
+    }
+  }
+
+  &.stat-card--info {
+    .stat-card__icon {
+      background: var(--color-info-100);
+      color: var(--color-info-600);
+    }
+    .stat-card__progress-bar {
+      background: var(--color-info-500);
+    }
+  }
+
+  &.stat-card--neutral {
+    .stat-card__icon {
+      background: var(--surface-hover);
+      color: var(--text-secondary);
+    }
+    .stat-card__progress-bar {
+      background: var(--text-tertiary);
+    }
+  }
+
+  &.stat-card--compact {
     padding: 1rem;
     gap: 0.75rem;
 
@@ -144,23 +209,45 @@
 [data-theme='dark'] {
   :host {
     box-shadow: var(--elevation-2), 0 0 0 1px rgba(255, 255, 255, 0.05);
-  }
 
-  .stat-card {
-    @each $color in (primary, secondary, accent, success, warning, danger, info) {
-      &--#{$color} {
-        .stat-card__icon {
-          background: rgba(var(--color-#{$color}-500-rgb), 0.15);
-          color: var(--color-#{$color}-400);
-        }
-      }
+    &.stat-card--primary .stat-card__icon {
+      background: rgba(var(--color-primary-500-rgb), 0.15);
+      color: var(--color-primary-400);
     }
 
-    &--neutral {
-      .stat-card__icon {
-        background: var(--surface-hover);
-        color: var(--text-secondary);
-      }
+    &.stat-card--secondary .stat-card__icon {
+      background: rgba(var(--color-secondary-500-rgb), 0.15);
+      color: var(--color-secondary-400);
+    }
+
+    &.stat-card--accent .stat-card__icon {
+      background: rgba(var(--color-accent-500-rgb), 0.15);
+      color: var(--color-accent-400);
+    }
+
+    &.stat-card--success .stat-card__icon {
+      background: rgba(var(--color-success-500-rgb), 0.15);
+      color: var(--color-success-400);
+    }
+
+    &.stat-card--warning .stat-card__icon {
+      background: rgba(var(--color-warning-500-rgb), 0.15);
+      color: var(--color-warning-400);
+    }
+
+    &.stat-card--danger .stat-card__icon {
+      background: rgba(var(--color-danger-500-rgb), 0.15);
+      color: var(--color-danger-400);
+    }
+
+    &.stat-card--info .stat-card__icon {
+      background: rgba(var(--color-info-500-rgb), 0.15);
+      color: var(--color-info-400);
+    }
+
+    &.stat-card--neutral .stat-card__icon {
+      background: var(--surface-hover);
+      color: var(--text-secondary);
     }
   }
 
