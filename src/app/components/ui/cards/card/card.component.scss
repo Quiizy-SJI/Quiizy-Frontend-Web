@@ -1,0 +1,336 @@
+// ============================================
+// CARD COMPONENT STYLES
+// ============================================
+
+:host {
+  display: block;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-base);
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  transition: all var(--motion-duration-normal) var(--motion-ease-out);
+
+  // ==========================================
+  // VARIANTS
+  // ==========================================
+  &--elevated {
+    box-shadow: var(--elevation-2);
+  }
+
+  &--outlined {
+    border: 1.5px solid var(--border-default);
+    box-shadow: none;
+  }
+
+  &--filled {
+    background: var(--surface-raised);
+    box-shadow: none;
+  }
+
+  &--ghost {
+    background: transparent;
+    box-shadow: none;
+  }
+
+  // ==========================================
+  // SIZES
+  // ==========================================
+  &--xs {
+    border-radius: 10px;
+
+    .card__header { padding: 0.5rem 0.75rem; }
+    .card__body { padding: 0.75rem; }
+    .card__footer { padding: 0.5rem 0.75rem; }
+    .card__title { font-size: 0.875rem; }
+    .card__subtitle { font-size: 0.75rem; }
+  }
+
+  &--sm {
+    border-radius: 12px;
+
+    .card__header { padding: 0.75rem 1rem; }
+    .card__body { padding: 1rem; }
+    .card__footer { padding: 0.75rem 1rem; }
+    .card__title { font-size: 1rem; }
+    .card__subtitle { font-size: 0.8125rem; }
+  }
+
+  &--md {
+    border-radius: 16px;
+
+    .card__header { padding: 1rem 1.25rem; }
+    .card__body { padding: 1.25rem; }
+    .card__footer { padding: 1rem 1.25rem; }
+    .card__title { font-size: 1.125rem; }
+    .card__subtitle { font-size: 0.875rem; }
+  }
+
+  &--lg {
+    border-radius: 20px;
+
+    .card__header { padding: 1.25rem 1.5rem; }
+    .card__body { padding: 1.5rem; }
+    .card__footer { padding: 1.25rem 1.5rem; }
+    .card__title { font-size: 1.25rem; }
+    .card__subtitle { font-size: 1rem; }
+  }
+
+  &--xl {
+    border-radius: 24px;
+
+    .card__header { padding: 1.5rem 2rem; }
+    .card__body { padding: 2rem; }
+    .card__footer { padding: 1.5rem 2rem; }
+    .card__title { font-size: 1.5rem; }
+    .card__subtitle { font-size: 1.125rem; }
+  }
+
+  // ==========================================
+  // STATES
+  // ==========================================
+  &--hoverable {
+    cursor: default;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--elevation-4);
+    }
+  }
+
+  &--clickable {
+    cursor: pointer;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--elevation-3);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: var(--focus-ring-offset);
+    }
+  }
+
+  &--full-width {
+    width: 100%;
+  }
+
+  &--horizontal {
+    .card__body {
+      flex-direction: row;
+    }
+
+    .card__image-container--side {
+      width: 40%;
+      flex-shrink: 0;
+    }
+
+    .card__content {
+      flex: 1;
+    }
+  }
+
+  &--bg-image {
+    background-size: cover;
+    background-position: center;
+    color: var(--text-inverse);
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.1) 0%,
+        rgba(0, 0, 0, 0.6) 100%
+      );
+      z-index: 0;
+    }
+
+    .card__header,
+    .card__body,
+    .card__footer {
+      position: relative;
+      z-index: 1;
+    }
+
+    .card__title,
+    .card__subtitle {
+      color: inherit;
+    }
+  }
+
+  &--loading {
+    pointer-events: none;
+
+    .card__header,
+    .card__body,
+    .card__footer {
+      opacity: 0.5;
+    }
+  }
+}
+
+// ==========================================
+// CARD SECTIONS
+// ==========================================
+.card__header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.card__header-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.card__title {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.card__subtitle {
+  color: var(--text-secondary);
+  margin: 0.25rem 0 0;
+  line-height: 1.4;
+}
+
+.card__body {
+  display: flex;
+  flex: 1;
+}
+
+.card__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.card__footer {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-top: 1px solid var(--border-subtle);
+  margin-top: auto;
+}
+
+// ==========================================
+// CARD IMAGE
+// ==========================================
+.card__image-container {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface-hover);
+
+  &--cover {
+    height: 200px;
+
+    .card__image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &--side {
+    height: 100%;
+    min-height: 150px;
+
+    .card__image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+}
+
+.card__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: transform var(--motion-duration-normal) var(--motion-ease-out);
+
+  .card--hoverable:hover &,
+  .card--clickable:hover & {
+    transform: scale(1.05);
+  }
+}
+
+.card__image-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  padding: 1rem;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.7) 0%,
+    transparent 100%
+  );
+  color: var(--text-inverse);
+}
+
+// ==========================================
+// EXPANDABLE
+// ==========================================
+.card__expandable {
+  border-top: 1px solid var(--border-subtle);
+  overflow: hidden;
+}
+
+// ==========================================
+// LOADING
+// ==========================================
+.card__loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(var(--surface-base-rgb), 0.8);
+  z-index: 10;
+}
+
+.card__loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border-default);
+  border-top-color: var(--color-primary-500);
+  border-radius: 50%;
+  animation: card-spinner 0.8s linear infinite;
+}
+
+@keyframes card-spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ==========================================
+// DARK MODE
+// ==========================================
+[data-theme='dark'] {
+  .card--elevated {
+    box-shadow: var(--elevation-2), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  }
+
+  .card--bg-image::before {
+    background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.2) 0%,
+      rgba(0, 0, 0, 0.75) 100%
+    );
+  }
+}

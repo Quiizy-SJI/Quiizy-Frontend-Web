@@ -1,0 +1,214 @@
+// ============================================
+// TOAST COMPONENT STYLES
+// ============================================
+
+:host {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  min-width: 300px;
+  max-width: 450px;
+  padding: 1rem;
+  background: var(--surface-raised);
+  border-radius: 12px;
+  box-shadow: var(--elevation-4);
+  position: relative;
+  overflow: hidden;
+  animation: toast-in 0.3s ease-out;
+}
+
+.toast {
+  // ==========================================
+  // COLOR VARIANTS
+  // ==========================================
+  &--primary {
+    .toast__icon { color: var(--color-primary-500); }
+    .toast__progress-bar { background: var(--color-primary-500); }
+    .toast__action { color: var(--color-primary-500); }
+  }
+
+  &--secondary {
+    .toast__icon { color: var(--color-secondary-500); }
+    .toast__progress-bar { background: var(--color-secondary-500); }
+    .toast__action { color: var(--color-secondary-500); }
+  }
+
+  &--accent {
+    .toast__icon { color: var(--color-accent-500); }
+    .toast__progress-bar { background: var(--color-accent-500); }
+    .toast__action { color: var(--color-accent-500); }
+  }
+
+  &--success {
+    .toast__icon { color: var(--color-success-500); }
+    .toast__progress-bar { background: var(--color-success-500); }
+    .toast__action { color: var(--color-success-600); }
+  }
+
+  &--warning {
+    .toast__icon { color: var(--color-warning-600); }
+    .toast__progress-bar { background: var(--color-warning-500); }
+    .toast__action { color: var(--color-warning-600); }
+  }
+
+  &--danger {
+    .toast__icon { color: var(--color-danger-500); }
+    .toast__progress-bar { background: var(--color-danger-500); }
+    .toast__action { color: var(--color-danger-500); }
+  }
+
+  &--info {
+    .toast__icon { color: var(--color-info-500); }
+    .toast__progress-bar { background: var(--color-info-500); }
+    .toast__action { color: var(--color-info-500); }
+  }
+
+  &--neutral {
+    .toast__icon { color: var(--text-secondary); }
+    .toast__progress-bar { background: var(--text-tertiary); }
+    .toast__action { color: var(--text-primary); }
+  }
+}
+
+// ==========================================
+// TOAST ELEMENTS
+// ==========================================
+.toast__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-top: 0.0625rem;
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.toast__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.toast__title {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--text-primary);
+  line-height: 1.3;
+  margin-bottom: 0.125rem;
+}
+
+.toast__message {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.toast__action {
+  padding: 0.25rem 0.5rem;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--motion-duration-fast) var(--motion-ease-out);
+  flex-shrink: 0;
+  margin-top: -0.125rem;
+
+  &:hover {
+    background: var(--surface-hover);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+}
+
+.toast__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: all var(--motion-duration-fast) var(--motion-ease-out);
+  flex-shrink: 0;
+  margin-top: -0.125rem;
+
+  &:hover {
+    background: var(--surface-hover);
+    color: var(--text-primary);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+// ==========================================
+// PROGRESS BAR
+// ==========================================
+.toast__progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--surface-hover);
+  overflow: hidden;
+}
+
+.toast__progress-bar {
+  height: 100%;
+  animation: toast-progress linear forwards;
+  transform-origin: left;
+}
+
+// ==========================================
+// ANIMATIONS
+// ==========================================
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes toast-progress {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+// ==========================================
+// DARK MODE
+// ==========================================
+[data-theme='dark'] {
+  :host {
+    background: var(--surface-raised);
+    box-shadow: var(--elevation-4), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  }
+}

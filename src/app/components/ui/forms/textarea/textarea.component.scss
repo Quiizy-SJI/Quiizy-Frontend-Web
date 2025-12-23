@@ -1,0 +1,216 @@
+// ============================================
+// TEXTAREA COMPONENT STYLES
+// ============================================
+
+.textarea-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  width: 100%;
+}
+
+.textarea__label {
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 0.125rem;
+
+  .textarea__required {
+    color: var(--color-danger-500);
+    margin-left: 0.125rem;
+  }
+}
+
+.textarea__container {
+  position: relative;
+  width: 100%;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 100px;
+  font-family: var(--font-family, inherit);
+  color: var(--input-text);
+  background: var(--input-bg);
+  border: 1.5px solid var(--input-border);
+  border-radius: 10px;
+  padding: 0.75rem;
+  transition: all var(--motion-duration-fast) var(--motion-ease-out);
+  outline: none;
+  line-height: 1.5;
+
+  &::placeholder {
+    color: var(--input-placeholder);
+  }
+
+  &:hover:not(:disabled):not(:focus) {
+    border-color: var(--input-border-hover);
+  }
+
+  &:focus {
+    border-color: var(--input-border-focus);
+    box-shadow: var(--focus-ring);
+  }
+
+  // ==========================================
+  // SIZE VARIANTS
+  // ==========================================
+  &--xs {
+    padding: 0.5rem;
+    font-size: 0.75rem;
+    border-radius: 6px;
+  }
+
+  &--sm {
+    padding: 0.625rem;
+    font-size: 0.8125rem;
+    border-radius: 8px;
+  }
+
+  &--md {
+    padding: 0.75rem;
+    font-size: 0.875rem;
+    border-radius: 10px;
+  }
+
+  &--lg {
+    padding: 1rem;
+    font-size: 1rem;
+    border-radius: 12px;
+  }
+
+  &--xl {
+    padding: 1.25rem;
+    font-size: 1.125rem;
+    border-radius: 14px;
+  }
+
+  // ==========================================
+  // VARIANTS
+  // ==========================================
+  &--filled {
+    background: var(--surface-hover);
+    border-color: transparent;
+
+    &:hover:not(:disabled):not(:focus) {
+      background: var(--surface-active);
+    }
+
+    &:focus {
+      background: var(--surface-base);
+      border-color: var(--input-border-focus);
+    }
+  }
+
+  &--underlined {
+    border-radius: 0;
+    border: none;
+    border-bottom: 2px solid var(--input-border);
+    background: transparent;
+
+    &:hover:not(:disabled):not(:focus) {
+      border-bottom-color: var(--input-border-hover);
+    }
+
+    &:focus {
+      border-bottom-color: var(--input-border-focus);
+      box-shadow: none;
+    }
+  }
+
+  // ==========================================
+  // RESIZE OPTIONS
+  // ==========================================
+  &--resize-none {
+    resize: none;
+  }
+
+  &--resize-vertical {
+    resize: vertical;
+  }
+
+  &--resize-horizontal {
+    resize: horizontal;
+  }
+
+  &--resize-both {
+    resize: both;
+  }
+
+  // ==========================================
+  // VALIDATION STATES
+  // ==========================================
+  &--valid {
+    border-color: var(--color-success-500);
+
+    &:focus {
+      box-shadow: 0 0 0 2px var(--color-success-100);
+    }
+  }
+
+  &--invalid {
+    border-color: var(--color-danger-500);
+
+    &:focus {
+      box-shadow: 0 0 0 2px var(--color-danger-100);
+    }
+  }
+
+  // ==========================================
+  // STATES
+  // ==========================================
+  &--disabled,
+  &:disabled {
+    background: var(--input-disabled-bg);
+    color: var(--input-disabled-text);
+    cursor: not-allowed;
+    opacity: 0.6;
+    resize: none;
+  }
+
+  &--readonly {
+    background: var(--surface-sunken);
+    cursor: default;
+  }
+}
+
+.textarea__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.textarea__helper {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  flex: 1;
+
+  &--error {
+    color: var(--color-danger-500);
+  }
+}
+
+.textarea__count {
+  font-size: 0.6875rem;
+  color: var(--text-quaternary);
+  white-space: nowrap;
+
+  &--warning {
+    color: var(--color-warning-600);
+  }
+}
+
+// ==========================================
+// DARK MODE ADJUSTMENTS
+// ==========================================
+[data-theme='dark'] {
+  .textarea {
+    &--valid:focus {
+      box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.2);
+    }
+
+    &--invalid:focus {
+      box-shadow: 0 0 0 2px rgba(248, 113, 113, 0.2);
+    }
+  }
+}

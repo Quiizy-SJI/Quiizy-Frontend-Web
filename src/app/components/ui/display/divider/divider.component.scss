@@ -1,0 +1,128 @@
+// ============================================
+// DIVIDER COMPONENT STYLES
+// ============================================
+
+:host {
+  display: flex;
+  align-items: center;
+}
+
+.divider {
+  // ==========================================
+  // ORIENTATION
+  // ==========================================
+  &--horizontal {
+    width: 100%;
+    flex-direction: row;
+
+    &::before,
+    &::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border-default);
+    }
+
+    &.divider--dashed::before,
+    &.divider--dashed::after {
+      background: transparent;
+      border-top: 1px dashed var(--border-default);
+    }
+
+    &.divider--dotted::before,
+    &.divider--dotted::after {
+      background: transparent;
+      border-top: 1px dotted var(--border-default);
+    }
+  }
+
+  &--vertical {
+    height: 100%;
+    min-height: 24px;
+    flex-direction: column;
+    width: auto;
+
+    &::before,
+    &::after {
+      content: '';
+      flex: 1;
+      width: 1px;
+      background: var(--border-default);
+    }
+
+    &.divider--dashed::before,
+    &.divider--dashed::after {
+      background: transparent;
+      border-left: 1px dashed var(--border-default);
+    }
+
+    &.divider--dotted::before,
+    &.divider--dotted::after {
+      background: transparent;
+      border-left: 1px dotted var(--border-default);
+    }
+  }
+
+  // ==========================================
+  // SPACING
+  // ==========================================
+  &--spacing-sm {
+    &.divider--horizontal { margin: 0.5rem 0; }
+    &.divider--vertical { margin: 0 0.5rem; }
+  }
+
+  &--spacing-md {
+    &.divider--horizontal { margin: 1rem 0; }
+    &.divider--vertical { margin: 0 1rem; }
+  }
+
+  &--spacing-lg {
+    &.divider--horizontal { margin: 1.5rem 0; }
+    &.divider--vertical { margin: 0 1.5rem; }
+  }
+
+  // ==========================================
+  // WITH LABEL
+  // ==========================================
+  &--with-label {
+    &::before,
+    &::after {
+      content: '';
+    }
+  }
+
+  &--label-left {
+    &::before {
+      flex: 0;
+      width: 0;
+    }
+  }
+
+  &--label-right {
+    &::after {
+      flex: 0;
+      width: 0;
+    }
+  }
+
+  &--label-center {
+    &::before,
+    &::after {
+      flex: 1;
+    }
+  }
+}
+
+.divider__label {
+  padding: 0 1rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+
+  .divider--vertical & {
+    padding: 0.5rem 0;
+    writing-mode: vertical-lr;
+    text-orientation: mixed;
+  }
+}

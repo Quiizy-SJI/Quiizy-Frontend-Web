@@ -1,0 +1,580 @@
+<div class="showcase">
+  <header class="showcase__header">
+    <h1 class="showcase__title">🎨 UI Component Library</h1>
+    <p class="showcase__subtitle">A comprehensive collection of customizable Angular components</p>
+  </header>
+
+  <!-- Breadcrumb Demo -->
+  <ui-breadcrumb [items]="breadcrumbItems" separator="chevron"></ui-breadcrumb>
+
+  <ui-divider></ui-divider>
+
+  <!-- Tabs Navigation -->
+  <section class="showcase__section">
+    <h2 class="section-title">Navigation - Tabs</h2>
+    <div class="demo-group">
+      <div class="demo-item">
+        <h4>Line Tabs</h4>
+        <ui-tabs [tabs]="tabItems" [activeTab]="activeTab" variant="line" (tabChange)="onTabChange($event)"></ui-tabs>
+      </div>
+      <div class="demo-item">
+        <h4>Enclosed Tabs</h4>
+        <ui-tabs [tabs]="tabItems" [activeTab]="activeTab" variant="enclosed" (tabChange)="onTabChange($event)"></ui-tabs>
+      </div>
+      <div class="demo-item">
+        <h4>Pills Tabs</h4>
+        <ui-tabs [tabs]="tabItems" [activeTab]="activeTab" variant="pills" (tabChange)="onTabChange($event)"></ui-tabs>
+      </div>
+      <div class="demo-item">
+        <h4>Soft Tabs</h4>
+        <ui-tabs [tabs]="tabItems" [activeTab]="activeTab" variant="soft" (tabChange)="onTabChange($event)"></ui-tabs>
+      </div>
+    </div>
+  </section>
+
+  <ui-divider label="Buttons"></ui-divider>
+
+  <!-- Button Section -->
+  <section class="showcase__section">
+    <h2 class="section-title">Buttons</h2>
+
+    <div class="demo-group">
+      <h3>Button Variants</h3>
+      <div class="demo-row">
+        @for (variant of buttonVariants; track variant) {
+          <ui-button [variant]="variant" color="primary">{{ variant | titlecase }}</ui-button>
+        }
+      </div>
+    </div>
+
+    <div class="demo-group">
+      <h3>Button Colors</h3>
+      <div class="demo-row">
+        @for (color of colors; track color) {
+          <ui-button variant="solid" [color]="color">{{ color | titlecase }}</ui-button>
+        }
+      </div>
+    </div>
+
+    <div class="demo-group">
+      <h3>Button Sizes</h3>
+      <div class="demo-row demo-row--align-center">
+        @for (size of sizes; track size) {
+          <ui-button variant="solid" color="primary" [size]="size">{{ size | uppercase }}</ui-button>
+        }
+      </div>
+    </div>
+
+    <div class="demo-group">
+      <h3>Button States</h3>
+      <div class="demo-row">
+        <ui-button variant="solid" color="primary">Normal</ui-button>
+        <ui-button variant="solid" color="primary" [disabled]="true">Disabled</ui-button>
+        <ui-button variant="solid" color="primary" [loading]="true">Loading</ui-button>
+        <ui-button variant="solid" color="primary" [fullWidth]="false" [uiTooltip]="'Click me!'" tooltipPosition="top">With Tooltip</ui-button>
+      </div>
+    </div>
+
+    <div class="demo-group">
+      <h3>Button Group</h3>
+      <div class="demo-row">
+        <ui-button-group>
+          <ui-button variant="outline" color="primary">Left</ui-button>
+          <ui-button variant="outline" color="primary">Center</ui-button>
+          <ui-button variant="outline" color="primary">Right</ui-button>
+        </ui-button-group>
+      </div>
+    </div>
+
+    <div class="demo-group">
+      <h3>Icon Buttons</h3>
+      <div class="demo-row demo-row--align-center">
+        <ui-icon-button icon="🏠" color="primary" [uiTooltip]="'Home'" tooltipPosition="bottom"></ui-icon-button>
+        <ui-icon-button icon="⚙️" color="secondary" variant="outline" [uiTooltip]="'Settings'" tooltipPosition="bottom"></ui-icon-button>
+        <ui-icon-button icon="🗑️" color="danger" variant="ghost" [uiTooltip]="'Delete'" tooltipPosition="bottom"></ui-icon-button>
+        <ui-icon-button icon="✏️" color="accent" variant="soft" [uiTooltip]="'Edit'" tooltipPosition="bottom"></ui-icon-button>
+      </div>
+    </div>
+  </section>
+
+  <ui-divider label="Badges"></ui-divider>
+
+  <!-- Badges Section -->
+  <section class="showcase__section">
+    <h2 class="section-title">Badges</h2>
+
+    <div class="demo-group">
+      <h3>Badge Variants</h3>
+      <div class="demo-row">
+        <ui-badge variant="solid" color="primary">Solid</ui-badge>
+        <ui-badge variant="outline" color="primary">Outline</ui-badge>
+        <ui-badge variant="subtle" color="primary">Subtle</ui-badge>
+        <ui-badge variant="dot" color="primary">With Dot</ui-badge>
+      </div>
+    </div>
+
+    <div class="demo-group">
+      <h3>Badge Colors</h3>
+      <div class="demo-row">
+        @for (color of colors; track color) {
+          <ui-badge variant="solid" [color]="color">{{ color | titlecase }}</ui-badge>
+        }
+      </div>
+    </div>
+
+    <div class="demo-group">
+      <h3>Badge Sizes</h3>
+      <div class="demo-row demo-row--align-center">
+        @for (size of sizes; track size) {
+          <ui-badge variant="solid" color="accent" [size]="size">{{ size | uppercase }}</ui-badge>
+        }
+      </div>
+    </div>
+  </section>
+
+  <ui-divider label="Forms"></ui-divider>
+
+  <!-- Form Components Section -->
+  <section class="showcase__section">
+    <h2 class="section-title">Form Components</h2>
+
+    <div class="demo-grid">
+      <div class="demo-group">
+        <h3>Input Variants</h3>
+        <ui-input
+          label="Outlined Input"
+          placeholder="Enter text..."
+          variant="outlined"
+          [(ngModel)]="inputValue"
+        ></ui-input>
+        <ui-input
+          label="Filled Input"
+          placeholder="Enter text..."
+          variant="filled"
+        ></ui-input>
+        <ui-input
+          label="Underlined Input"
+          placeholder="Enter text..."
+          variant="underlined"
+        ></ui-input>
+      </div>
+
+      <div class="demo-group">
+        <h3>Input States</h3>
+        <ui-input
+          label="Valid Input"
+          placeholder="Valid state"
+          validationState="valid"
+          helperText="This field is valid!"
+        ></ui-input>
+        <ui-input
+          label="Invalid Input"
+          placeholder="Invalid state"
+          validationState="invalid"
+          errorMessage="This field has an error"
+        ></ui-input>
+        <ui-input
+          label="Disabled Input"
+          placeholder="Disabled"
+          [disabled]="true"
+        ></ui-input>
+      </div>
+
+      <div class="demo-group">
+        <h3>Special Inputs</h3>
+        <ui-input
+          label="Password"
+          type="password"
+          placeholder="Enter password..."
+          [(ngModel)]="passwordValue"
+        ></ui-input>
+        <ui-input
+          label="Clearable Input"
+          placeholder="Type to clear..."
+          [clearable]="true"
+        ></ui-input>
+        <ui-input
+          label="With Prefix/Suffix"
+          placeholder="0.00"
+          [prefix]="true"
+          [suffix]="true"
+        >
+          <span slot="prefix">$</span>
+          <span slot="suffix">USD</span>
+        </ui-input>
+      </div>
+
+      <div class="demo-group">
+        <h3>Textarea</h3>
+        <ui-textarea
+          label="Description"
+          placeholder="Enter description..."
+          [(ngModel)]="textareaValue"
+          [rows]="4"
+          [showCharacterCount]="true"
+          [maxlength]="200"
+        ></ui-textarea>
+      </div>
+
+      <div class="demo-group">
+        <h3>Select</h3>
+        <ui-select
+          label="Framework"
+          placeholder="Select a framework..."
+          [options]="selectOptions"
+          [(ngModel)]="selectedOption"
+          [searchable]="true"
+          [clearable]="true"
+        ></ui-select>
+      </div>
+
+      <div class="demo-group">
+        <h3>Checkboxes & Toggles</h3>
+        <ui-checkbox
+          label="Accept terms and conditions"
+          [(ngModel)]="checkboxValue"
+          color="primary"
+        ></ui-checkbox>
+        <ui-checkbox
+          label="Indeterminate state"
+          [indeterminate]="true"
+          color="accent"
+        ></ui-checkbox>
+        <ui-checkbox
+          label="Disabled checkbox"
+          [disabled]="true"
+        ></ui-checkbox>
+        <ui-divider variant="dashed"></ui-divider>
+        <ui-toggle
+          label="Enable notifications"
+          [(ngModel)]="toggleValue"
+          color="success"
+        ></ui-toggle>
+        <ui-toggle
+          label="Dark mode"
+          color="primary"
+          [showIcons]="true"
+        ></ui-toggle>
+      </div>
+
+      <div class="demo-group">
+        <h3>Radio Buttons</h3>
+        <ui-radio
+          label="Option 1"
+          name="demo-radio"
+          value="option1"
+          [(ngModel)]="radioValue"
+          color="primary"
+        ></ui-radio>
+        <ui-radio
+          label="Option 2"
+          name="demo-radio"
+          value="option2"
+          [(ngModel)]="radioValue"
+          color="primary"
+        ></ui-radio>
+        <ui-radio
+          label="Option 3 (disabled)"
+          name="demo-radio"
+          value="option3"
+          [disabled]="true"
+        ></ui-radio>
+      </div>
+    </div>
+  </section>
+
+  <ui-divider label="Cards"></ui-divider>
+
+  <!-- Cards Section -->
+  <section class="showcase__section">
+    <h2 class="section-title">Cards</h2>
+
+    <div class="demo-grid demo-grid--cards">
+      <ui-card
+        title="Elevated Card"
+        subtitle="With shadow elevation"
+        variant="elevated"
+        [hoverable]="true"
+      >
+        <p>This is an elevated card with hover effect. It has a subtle shadow that increases on hover.</p>
+      </ui-card>
+
+      <ui-card
+        title="Outlined Card"
+        subtitle="With border"
+        variant="outlined"
+      >
+        <p>This card has a border outline instead of shadow elevation.</p>
+      </ui-card>
+
+      <ui-card
+        title="Filled Card"
+        subtitle="With background"
+        variant="filled"
+      >
+        <p>This card has a filled background color that distinguishes it from the page.</p>
+      </ui-card>
+
+      <ui-card
+        title="Clickable Card"
+        subtitle="Click anywhere"
+        variant="elevated"
+        [clickable]="true"
+      >
+        <p>This entire card is clickable. Hover to see the cursor change.</p>
+      </ui-card>
+    </div>
+
+    <h3 style="margin-top: 2rem;">Stat Cards</h3>
+    <div class="demo-grid demo-grid--stats">
+      <ui-stat-card
+        label="Total Users"
+        [value]="12847"
+        [showTrend]="true"
+        [trendValue]="12.5"
+        trendDirection="up"
+        description="vs last month"
+        color="primary"
+      ></ui-stat-card>
+
+      <ui-stat-card
+        label="Revenue"
+        [value]="48520"
+        [showTrend]="true"
+        [trendValue]="-3.2"
+        trendDirection="down"
+        description="vs last week"
+        color="success"
+        format="currency"
+      ></ui-stat-card>
+
+      <ui-stat-card
+        label="Active Sessions"
+        [value]="342"
+        color="accent"
+        [showProgress]="true"
+        [progress]="68"
+      ></ui-stat-card>
+
+      <ui-stat-card
+        label="Completion Rate"
+        value="89%"
+        [showTrend]="true"
+        [trendValue]="5.8"
+        trendDirection="up"
+        color="info"
+      ></ui-stat-card>
+    </div>
+  </section>
+
+  <ui-divider label="Feedback"></ui-divider>
+
+  <!-- Alerts Section -->
+  <section class="showcase__section">
+    <h2 class="section-title">Alerts</h2>
+
+    <div class="demo-group">
+      <h3>Alert Variants</h3>
+      <ui-alert color="info" variant="soft" title="Information">
+        This is a soft info alert with a title and description.
+      </ui-alert>
+      <ui-alert color="success" variant="filled" title="Success!">
+        Your changes have been saved successfully.
+      </ui-alert>
+      <ui-alert color="warning" variant="outlined" title="Warning">
+        Please review your input before submitting.
+      </ui-alert>
+      <ui-alert color="danger" variant="accent" title="Error" [dismissible]="true">
+        Something went wrong. Please try again later.
+      </ui-alert>
+    </div>
+
+    <div class="demo-group">
+      <h3>Modals</h3>
+      <div class="demo-row">
+        <ui-button variant="solid" color="primary" (click)="openModal('sm')">Small Modal</ui-button>
+        <ui-button variant="solid" color="secondary" (click)="openModal('md')">Medium Modal</ui-button>
+        <ui-button variant="solid" color="accent" (click)="openModal('lg')">Large Modal</ui-button>
+      </div>
+    </div>
+
+    <div class="demo-group">
+      <h3>Toast Notifications</h3>
+      <div class="demo-row">
+        <ui-button variant="soft" color="success" (click)="showToastNotification('success')">Success Toast</ui-button>
+        <ui-button variant="soft" color="danger" (click)="showToastNotification('danger')">Error Toast</ui-button>
+        <ui-button variant="soft" color="warning" (click)="showToastNotification('warning')">Warning Toast</ui-button>
+        <ui-button variant="soft" color="info" (click)="showToastNotification('info')">Info Toast</ui-button>
+      </div>
+    </div>
+  </section>
+
+  <ui-divider label="Data Display"></ui-divider>
+
+  <!-- Table Section -->
+  <section class="showcase__section">
+    <h2 class="section-title">Data Table</h2>
+
+    <ui-table
+      [columns]="tableColumns"
+      [data]="tableData"
+      [selectable]="true"
+      variant="striped"
+      [showPagination]="true"
+      [pagination]="tablePagination"
+      (sortChange)="onTableSort($event)"
+      (selectionChange)="onTableSelectionChange($event)"
+    ></ui-table>
+  </section>
+
+  <ui-divider label="Display Components"></ui-divider>
+
+  <!-- Display Components Section -->
+  <section class="showcase__section">
+    <h2 class="section-title">Display Components</h2>
+
+    <div class="demo-group">
+      <h3>Avatars</h3>
+      <div class="demo-row demo-row--align-center">
+        <ui-avatar
+          src="https://i.pravatar.cc/150?img=1"
+          alt="User 1"
+          size="xs"
+        ></ui-avatar>
+        <ui-avatar
+          src="https://i.pravatar.cc/150?img=2"
+          alt="User 2"
+          size="sm"
+        ></ui-avatar>
+        <ui-avatar
+          src="https://i.pravatar.cc/150?img=3"
+          alt="User 3"
+          size="md"
+        ></ui-avatar>
+        <ui-avatar
+          initials="JD"
+          size="lg"
+          color="primary"
+        ></ui-avatar>
+        <ui-avatar
+          initials="AS"
+          size="xl"
+          color="accent"
+          [showBadge]="true"
+          badgeColor="success"
+        ></ui-avatar>
+      </div>
+      <div class="demo-row demo-row--align-center" style="margin-top: 1rem;">
+        <ui-avatar initials="AB" color="primary" shape="circle"></ui-avatar>
+        <ui-avatar initials="CD" color="secondary" shape="rounded"></ui-avatar>
+        <ui-avatar initials="EF" color="accent" shape="square"></ui-avatar>
+      </div>
+    </div>
+
+    <div class="demo-group">
+      <h3>Links</h3>
+      <div class="demo-row">
+        <ui-link href="/">Default Link</ui-link>
+        <ui-link href="/" color="primary">Primary Link</ui-link>
+        <ui-link href="/" color="secondary">Secondary Link</ui-link>
+        <ui-link href="/" color="accent" underline="always">Always Underlined</ui-link>
+        <ui-link href="https://google.com" [external]="true">External Link ↗</ui-link>
+      </div>
+    </div>
+
+    <div class="demo-group">
+      <h3>Dividers</h3>
+      <p>Solid divider:</p>
+      <ui-divider></ui-divider>
+      <p>Dashed divider:</p>
+      <ui-divider variant="dashed"></ui-divider>
+      <p>Dotted divider:</p>
+      <ui-divider variant="dotted"></ui-divider>
+      <p>Divider with label:</p>
+      <ui-divider label="OR" labelPosition="center"></ui-divider>
+    </div>
+  </section>
+
+  <ui-divider label="Loaders"></ui-divider>
+
+  <!-- Loaders Section -->
+  <section class="showcase__section">
+    <h2 class="section-title">Loading States</h2>
+
+    <div class="demo-group">
+      <h3>Spinners</h3>
+      <div class="demo-row demo-row--align-center">
+        <ui-spinner size="xs" color="primary"></ui-spinner>
+        <ui-spinner size="sm" color="secondary"></ui-spinner>
+        <ui-spinner size="md" color="accent"></ui-spinner>
+        <ui-spinner size="lg" color="success"></ui-spinner>
+        <ui-spinner size="xl" color="danger"></ui-spinner>
+      </div>
+    </div>
+
+    <div class="demo-group">
+      <h3>Skeleton Loaders</h3>
+      <div class="skeleton-demo">
+        <div class="skeleton-row">
+          <ui-skeleton variant="circular" width="48px" height="48px"></ui-skeleton>
+          <div class="skeleton-content">
+            <ui-skeleton variant="text" width="150px"></ui-skeleton>
+            <ui-skeleton variant="text" width="100px" height="12px"></ui-skeleton>
+          </div>
+        </div>
+        <ui-skeleton variant="rectangular" width="100%" height="120px"></ui-skeleton>
+        <ui-skeleton variant="text" width="100%"></ui-skeleton>
+        <ui-skeleton variant="text" width="80%"></ui-skeleton>
+        <ui-skeleton variant="text" width="60%"></ui-skeleton>
+      </div>
+    </div>
+
+    <div class="demo-group">
+      <h3>Loading Button Demo</h3>
+      <ui-button
+        variant="solid"
+        color="primary"
+        [loading]="isLoading"
+        (click)="simulateLoading()"
+      >
+        {{ isLoading ? 'Loading...' : 'Click to Load' }}
+      </ui-button>
+    </div>
+  </section>
+
+  <!-- Modal Component -->
+  @if (isModalOpen()) {
+    <ui-modal
+      [isOpen]="isModalOpen()"
+      [size]="modalSize"
+      title="Example Modal"
+      [showCloseButton]="true"
+      (close)="closeModal()"
+    >
+      <p>This is a {{ modalSize }} modal dialog. You can put any content here.</p>
+      <p>Click outside or press ESC to close.</p>
+      <div style="margin-top: 1.5rem; display: flex; gap: 0.5rem; justify-content: flex-end;">
+        <ui-button variant="ghost" color="neutral" (click)="closeModal()">Cancel</ui-button>
+        <ui-button variant="solid" color="primary" (click)="closeModal()">Confirm</ui-button>
+      </div>
+    </ui-modal>
+  }
+
+  <!-- Toast Component -->
+  @if (showToast()) {
+    <ui-toast
+      [message]="'This is a ' + toastColor + ' notification!'"
+      [color]="toastColor"
+      [title]="toastColor === 'success' ? 'Success!' : toastColor === 'danger' ? 'Error!' : toastColor === 'warning' ? 'Warning!' : 'Info'"
+      position="top-right"
+      [duration]="4000"
+      [showProgress]="true"
+      (dismiss)="hideToast()"
+    ></ui-toast>
+  }
+
+  <footer class="showcase__footer">
+    <ui-divider></ui-divider>
+    <p>Built with ❤️ using Angular 19+ | Quizzy UI Component Library</p>
+  </footer>
+</div>

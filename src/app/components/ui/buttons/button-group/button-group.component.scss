@@ -1,0 +1,95 @@
+// ============================================
+// BUTTON GROUP COMPONENT STYLES
+// ============================================
+
+.btn-group {
+  display: inline-flex;
+  align-items: center;
+
+  // ==========================================
+  // ORIENTATION
+  // ==========================================
+  &--horizontal {
+    flex-direction: row;
+  }
+
+  &--vertical {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  // ==========================================
+  // SPACING
+  // ==========================================
+  &--spacing-none {
+    gap: 0;
+  }
+
+  &--spacing-xs {
+    gap: 0.25rem;
+  }
+
+  &--spacing-sm {
+    gap: 0.5rem;
+  }
+
+  &--spacing-md {
+    gap: 0.75rem;
+  }
+
+  // ==========================================
+  // ATTACHED VARIANT
+  // ==========================================
+  &--attached {
+    gap: 0;
+
+    &.btn-group--horizontal {
+      ::ng-deep .btn {
+        border-radius: 0;
+        margin-left: -1px;
+
+        &:first-child {
+          border-radius: 10px 0 0 10px;
+          margin-left: 0;
+        }
+
+        &:last-child {
+          border-radius: 0 10px 10px 0;
+        }
+
+        &:only-child {
+          border-radius: 10px;
+        }
+
+        &:focus {
+          z-index: 1;
+        }
+      }
+    }
+
+    &.btn-group--vertical {
+      ::ng-deep .btn {
+        border-radius: 0;
+        margin-top: -1px;
+        width: 100%;
+
+        &:first-child {
+          border-radius: 10px 10px 0 0;
+          margin-top: 0;
+        }
+
+        &:last-child {
+          border-radius: 0 0 10px 10px;
+        }
+
+        &:only-child {
+          border-radius: 10px;
+        }
+
+        &:focus {
+          z-index: 1;
+        }
+      }
+    }
+  }
+}
