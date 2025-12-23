@@ -1,4 +1,4 @@
-import { Component, Input, ChangeDetectionStrategy, HostBinding } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { cn } from '../../utils/class-utils';
 
@@ -6,7 +6,7 @@ import { cn } from '../../utils/class-utils';
   selector: 'ui-skeleton',
   standalone: true,
   imports: [CommonModule],
-  template: ``,
+  template: `<div [class]="skeletonClasses" [style.width]="width" [style.height]="height"></div>`,
   styleUrl: './skeleton.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -18,23 +18,12 @@ export class SkeletonComponent {
   @Input() animated = true;
   @Input() customClass?: string;
 
-  @HostBinding('class')
-  get hostClasses(): string {
+  get skeletonClasses(): string {
     return cn(
       'skeleton',
       `skeleton--${this.variant}`,
       this.animated && 'skeleton--animated',
       this.customClass
     );
-  }
-
-  @HostBinding('style.width')
-  get widthStyle(): string | null {
-    return this.width ?? null;
-  }
-
-  @HostBinding('style.height')
-  get heightStyle(): string | null {
-    return this.height ?? null;
   }
 }
