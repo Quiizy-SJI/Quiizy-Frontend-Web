@@ -7,6 +7,11 @@
 // Material Design 3 Icons
 @use '@fontsource/material-icons-outlined' as *;
 
+// Configure Angular Material icons to use outlined font
+.mat-icon {
+  font-family: 'Material Icons Outlined' !important;
+}
+
 // ============================================
 // CONFIGURATION SECTION
 // ============================================
