@@ -28,9 +28,10 @@
     border-radius: 4px;
     font-size: 0.75rem;
 
-    svg, img {
+    svg, img, .mat-icon {
       width: 14px;
       height: 14px;
+      font-size: 14px;
     }
   }
 
@@ -40,9 +41,10 @@
     border-radius: 6px;
     font-size: 0.875rem;
 
-    svg, img {
+    svg, img, .mat-icon {
       width: 16px;
       height: 16px;
+      font-size: 16px;
     }
   }
 
@@ -52,9 +54,10 @@
     border-radius: 8px;
     font-size: 1rem;
 
-    svg, img {
+    svg, img, .mat-icon {
       width: 20px;
       height: 20px;
+      font-size: 20px;
     }
   }
 
@@ -64,9 +67,10 @@
     border-radius: 10px;
     font-size: 1.125rem;
 
-    svg, img {
+    svg, img, .mat-icon {
       width: 24px;
       height: 24px;
+      font-size: 24px;
     }
   }
 
@@ -76,9 +80,10 @@
     border-radius: 12px;
     font-size: 1.25rem;
 
-    svg, img {
+    svg, img, .mat-icon {
       width: 28px;
       height: 28px;
+      font-size: 28px;
     }
   }
 
