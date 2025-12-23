@@ -1,4 +1,4 @@
-import { Component, Input, ChangeDetectionStrategy, HostBinding } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { cn } from '../../utils/class-utils';
 
@@ -7,10 +7,12 @@ import { cn } from '../../utils/class-utils';
   standalone: true,
   imports: [CommonModule],
   template: `
-    @if (label) {
-      <span class="divider__label">{{ label }}</span>
-    }
-    <ng-content></ng-content>
+    <div [class]="dividerClasses" role="separator" [attr.aria-orientation]="orientation">
+      @if (label) {
+        <span class="divider__label">{{ label }}</span>
+      }
+      <ng-content></ng-content>
+    </div>
   `,
   styleUrl: './divider.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -23,8 +25,7 @@ export class DividerComponent {
   @Input() spacing: 'sm' | 'md' | 'lg' = 'md';
   @Input() customClass?: string;
 
-  @HostBinding('class')
-  get hostClasses(): string {
+  get dividerClasses(): string {
     return cn(
       'divider',
       `divider--${this.orientation}`,
@@ -34,15 +35,5 @@ export class DividerComponent {
       this.label && `divider--label-${this.labelPosition}`,
       this.customClass
     );
-  }
-
-  @HostBinding('role')
-  get role(): string {
-    return 'separator';
-  }
-
-  @HostBinding('attr.aria-orientation')
-  get ariaOrientation(): string {
-    return this.orientation;
   }
 }
