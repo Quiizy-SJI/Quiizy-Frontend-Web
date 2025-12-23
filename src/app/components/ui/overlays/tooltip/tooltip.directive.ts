@@ -54,6 +54,8 @@ export class TooltipDirective implements OnDestroy {
     document.body.appendChild(this.tooltipRef.location.nativeElement);
     this.appRef.attachView(this.tooltipRef.hostView);
 
+    // Trigger change detection and position update
+    this.tooltipRef.changeDetectorRef.detectChanges();
     this.tooltipRef.instance.updatePosition();
   }
 

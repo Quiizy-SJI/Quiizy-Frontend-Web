@@ -1,4 +1,4 @@
-import { Component, Input, ChangeDetectionStrategy, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy, ChangeDetectorRef, ElementRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import type { Position } from '../../types/component.types';
 
@@ -80,11 +80,15 @@ export class TooltipContentComponent implements AfterViewInit {
 
   visible = false;
 
-  constructor(private elementRef: ElementRef) {}
+  constructor(
+    private elementRef: ElementRef,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngAfterViewInit(): void {
     setTimeout(() => {
       this.visible = true;
+      this.cdr.markForCheck();
     }, 10);
   }
 
