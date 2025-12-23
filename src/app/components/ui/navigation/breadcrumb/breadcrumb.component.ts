@@ -1,4 +1,4 @@
-import { Component, Input, ChangeDetectionStrategy, HostBinding } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { cn } from '../../utils/class-utils';
@@ -15,7 +15,7 @@ export interface BreadcrumbItem {
   standalone: true,
   imports: [CommonModule, RouterModule],
   template: `
-    <nav [attr.aria-label]="ariaLabel">
+    <nav [class]="breadcrumbClasses" [attr.aria-label]="ariaLabel">
       <ol class="breadcrumb__list">
         @for (item of items; track item.label; let last = $last; let i = $index) {
           <li class="breadcrumb__item">
@@ -82,8 +82,7 @@ export class BreadcrumbComponent {
   @Input() ariaLabel = 'Breadcrumb';
   @Input() customClass?: string;
 
-  @HostBinding('class')
-  get hostClasses(): string {
+  get breadcrumbClasses(): string {
     return cn(
       'breadcrumb',
       `breadcrumb--${this.size}`,
