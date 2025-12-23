@@ -161,7 +161,7 @@ import { generateId } from '../../utils/class-utils';
       <!-- Character Count -->
       @if (showCharacterCount && maxlength) {
         <div class="input__count">
-          {{ value?.length || 0 }} / {{ maxlength }}
+          {{ value.length || 0 }} / {{ maxlength }}
         </div>
       }
     </div>

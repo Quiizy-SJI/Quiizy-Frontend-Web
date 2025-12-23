@@ -67,8 +67,8 @@ import { generateId } from '../../utils/class-utils';
 
         <!-- Character Count -->
         @if (showCharacterCount && maxlength) {
-          <div class="textarea__count" [class.textarea__count--warning]="(value?.length || 0) > (maxlength || 0) * 0.9">
-            {{ value?.length || 0 }} / {{ maxlength }}
+          <div class="textarea__count" [class.textarea__count--warning]="(value.length || 0) > (maxlength || 0) * 0.9">
+            {{ value.length || 0 }} / {{ maxlength }}
           </div>
         }
       </div>
