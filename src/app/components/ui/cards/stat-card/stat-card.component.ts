@@ -1,4 +1,4 @@
-import { Component, Input, ChangeDetectionStrategy, HostBinding } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { cn, colorClass } from '../../utils/class-utils';
 import type { ColorVariant } from '../../types/component.types';
@@ -54,7 +54,10 @@ type TrendDirection = 'up' | 'down' | 'neutral';
     <ng-content select="[slot=footer]"></ng-content>
   `,
   styleUrl: './stat-card.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '[class]': 'hostClasses'
+  }
 })
 export class StatCardComponent {
   @Input() label!: string;
@@ -74,7 +77,6 @@ export class StatCardComponent {
   @Input() compact = false;
   @Input() customClass?: string;
 
-  @HostBinding('class')
   get hostClasses(): string {
     return cn(
       'stat-card',

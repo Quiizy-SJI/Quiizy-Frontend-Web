@@ -1,4 +1,4 @@
-import { Component, Input, ChangeDetectionStrategy, HostBinding } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { cn, sizeClass, colorClass } from '../../utils/class-utils';
 import type { Size, ColorVariant } from '../../types/component.types';
@@ -38,7 +38,10 @@ import type { Size, ColorVariant } from '../../types/component.types';
     }
   `,
   styleUrl: './spinner.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '[class]': 'hostClasses'
+  }
 })
 export class SpinnerComponent {
   @Input() size: Size = 'md';
@@ -47,7 +50,6 @@ export class SpinnerComponent {
   @Input() showLabel = false;
   @Input() customClass?: string;
 
-  @HostBinding('class')
   get hostClasses(): string {
     return cn(
       'spinner-wrapper',

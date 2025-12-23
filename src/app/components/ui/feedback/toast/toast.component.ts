@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, OnInit, OnDestroy, HostBinding } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { cn, colorClass } from '../../utils/class-utils';
 import type { ColorVariant, Position } from '../../types/component.types';
@@ -80,7 +80,11 @@ import type { ColorVariant, Position } from '../../types/component.types';
     }
   `,
   styleUrl: './toast.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '[class]': 'hostClasses',
+    'role': 'alert'
+  }
 })
 export class ToastComponent implements OnInit, OnDestroy {
   @Input() message!: string;
@@ -98,18 +102,12 @@ export class ToastComponent implements OnInit, OnDestroy {
 
   private timeoutId?: ReturnType<typeof setTimeout>;
 
-  @HostBinding('class')
   get hostClasses(): string {
     return cn(
       'toast',
       colorClass('toast', this.color),
       this.customClass
     );
-  }
-
-  @HostBinding('attr.role')
-  get role(): string {
-    return 'alert';
   }
 
   ngOnInit(): void {
