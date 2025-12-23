@@ -110,6 +110,7 @@ export class CardComponent {
       'card',
       variantClass('card', this.variant),
       sizeClass('card', this.size),
+      this.variant === 'glass' && 'liquid-glass',
       this.hoverable && 'card--hoverable',
       this.clickable && 'card--clickable',
       this.fullWidth && 'card--full-width',

@@ -32,12 +32,16 @@
     box-shadow: none;
   }
 
+  // Glass variant uses global .liquid-glass class
+  // Added via component TypeScript for proper styling
   &--glass {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(12px) saturate(180%);
-    -webkit-backdrop-filter: blur(12px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+    // Override the default opaque background to allow transparency
+    background: transparent;
+
+    // Prevent default card hover transform from conflicting with liquid-glass
+    &:hover {
+      transform: translateY(-3px) scale(1.02);
+    }
   }
 
   // ==========================================
