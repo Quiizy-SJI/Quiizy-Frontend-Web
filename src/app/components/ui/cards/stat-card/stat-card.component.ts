@@ -1,19 +1,39 @@
 import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 import { cn, colorClass } from '../../utils/class-utils';
 import type { ColorVariant } from '../../types/component.types';
 
 type TrendDirection = 'up' | 'down' | 'neutral';
 
+// Default icons for each color variant
+const DEFAULT_ICONS: Record<ColorVariant, string> = {
+  primary: 'group',
+  secondary: 'star',
+  accent: 'bolt',
+  success: 'check_circle',
+  warning: 'warning',
+  danger: 'error',
+  info: 'info',
+  neutral: 'analytics'
+};
+
 @Component({
   selector: 'ui-stat-card',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MatIconModule],
   template: `
     <!-- Icon -->
     @if (showIcon) {
       <div [class]="iconClasses">
-        <ng-content select="[slot=icon]"></ng-content>
+        @if (icon) {
+          <mat-icon>{{ icon }}</mat-icon>
+        } @else {
+          <ng-content select="[slot=icon]"></ng-content>
+          @if (!hasIconContent) {
+            <mat-icon>{{ defaultIcon }}</mat-icon>
+          }
+        }
       </div>
     }
 
@@ -64,6 +84,7 @@ export class StatCardComponent {
   @Input() value!: number | string;
   @Input() description?: string;
   @Input() color: ColorVariant = 'primary';
+  @Input() icon?: string;
   @Input() showIcon = true;
   @Input() showTrend = false;
   @Input() trendValue?: number | string;
@@ -76,6 +97,13 @@ export class StatCardComponent {
   @Input() currencyCode = 'USD';
   @Input() compact = false;
   @Input() customClass?: string;
+
+  // Track if icon content was projected
+  hasIconContent = false;
+
+  get defaultIcon(): string {
+    return DEFAULT_ICONS[this.color] || 'analytics';
+  }
 
   get hostClasses(): string {
     return cn(
