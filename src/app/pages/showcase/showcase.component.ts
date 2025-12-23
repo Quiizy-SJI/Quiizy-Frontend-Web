@@ -100,13 +100,35 @@ export class ShowcaseComponent {
     { value: 'nextjs', label: 'Next.js' }
   ];
 
-  // Tab items
+  // Tab items - different sets for each variant
   tabItems: TabItem[] = [
     { id: 'overview', label: 'Overview', icon: '📋' },
     { id: 'features', label: 'Features', icon: '✨' },
     { id: 'docs', label: 'Documentation', icon: '📚' },
     { id: 'examples', label: 'Examples', icon: '💡' }
   ];
+
+  tabItems2: TabItem[] = [
+    { id: 'design', label: 'Design', icon: '🎨' },
+    { id: 'develop', label: 'Develop', icon: '💻' },
+    { id: 'deploy', label: 'Deploy', icon: '🚀' },
+    { id: 'monitor', label: 'Monitor', icon: '📊' }
+  ];
+
+  tabItems3: TabItem[] = [
+    { id: 'profile', label: 'Profile', icon: '👤' },
+    { id: 'settings', label: 'Settings', icon: '⚙️' },
+    { id: 'security', label: 'Security', icon: '🔒' },
+    { id: 'notifications', label: 'Notifications', icon: '🔔' }
+  ];
+
+  tabItems4: TabItem[] = [
+    { id: 'analytics', label: 'Analytics', icon: '📈' },
+    { id: 'reports', label: 'Reports', icon: '📄' },
+    { id: 'export', label: 'Export', icon: '💾' },
+    { id: 'archive', label: 'Archive', icon: '📦' }
+  ];
+
   activeTab = 'overview';
 
   // Breadcrumb items
