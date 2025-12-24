@@ -58,6 +58,9 @@ export { DividerComponent } from './display/divider/divider.component';
 export { TooltipDirective } from './overlays/tooltip/tooltip.directive';
 export { TooltipContentComponent } from './overlays/tooltip/tooltip-content.component';
 
+// Theme
+export { ThemeToggleComponent } from './theme-toggle/theme-toggle.component';
+
 // ============================================
 // CONVENIENCE ARRAYS FOR BULK IMPORTS
 // ============================================

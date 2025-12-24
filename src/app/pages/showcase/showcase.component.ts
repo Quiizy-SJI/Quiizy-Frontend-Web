@@ -28,7 +28,8 @@ import {
   SkeletonComponent,
   AvatarComponent,
   DividerComponent,
-  TooltipDirective
+  TooltipDirective,
+  ThemeToggleComponent
 } from '../../components/ui';
 
 import type { TableColumn, DropdownOption, TabItem } from '../../components/ui';
@@ -63,7 +64,8 @@ import type { TableColumn, DropdownOption, TabItem } from '../../components/ui';
     SkeletonComponent,
     AvatarComponent,
     DividerComponent,
-    TooltipDirective
+    TooltipDirective,
+    ThemeToggleComponent
   ],
   templateUrl: './showcase.component.html',
   styleUrl: './showcase.component.scss'
