@@ -7,8 +7,8 @@ import { ThemeService } from '../../../services/theme.service';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <button 
-      class="theme-toggle" 
+    <button
+      class="theme-toggle"
       [class.dark]="themeService.isDark()"
       (click)="themeService.toggle()"
       [attr.aria-label]="themeService.isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
@@ -40,7 +40,7 @@ import { ThemeService } from '../../../services/theme.service';
       --toggle-width: 56px;
       --toggle-height: 28px;
       --thumb-size: 22px;
-      
+
       position: relative;
       width: var(--toggle-width);
       height: var(--toggle-height);

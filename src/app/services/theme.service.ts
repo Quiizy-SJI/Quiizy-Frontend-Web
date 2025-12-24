@@ -5,7 +5,7 @@ export type Theme = 'light' | 'dark';
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
   private readonly STORAGE_KEY = 'quizzy-theme';
-  
+
   theme = signal<Theme>(this.getInitialTheme());
 
   constructor() {
@@ -19,7 +19,7 @@ export class ThemeService {
   private getInitialTheme(): Theme {
     const stored = localStorage.getItem(this.STORAGE_KEY) as Theme;
     if (stored) return stored;
-    
+
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   }
 
