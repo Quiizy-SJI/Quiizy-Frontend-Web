@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" fill="none">
+  <!-- PrépaVogt - Classes Préparatoires Intégrées -->
+  <defs>
+    <linearGradient id="pv-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#059669;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#34d399;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background Circle -->
+  <circle cx="30" cy="30" r="28" fill="url(#pv-grad)" stroke="#f8fafc" stroke-width="1.5"/>
+
+  <!-- Graduation Cap -->
+  <path d="M30 18 L48 26 L30 34 L12 26 Z" fill="#f8fafc"/>
+  <path d="M18 28 L18 38 C18 42 24 46 30 46 C36 46 42 42 42 38 L42 28" fill="none" stroke="#f8fafc" stroke-width="2"/>
+  <line x1="48" y1="26" x2="48" y2="40" stroke="#fbbf24" stroke-width="2"/>
+  <circle cx="48" cy="42" r="2" fill="#fbbf24"/>
+
+  <!-- PV Text -->
+  <text x="30" y="40" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" font-weight="bold" fill="#fbbf24">PV</text>
+</svg>

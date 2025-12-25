@@ -7,6 +7,11 @@ export const routes: Routes = [
     pathMatch: 'full'
   },
   {
+    path: 'login',
+    loadComponent: () => import('./pages/login/login').then(m => m.Login),
+    title: 'Login'
+  },
+  {
     path: 'showcase',
     loadComponent: () => import('./pages/showcase/showcase.component').then(m => m.ShowcaseComponent),
     title: 'UI Component Showcase'

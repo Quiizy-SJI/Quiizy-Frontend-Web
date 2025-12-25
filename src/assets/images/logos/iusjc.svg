@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" fill="none">
+  <!-- Saint Jean Ingénieur - Engineering School -->
+  <defs>
+    <linearGradient id="sji-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e40af;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background Circle -->
+  <circle cx="30" cy="30" r="28" fill="url(#sji-grad)" stroke="#f8fafc" stroke-width="1.5"/>
+
+  <!-- Gear/Engineering Symbol -->
+  <path d="M30 12 L33 16 L38 15 L39 20 L44 22 L42 27 L46 31 L42 35 L44 40 L39 42 L38 47 L33 46 L30 50 L27 46 L22 47 L21 42 L16 40 L18 35 L14 31 L18 27 L16 22 L21 20 L22 15 L27 16 Z" fill="none" stroke="#f8fafc" stroke-width="1.5"/>
+  <circle cx="30" cy="31" r="8" fill="none" stroke="#f8fafc" stroke-width="1.5"/>
+
+  <!-- SJI Text -->
+  <text x="30" y="34" text-anchor="middle" font-family="Arial, sans-serif" font-size="7" font-weight="bold" fill="#fbbf24">SJI</text>
+</svg>

@@ -1,0 +1,203 @@
+<section class="login-page">
+  <!-- Background Image Overlay -->
+  <div class="login-page__background">
+    <div class="login-page__overlay"></div>
+  </div>
+
+  <!-- Main Content Container -->
+  <div class="login-page__container">
+    <!-- Left Side - Branding -->
+    <div class="login-page__branding">
+      <!-- University Logos Section -->
+      <div class="login-page__logos">
+        <div class="login-page__logo-group">
+          <div class="login-page__logo login-page__logo--main">
+            <img
+              src="assets/images/logos/iusj-logo.png"
+              alt="IUSJC - Institut Universitaire Saint Jean du Cameroun"
+            />
+          </div>
+          <div class="login-page__schools-logos">
+            <div class="login-page__logo login-page__logo--school" title="Saint Jean Ingénieur">
+              <img
+                src="https://institutsaintjean.org/wp-content/uploads/2025/11/LOGO-UNIVERSITE-SAINT-JEAN_INGENIEUR_2.png"
+                alt="Saint Jean Ingénieur - Engineering School"
+              />
+            </div>
+            <div class="login-page__logo login-page__logo--school" title="Saint Jean Management">
+              <img
+                src="https://saintjeanmanagement.org/wp-content/uploads/2025/01/Logo-Institut-USJ-MANAGEMENT-1-458x179.png"
+                alt="Saint Jean Management - Business School"
+              />
+            </div>
+            <div class="login-page__logo login-page__logo--school" title="PrépaVogt">
+              <img
+                src="https://prepavogt.org/wp-content/uploads/2022/12/LOGO-PREPAVOGT.png"
+                alt="PrépaVogt - Classes Préparatoires Intégrées"
+              />
+            </div>
+            <div class="login-page__logo login-page__logo--school" title="Prépa Saint Jean Douala">
+              <img
+                src="https://prepasaintjean.org/images/Logo.png"
+                alt="Prépa Saint Jean - Douala"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Welcome Text -->
+      <div class="login-page__welcome">
+        <h1 class="login-page__title">Welcome to Quizzy</h1>
+        <p class="login-page__subtitle">
+          The intelligent examination platform for academic excellence. Streamlined assessments for
+          students, teachers, and administrators.
+        </p>
+      </div>
+
+      <!-- Feature Highlights -->
+      <div class="login-page__features">
+        <div class="login-page__feature">
+          <mat-icon class="login-page__feature-icon">quiz</mat-icon>
+          <span class="login-page__feature-text">Smart Question Banks</span>
+        </div>
+        <div class="login-page__feature">
+          <mat-icon class="login-page__feature-icon">analytics</mat-icon>
+          <span class="login-page__feature-text">Real-time Analytics</span>
+        </div>
+        <div class="login-page__feature">
+          <mat-icon class="login-page__feature-icon">psychology</mat-icon>
+          <span class="login-page__feature-text">AI-Powered Insights</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Side - Login Form -->
+    <div class="login-page__form-section">
+      <ui-card variant="elevated" class="login-page__card">
+        <!-- Theme Toggle -->
+        <div class="login-page__theme-toggle">
+          <ui-theme-toggle />
+        </div>
+
+        <!-- Form Header -->
+        <div class="login-page__form-header">
+          <h2 class="login-page__form-title">Sign In</h2>
+          <p class="login-page__form-subtitle">Access your Quizzy account</p>
+        </div>
+
+        <!-- Login Form -->
+        <form class="login-page__form" (ngSubmit)="onSubmit()" #loginForm="ngForm">
+          <!-- Error Alert -->
+          @if (errorMessage) {
+          <ui-alert
+            variant="soft"
+            color="danger"
+            [title]="'Authentication Failed'"
+            [dismissible]="true"
+            (dismissed)="errorMessage = ''"
+          >
+            {{ errorMessage }}
+          </ui-alert>
+          }
+
+          <!-- Role Selection -->
+          <div class="login-page__field">
+            <ui-select
+              label="Sign in as"
+              placeholder="Select your role"
+              [options]="roleOptions"
+              [(ngModel)]="loginRequest.role"
+              name="role"
+              [required]="true"
+              [validationState]="roleError ? 'invalid' : 'default'"
+              [errorMessage]="roleError"
+            >
+              <mat-icon slot="icon-left">person_outline</mat-icon>
+            </ui-select>
+          </div>
+
+          <!-- Identifier (Email/Matricule) -->
+          <div class="login-page__field">
+            <ui-input
+              [label]="identifierLabel"
+              [placeholder]="identifierPlaceholder"
+              type="text"
+              [(ngModel)]="loginRequest.identifier"
+              name="identifier"
+              [required]="true"
+              [validationState]="identifierError ? 'invalid' : 'default'"
+              [errorMessage]="identifierError"
+              autocomplete="username"
+            >
+              <mat-icon slot="icon-left">badge</mat-icon>
+            </ui-input>
+          </div>
+
+          <!-- Password -->
+          <div class="login-page__field">
+            <ui-input
+              label="Password"
+              placeholder="Enter your password"
+              type="password"
+              [(ngModel)]="loginRequest.password"
+              name="password"
+              [required]="true"
+              [showPasswordToggle]="true"
+              [validationState]="passwordError ? 'invalid' : 'default'"
+              [errorMessage]="passwordError"
+              autocomplete="current-password"
+            >
+              <mat-icon slot="icon-left">lock_outline</mat-icon>
+            </ui-input>
+          </div>
+
+          <!-- Remember Me -->
+          <div class="login-page__options">
+            <ui-checkbox
+              label="Remember me"
+              [(ngModel)]="loginRequest.rememberMe"
+              name="rememberMe"
+              color="primary"
+            >
+            </ui-checkbox>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="login-page__submit">
+            <ui-button
+              type="submit"
+              variant="solid"
+              color="primary"
+              size="lg"
+              [fullWidth]="true"
+              [loading]="isLoading"
+              [disabled]="isLoading"
+            >
+              @if (!isLoading) {
+              <mat-icon slot="icon-left">login</mat-icon>
+              }
+              {{ isLoading ? 'Signing in...' : 'Sign In' }}
+            </ui-button>
+          </div>
+        </form>
+
+        <!-- Help Link -->
+        <div class="login-page__help">
+          <p class="login-page__help-text">
+            Having trouble signing in?
+            <a href="mailto:support@quizzy.edu" class="login-page__help-link">Contact Support</a>
+          </p>
+        </div>
+      </ui-card>
+
+      <!-- Footer -->
+      <div class="login-page__footer">
+        <p class="login-page__copyright">
+          © {{ currentYear }} Quizzy - Saint Jean Group of Universities
+        </p>
+        <p class="login-page__version">Version 1.0.0</p>
+      </div>
+    </div>
+  </div>
+</section>

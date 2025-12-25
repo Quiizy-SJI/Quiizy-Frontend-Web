@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 100" fill="none">
+  <!-- IUSJC Main Logo - Institut Universitaire Saint Jean du Cameroun -->
+  <defs>
+    <linearGradient id="iusjc-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e40af;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Shield/Emblem Shape -->
+  <path d="M50 10 L80 20 L80 55 C80 70 65 82 50 90 C35 82 20 70 20 55 L20 20 Z" fill="url(#iusjc-grad)" stroke="#f8fafc" stroke-width="2"/>
+
+  <!-- Cross Symbol (Congregation Saint Jean) -->
+  <rect x="45" y="25" width="10" height="40" fill="#f8fafc"/>
+  <rect x="35" y="35" width="30" height="10" fill="#f8fafc"/>
+
+  <!-- Book Symbol -->
+  <path d="M37 58 L50 52 L63 58 L63 72 L50 66 L37 72 Z" fill="#fbbf24" stroke="#f8fafc" stroke-width="1"/>
+
+  <!-- Text: IUSJC -->
+  <text x="100" y="40" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#f8fafc">IUSJC</text>
+
+  <!-- Subtext -->
+  <text x="100" y="58" font-family="Arial, sans-serif" font-size="9" fill="rgba(248,250,252,0.9)">Institut Universitaire</text>
+  <text x="100" y="70" font-family="Arial, sans-serif" font-size="9" fill="rgba(248,250,252,0.9)">Saint Jean du Cameroun</text>
+
+  <!-- Decorative line -->
+  <line x1="100" y1="78" x2="220" y2="78" stroke="rgba(248,250,252,0.5)" stroke-width="1"/>
+
+  <!-- Motto -->
+  <text x="100" y="90" font-family="Arial, sans-serif" font-size="7" font-style="italic" fill="rgba(248,250,252,0.7)">Excellence • Foi • Intégrité</text>
+</svg>
