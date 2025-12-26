@@ -1,59 +1,82 @@
-# QuizzyFrontendWeb
+# QUIIZY (EQuizz) — Frontend Web (Angular)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.11.
+QUIIZY is a digital assessment platform for continuous and end-of-semester exams. It replaces paper-based exams with a web + mobile solution that supports online/offline delivery (students), anonymous grading, and statistics/reporting.
 
-## Development server
+This repository contains the Angular web application used for web access (administration/teaching workflows and student web access, depending on the module).
 
-To start a local development server, run:
+## Product requirements (summary)
 
-```bash
-ng serve
-```
+### Roles
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- **Administrator**: manages academic structure (years/semesters), evaluation types, subjects/courses, and mini-admin accounts.
+- **Mini-Administrator (Branch Admin)**: manages classes, teacher accounts, and student accounts for a department/branch.
+- **Teacher**: creates/manages exams and questions, manages grading, creates mock tests.
+- **Student**: takes exams and views results (web and/or mobile, depending on deployment).
 
-## Code scaffolding
+### Core features
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+- Academic structure management (academic years, semesters, evaluation types, subjects/courses, classes/departments)
+- Exam & question management (CRUD questions/exams, mock tests, archiving)
+- Student access (matricule + class + institutional email validation; optional student card login)
+- Anonymous grading (student identity hidden during grading)
+- Dashboards & reporting (filters by year/class/subject/exam type/session; exportable reports)
+- Real-time notifications in the web UI via backend events (SSE)
+- Sentiment analysis on open-ended responses (via external AI service, exposed to administrators)
 
-```bash
-ng generate component component-name
-```
+## Architecture
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+- **Frontend (this repo)**: Angular + TypeScript
+- **Backend**: NestJS API + PostgreSQL + role-based access
+- **Real-time (web)**: Server-Sent Events (SSE) from the backend to the Angular client
 
-```bash
-ng generate --help
-```
+## Getting started
 
-## Building
+### Prerequisites
 
-To build the project run:
+- Node.js (LTS recommended)
+- pnpm
 
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+### Install
 
 ```bash
-ng test
+pnpm install
 ```
 
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
+### Run (development)
 
 ```bash
-ng e2e
+pnpm start
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+Then open `http://localhost:4200/`.
 
-## Additional Resources
+## Scripts
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+```bash
+pnpm start     # ng serve
+pnpm build     # ng build
+pnpm test      # ng test
+pnpm watch     # ng build --watch --configuration development
+```
+
+## Project structure (high level)
+
+- `src/app/core/` — app configuration, auth, HTTP client/interceptors, storage
+- `src/app/pages/` — feature pages (e.g., login)
+- `src/app/components/ui/` — shared UI components
+- `src/app/realtime/` — SSE integration and event types
+
+## Backend integration
+
+- API calls go through the app’s API client in `src/app/core/http/`
+- Real-time updates use SSE (see the backend README for connection details and event types)
+
+## Notes
+
+- This README describes the intended behavior from the project specification. Some features may be implemented progressively depending on the sprint/iteration.
+
+## Team
+
+- MOUTCHEU SOMO Gift Anderson
+- FOTSING KEGNE Weber
+- ABENA Alex Nelson Ryan
