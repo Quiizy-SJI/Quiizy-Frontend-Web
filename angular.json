@@ -78,6 +78,8 @@
           "builder": "@angular/build:karma",
           "options": {
             "tsConfig": "tsconfig.spec.json",
+            "watch": false,
+            "browsers": "ChromeHeadless",
             "inlineStyleLanguage": "scss",
             "assets": [
               {
