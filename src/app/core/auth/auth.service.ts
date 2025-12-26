@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { map, tap } from 'rxjs/operators';
 import type { Observable } from 'rxjs';
+import { finalize, map, mapTo, tap } from 'rxjs/operators';
 import type { LoginRequest } from '../../domain/dtos/login.dto';
 import { ApiClientService } from '../http/api-client.service';
 import { AuthStoreService } from './auth-store.service';
@@ -26,7 +26,13 @@ export class AuthService {
     );
   }
 
-  logout(): void {
-    this.store.clear();
+  logout(): Observable<void> {
+    // Always clear local session even if backend rejects the token.
+    return this.api
+      .post<{ message: string }>('/auth/logout', {})
+      .pipe(
+        mapTo(void 0),
+        finalize(() => this.store.clear()),
+      );
   }
 }
