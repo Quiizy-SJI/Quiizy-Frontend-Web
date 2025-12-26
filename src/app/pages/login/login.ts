@@ -13,6 +13,8 @@ import {
   type DropdownOption
 } from '../../components/ui';
 import type { LoginRequest, Role } from '../../domain/dtos/login.dto';
+import { AuthService } from '../../core/auth/auth.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -33,12 +35,14 @@ import type { LoginRequest, Role } from '../../domain/dtos/login.dto';
   styleUrl: './login.scss',
 })
 export class Login {
+  private readonly authService = inject(AuthService);
+
   // Form state
   loginRequest: LoginRequest = {
     identifier: '',
     password: '',
     rememberMe: false,
-    role: 'STUDENT'
+    role: 'TEACHER'
   };
 
   // UI state
@@ -114,17 +118,14 @@ export class Login {
     this.isLoading = true;
 
     try {
-      // TODO: Implement actual authentication service call
-      // const response = await this.authService.login(this.loginRequest);
-
-      // Simulating API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      // TODO: Handle successful login - navigate to appropriate dashboard
-      console.log('Login attempt:', this.loginRequest);
-
-    } catch (error: any) {
-      this.errorMessage = error?.message || 'An error occurred during sign in. Please try again.';
+      const session = await firstValueFrom(this.authService.login(this.loginRequest));
+      // TODO: Navigate to dashboard by role
+      console.log('Logged in:', session.user);
+    } catch (error: unknown) {
+      this.errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'An error occurred during sign in. Please try again.';
     } finally {
       this.isLoading = false;
     }
