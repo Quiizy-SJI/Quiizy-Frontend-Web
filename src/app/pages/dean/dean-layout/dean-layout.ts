@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, computed, inject } from '@angular/core';
+import { Component, DestroyRef, computed, inject, ChangeDetectorRef } from '@angular/core';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter, finalize } from 'rxjs/operators';
@@ -24,6 +24,7 @@ export class DeanLayout {
   private readonly authService = inject(AuthService);
   private readonly authStore = inject(AuthStoreService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   logoutLoading = false;
   errorMessage = '';
@@ -102,6 +103,7 @@ export class DeanLayout {
         takeUntilDestroyed(this.destroyRef),
         finalize(() => {
           this.logoutLoading = false;
+          this.cdr.markForCheck();
         }),
       )
       .subscribe({
@@ -110,6 +112,7 @@ export class DeanLayout {
         },
         error: (err: unknown) => {
           this.errorMessage = err instanceof Error ? err.message : 'Logout failed.';
+          this.cdr.markForCheck();
         },
       });
   }
