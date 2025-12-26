@@ -112,6 +112,7 @@
               [required]="true"
               [validationState]="roleError ? 'invalid' : 'default'"
               [errorMessage]="roleError"
+              [iconLeft]="true"
             >
               <mat-icon slot="icon-left">person_outline</mat-icon>
             </ui-select>
@@ -129,6 +130,7 @@
               [validationState]="identifierError ? 'invalid' : 'default'"
               [errorMessage]="identifierError"
               autocomplete="username"
+              [iconLeft]="true"
             >
               <mat-icon slot="icon-left">badge</mat-icon>
             </ui-input>
@@ -147,6 +149,7 @@
               [validationState]="passwordError ? 'invalid' : 'default'"
               [errorMessage]="passwordError"
               autocomplete="current-password"
+              [iconLeft]="true"
             >
               <mat-icon slot="icon-left">lock_outline</mat-icon>
             </ui-input>
@@ -173,6 +176,7 @@
               [fullWidth]="true"
               [loading]="isLoading"
               [disabled]="isLoading"
+              [iconLeft]="!isLoading"
             >
               @if (!isLoading) {
               <mat-icon slot="icon-left">login</mat-icon>
