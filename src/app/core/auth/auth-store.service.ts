@@ -9,13 +9,13 @@ const STORAGE_KEY = 'quiizy.auth.session.v1';
   providedIn: 'root',
 })
 export class AuthStoreService {
-  private readonly sessionSubject = new BehaviorSubject<AuthSession | null>(
-    this.loadSession(),
-  );
+  private readonly sessionSubject = new BehaviorSubject<AuthSession | null>(null);
 
   readonly session$ = this.sessionSubject.asObservable();
 
-  constructor(private readonly storage: StorageService) {}
+  constructor(private readonly storage: StorageService) {
+    this.sessionSubject.next(this.loadSession());
+  }
 
   getSession(): AuthSession | null {
     return this.sessionSubject.value;
