@@ -1,4 +1,5 @@
 import { Injectable, signal, effect } from '@angular/core';
+import { StorageService } from '../core/storage/storage.service';
 
 export type Theme = 'light' | 'dark';
 
@@ -6,18 +7,19 @@ export type Theme = 'light' | 'dark';
 export class ThemeService {
   private readonly STORAGE_KEY = 'quizzy-theme';
 
-  theme = signal<Theme>(this.getInitialTheme());
+  theme = signal<Theme>('light');
 
-  constructor() {
+  constructor(private readonly storage: StorageService) {
+    this.theme.set(this.getInitialTheme());
     effect(() => {
       const theme = this.theme();
       document.documentElement.setAttribute('data-theme', theme);
-      localStorage.setItem(this.STORAGE_KEY, theme);
+      this.storage.set(this.STORAGE_KEY, theme);
     });
   }
 
   private getInitialTheme(): Theme {
-    const stored = localStorage.getItem(this.STORAGE_KEY) as Theme;
+    const stored = this.storage.get(this.STORAGE_KEY) as Theme | null;
     if (stored) return stored;
 
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
