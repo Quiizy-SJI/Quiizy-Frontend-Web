@@ -1,0 +1,47 @@
+.dean {
+  min-height: 100vh;
+  background: var(--surface-base);
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+}
+
+.dean__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.dean__header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.dean__title {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.dean__subtitle {
+  color: var(--text-tertiary);
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 60vw;
+}
+
+.dean__nav {
+  padding: 0.5rem 1.25rem;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.dean__content {
+  padding: 1.25rem;
+  flex: 1;
+}

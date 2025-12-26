@@ -1,0 +1,36 @@
+<div class="dean">
+  <header class="dean__header surface-raised">
+    <div class="dean__header-left">
+      <div class="dean__title">Quizzy — Dean</div>
+      @if (session()?.user) {
+        <div class="dean__subtitle">
+          {{ session()?.user?.name }} {{ session()?.user?.surname }} • {{ session()?.user?.email }}
+        </div>
+      }
+    </div>
+
+    <div class="dean__header-right">
+      <ui-button
+        color="neutral"
+        variant="ghost"
+        [loading]="logoutLoading"
+        (clicked)="onLogout()"
+      >
+        Logout
+      </ui-button>
+    </div>
+  </header>
+
+  <div class="dean__nav">
+    <ui-tabs
+      variant="line"
+      [tabs]="tabs"
+      [activeTab]="activeTab"
+      (tabChange)="onTabChange($event)"
+    ></ui-tabs>
+  </div>
+
+  <main class="dean__content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

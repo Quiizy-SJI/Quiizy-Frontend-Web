@@ -1,7 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { Router } from '@angular/router';
 import {
   CardComponent,
   InputComponent,
@@ -36,6 +37,8 @@ import { firstValueFrom } from 'rxjs';
 })
 export class Login {
   private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   // Form state
   loginRequest: LoginRequest = {
@@ -119,15 +122,20 @@ export class Login {
 
     try {
       const session = await firstValueFrom(this.authService.login(this.loginRequest));
-      // TODO: Navigate to dashboard by role
-      console.log('Logged in:', session.user);
+      if (session.user.role === 'DEAN') {
+        await this.router.navigateByUrl('/dean');
+      } else {
+        await this.router.navigateByUrl('/showcase');
+      }
     } catch (error: unknown) {
       this.errorMessage =
         error instanceof Error
           ? error.message
           : 'An error occurred during sign in. Please try again.';
+      this.cdr.markForCheck();
     } finally {
       this.isLoading = false;
+      this.cdr.markForCheck();
     }
   }
 }

@@ -1,0 +1,55 @@
+<div class="page">
+  <div class="page__top">
+    <div>
+      <div class="page__title">AI Analytics</div>
+      <div class="page__subtitle">Hardest questions based on student performance.</div>
+    </div>
+
+    <div class="page__actions">
+      <ui-select
+        label="Scope"
+        [options]="academicYearOptions()"
+        [(ngModel)]="selectedAcademicYearId"
+        (ngModelChange)="onFilterChanged()"
+      ></ui-select>
+
+      <ui-button variant="outline" color="neutral" (clicked)="loadAnalytics()" [loading]="isLoading">
+        Refresh
+      </ui-button>
+    </div>
+  </div>
+
+  @if (errorMessage) {
+    <ui-alert type="danger" variant="outlined">
+      {{ errorMessage }}
+    </ui-alert>
+  }
+
+  <ui-card title="Insights" [hoverable]="false">
+    @if (isLoading) {
+      <div class="page__loading">
+        <ui-spinner size="lg"></ui-spinner>
+      </div>
+    } @else {
+      <div class="meta">
+        <div class="meta__row">
+          <span class="meta__label">Generated</span>
+          <span class="meta__value">{{ analytics?.generatedAt }}</span>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section__title">Hardest Questions</div>
+        <ui-table [columns]="columns" [data]="rows()">
+          <ng-template #cell let-row let-column="column">
+            @switch (column.key) {
+              @case ('questionId') { {{ row.questionId }} }
+              @case ('attempts') { {{ row.attempts }} }
+              @case ('avgMark') { {{ formatAvg(row) }} }
+            }
+          </ng-template>
+        </ui-table>
+      </div>
+    }
+  </ui-card>
+</div>

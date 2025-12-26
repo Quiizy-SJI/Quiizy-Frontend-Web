@@ -1,0 +1,96 @@
+<div class="page">
+  <div class="page__top">
+    <div>
+      <div class="page__title">Semesters</div>
+      <div class="page__subtitle">Manage semesters per academic year/class.</div>
+    </div>
+
+    <div class="page__actions">
+      <ui-select
+        label="Scope"
+        [options]="academicYearOptions()"
+        [(ngModel)]="selectedAcademicYearId"
+        (ngModelChange)="onFilterChanged()"
+      ></ui-select>
+
+      <ui-button variant="outline" color="neutral" (clicked)="loadSemesters()" [loading]="isLoading">
+        Refresh
+      </ui-button>
+      <ui-button variant="solid" color="primary" (clicked)="openCreate()">
+        New Semester
+      </ui-button>
+    </div>
+  </div>
+
+  @if (errorMessage) {
+    <ui-alert type="danger" variant="outlined">
+      {{ errorMessage }}
+    </ui-alert>
+  }
+
+  <ui-card title="Semesters" [hoverable]="false">
+    @if (isLoading) {
+      <div class="page__loading">
+        <ui-spinner size="lg"></ui-spinner>
+      </div>
+    } @else {
+      <ui-table [columns]="columns" [data]="semesters">
+        <ng-template #cell let-row let-column="column">
+          @switch (column.key) {
+            @case ('name') { {{ row.name }} }
+            @case ('shortCode') { {{ row.shortCode }} }
+            @case ('status') { {{ row.status }} }
+            @case ('class') { {{ row.classAcademicYear?.class?.name }} }
+            @case ('academicYear') { {{ formatAcademicYear(row) }} }
+            @case ('dates') { {{ formatDates(row) }} }
+            @case ('updatedAt') { {{ row.updatedAt }} }
+            @case ('actions') {
+              <div class="row-actions">
+                <ui-button size="sm" variant="ghost" color="neutral" (clicked)="openEdit(row)">Edit</ui-button>
+                <ui-button size="sm" variant="ghost" color="danger" (clicked)="delete(row)">Delete</ui-button>
+              </div>
+            }
+          }
+        </ng-template>
+      </ui-table>
+    }
+  </ui-card>
+
+  <ui-modal
+    [isOpen]="isModalOpen"
+    [title]="modalTitle()"
+    [showFooter]="true"
+    (closed)="closeModal()"
+  >
+    <div class="form">
+      <ui-input label="Name" placeholder="e.g. Semester 1" [(ngModel)]="form.name"></ui-input>
+      <ui-input label="Short Code" placeholder="e.g. S1" [(ngModel)]="form.shortCode"></ui-input>
+
+      <ui-select
+        label="Class Academic Year"
+        [options]="classAcademicYearOptions()"
+        [(ngModel)]="form.classAcademicYearId"
+      ></ui-select>
+
+      <ui-select
+        label="Status"
+        [options]="statusOptions"
+        [(ngModel)]="form.status"
+      ></ui-select>
+
+      <div class="grid-2">
+        <ui-input label="Start Date" placeholder="YYYY-MM-DD" [(ngModel)]="form.startDate"></ui-input>
+        <ui-input label="End Date" placeholder="YYYY-MM-DD" [(ngModel)]="form.endDate"></ui-input>
+      </div>
+    </div>
+
+    <div slot="footer" class="modal-actions">
+      <ui-button variant="ghost" color="neutral" (clicked)="closeModal()" [disabled]="saveLoading">
+        Cancel
+      </ui-button>
+      <ui-button variant="solid" color="primary" (clicked)="save()" [loading]="saveLoading">
+        Save
+      </ui-button>
+    </div>
+  </ui-modal>
+</div>

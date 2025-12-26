@@ -1,0 +1,85 @@
+<div class="page">
+  <div class="page__top">
+    <div>
+      <div class="page__title">Mini Admin Accounts</div>
+      <div class="page__subtitle">Create and manage speciality head accounts.</div>
+    </div>
+
+    <div class="page__actions">
+      <ui-button variant="outline" color="neutral" (clicked)="load()" [loading]="isLoading">
+        Refresh
+      </ui-button>
+      <ui-button variant="solid" color="primary" (clicked)="openCreate()">
+        New Mini Admin
+      </ui-button>
+    </div>
+  </div>
+
+  @if (errorMessage) {
+    <ui-alert type="danger" variant="outlined">
+      {{ errorMessage }}
+    </ui-alert>
+  }
+
+  <ui-card title="Mini Admins" [hoverable]="false">
+    @if (isLoading) {
+      <div class="page__loading">
+        <ui-spinner size="lg"></ui-spinner>
+      </div>
+    } @else {
+      <ui-table [columns]="columns" [data]="rows">
+        <ng-template #cell let-row let-column="column">
+          @switch (column.key) {
+            @case ('name') { {{ row.user?.name }} }
+            @case ('surname') { {{ row.user?.surname }} }
+            @case ('email') { {{ row.user?.email }} }
+            @case ('login') { {{ row.user?.login }} }
+            @case ('speciality') { {{ row.speciality?.name }} }
+            @case ('updatedAt') { {{ row.updatedAt }} }
+            @case ('actions') {
+              <div class="row-actions">
+                <ui-button size="sm" variant="ghost" color="neutral" (clicked)="openEdit(row)">Edit</ui-button>
+                <ui-button size="sm" variant="ghost" color="danger" (clicked)="delete(row)">Delete</ui-button>
+              </div>
+            }
+          }
+        </ng-template>
+      </ui-table>
+    }
+  </ui-card>
+
+  <ui-modal
+    [isOpen]="isModalOpen"
+    [title]="modalTitle()"
+    [showFooter]="true"
+    (closed)="closeModal()"
+  >
+    <div class="form">
+      <div class="grid-2">
+        <ui-input label="Name" [(ngModel)]="form.name"></ui-input>
+        <ui-input label="Surname" [(ngModel)]="form.surname"></ui-input>
+      </div>
+
+      <div class="grid-2">
+        <ui-input label="Email" type="email" [(ngModel)]="form.email"></ui-input>
+        <ui-input label="Login" [(ngModel)]="form.login"></ui-input>
+      </div>
+
+      <ui-input
+        label="Password"
+        type="password"
+        placeholder="Leave blank to keep current"
+        [(ngModel)]="form.password"
+      ></ui-input>
+    </div>
+
+    <div slot="footer" class="modal-actions">
+      <ui-button variant="ghost" color="neutral" (clicked)="closeModal()" [disabled]="saveLoading">
+        Cancel
+      </ui-button>
+      <ui-button variant="solid" color="primary" (clicked)="save()" [loading]="saveLoading">
+        Save
+      </ui-button>
+    </div>
+  </ui-modal>
+</div>

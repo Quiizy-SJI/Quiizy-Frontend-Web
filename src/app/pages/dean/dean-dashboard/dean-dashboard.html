@@ -1,0 +1,81 @@
+<div class="page">
+  <div class="page__top">
+    <div class="page__title">Dashboard</div>
+
+    <div class="page__actions">
+      <ui-select
+        label="Scope"
+        placeholder="All years"
+        [options]="academicYearOptions"
+        [(ngModel)]="selectedAcademicYearId"
+        (valueChange)="onAcademicYearChange($event)"
+      ></ui-select>
+
+      <ui-button
+        variant="outline"
+        color="primary"
+        [loading]="publishLoading"
+        (clicked)="onPublish()"
+      >
+        Refresh / Publish
+      </ui-button>
+    </div>
+  </div>
+
+  @if (errorMessage) {
+    <ui-alert variant="soft" color="danger">
+      {{ errorMessage }}
+    </ui-alert>
+  }
+
+  @if (isLoading && !stats) {
+    <div class="page__loading">
+      <ui-spinner color="primary" label="Loading dashboard" [showLabel]="true"></ui-spinner>
+    </div>
+  } @else {
+    <ui-card variant="outlined" title="Live status" subtitle="Updates via SSE (dean:stats-updated)">
+      <div class="meta">
+        <div class="meta__row">
+          <span class="meta__label">Generated</span>
+          <span class="meta__value">{{ stats?.generatedAt || '—' }}</span>
+        </div>
+        <div class="meta__row">
+          <span class="meta__label">SSE</span>
+          <span class="meta__value">{{ (connectionState$ | async) || 'disconnected' }}</span>
+        </div>
+      </div>
+    </ui-card>
+
+    <div class="grid">
+      <ui-card variant="outlined" title="Totals">
+        <div class="cards">
+          <ui-stat-card label="Academic Years" [value]="stats?.totals?.academicYears ?? 0" color="neutral" format="number"></ui-stat-card>
+          <ui-stat-card label="Classes" [value]="stats?.totals?.classes ?? 0" color="primary" format="number"></ui-stat-card>
+          <ui-stat-card label="Students" [value]="stats?.totals?.students ?? 0" color="info" format="number"></ui-stat-card>
+          <ui-stat-card label="Teachers" [value]="stats?.totals?.teachers ?? 0" color="secondary" format="number"></ui-stat-card>
+          <ui-stat-card label="Teaching Units" [value]="stats?.totals?.teachingUnits ?? 0" color="accent" format="number"></ui-stat-card>
+          <ui-stat-card label="Quizzes" [value]="stats?.totals?.quizzes ?? 0" color="success" format="number"></ui-stat-card>
+          <ui-stat-card label="Questions" [value]="stats?.totals?.questions ?? 0" color="warning" format="number"></ui-stat-card>
+        </div>
+      </ui-card>
+
+      <ui-card variant="outlined" title="Participation">
+        <div class="cards">
+          <ui-stat-card label="Invited" [value]="stats?.participation?.invited ?? 0" color="neutral" format="number"></ui-stat-card>
+          <ui-stat-card label="In progress" [value]="stats?.participation?.inProgress ?? 0" color="info" format="number"></ui-stat-card>
+          <ui-stat-card label="Completed" [value]="stats?.participation?.completed ?? 0" color="success" format="number"></ui-stat-card>
+          <ui-stat-card label="Missed" [value]="stats?.participation?.missed ?? 0" color="danger" format="number"></ui-stat-card>
+        </div>
+      </ui-card>
+
+      <ui-card variant="outlined" title="Scores">
+        <div class="cards">
+          <ui-stat-card label="Avg %" [value]="stats?.scores?.averagePercent ?? 0" color="primary" format="none"></ui-stat-card>
+          <ui-stat-card label="Avg raw score" [value]="stats?.scores?.averageRawScore ?? 0" color="secondary" format="none"></ui-stat-card>
+          <ui-stat-card label="Avg total marks" [value]="stats?.scores?.averageTotalMarks ?? 0" color="accent" format="none"></ui-stat-card>
+          <ui-stat-card label="Attempts w/score" [value]="stats?.scores?.completedAttemptsWithScore ?? 0" color="neutral" format="number"></ui-stat-card>
+        </div>
+      </ui-card>
+    </div>
+  }
+</div>
