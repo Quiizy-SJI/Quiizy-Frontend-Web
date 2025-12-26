@@ -6,6 +6,9 @@ export enum EventType {
   CONNECTED = 'connected',
   HEARTBEAT = 'heartbeat',
 
+  // Dean/Admin dashboard
+  DEAN_STATS_UPDATED = 'dean:stats-updated',
+
   EXAM_AVAILABLE = 'exam:available',
   EXAM_STARTING_SOON = 'exam:starting-soon',
   EXAM_STARTED = 'exam:started',
