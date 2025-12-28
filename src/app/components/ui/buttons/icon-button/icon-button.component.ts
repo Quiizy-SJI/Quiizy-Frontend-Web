@@ -20,7 +20,7 @@ import type { Size, ColorVariant } from '../../types/component.types';
       (click)="handleClick($event)"
     >
       @if (loading) {
-        <mat-icon class="icon-btn__spinner">progress_activity</mat-icon>
+        <mat-icon class="icon-btn__spinner" fontSet="material-symbols-outlined">progress_activity</mat-icon>
       } @else {
         <ng-content></ng-content>
       }

@@ -16,6 +16,7 @@ import {
 import { DeanApiService } from '../../../services/dean-api.service';
 import { SseService } from '../../../realtime/sse.service';
 import { EventType } from '../../../realtime/event-types';
+import { ChartHostComponent } from '../../../components/charts/chart-host/chart-host.component';
 
 import type { AcademicYearDto } from '../../../domain/dtos/dean/dean-shared.dto';
 import type { DeanDashboardStatsDto } from '../../../domain/dtos/dean/stats.dto';
@@ -32,6 +33,7 @@ import type { DeanDashboardStatsDto } from '../../../domain/dtos/dean/stats.dto'
     ButtonComponent,
     SpinnerComponent,
     AlertComponent,
+    ChartHostComponent,
   ],
   templateUrl: './dean-dashboard.html',
   styleUrl: './dean-dashboard.scss',
@@ -153,5 +155,89 @@ export class DeanDashboard {
     const d = new Date(dateString);
     if (Number.isNaN(d.getTime())) return null;
     return String(d.getFullYear());
+  }
+
+  // =============================
+  // Chart data builders
+  // =============================
+  get participationChartData(): any {
+    const p = this.stats?.participation;
+    const invited = p?.invited ?? 0;
+    const inProgress = p?.inProgress ?? 0;
+    const completed = p?.completed ?? 0;
+    const missed = p?.missed ?? 0;
+    return {
+      labels: ['Invited', 'In progress', 'Completed', 'Missed'],
+      datasets: [
+        {
+          data: [invited, inProgress, completed, missed],
+          backgroundColor: ['#64748b', '#3b82f6', '#10b981', '#ef4444'],
+          borderWidth: 0,
+        },
+      ],
+    };
+  }
+
+  get totalsChartData(): any {
+    const t = this.stats?.totals;
+    const labels = ['Academic Years', 'Classes', 'Students', 'Teachers', 'Units', 'Quizzes', 'Questions'];
+    const data = [
+      t?.academicYears ?? 0,
+      t?.classes ?? 0,
+      t?.students ?? 0,
+      t?.teachers ?? 0,
+      t?.teachingUnits ?? 0,
+      t?.quizzes ?? 0,
+      t?.questions ?? 0,
+    ];
+    return {
+      labels,
+      datasets: [
+        {
+          label: 'Totals',
+          data,
+          backgroundColor: '#3572ef',
+          borderRadius: 6,
+        },
+      ],
+    };
+  }
+
+  get scoresChartData(): any {
+    const s = this.stats?.scores;
+    const avgPct = (s?.averagePercent ?? 0) as number;
+    const avgRaw = (s?.averageRawScore ?? 0) as number;
+    const avgTotal = (s?.averageTotalMarks ?? 0) as number;
+    return {
+      labels: ['Avg %', 'Avg Raw', 'Avg Total'],
+      datasets: [
+        {
+          label: 'Scores',
+          data: [avgPct, avgRaw, avgTotal],
+          backgroundColor: ['#3572ef', '#8b5cf6', '#06b6d4'],
+          borderRadius: 6,
+        },
+      ],
+    };
+  }
+
+  get doughnutOptions(): any {
+    return {
+      plugins: {
+        legend: { position: 'bottom' },
+        tooltip: { enabled: true },
+      },
+    };
+  }
+
+  get barOptions(): any {
+    return {
+      scales: {
+        y: { beginAtZero: true, ticks: { precision: 0 } },
+      },
+      plugins: {
+        legend: { display: false },
+      },
+    };
   }
 }
