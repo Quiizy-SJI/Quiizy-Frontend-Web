@@ -4,12 +4,60 @@
 // Sass modules
 @use 'sass:color';
 
-// Material Design 3 Icons
-@use '@fontsource/material-icons-outlined' as *;
+// Material Symbols (MD3) are loaded via src/index.html Google Fonts link.
+// Map the helper class so <mat-icon fontSet="material-symbols-outlined"> works.
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;  /* Preferred icon size */
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+}
 
-// Configure Angular Material icons to use outlined font
-.mat-icon {
-  font-family: 'Material Icons Outlined' !important;
+// Legacy Material Icons support (many templates use <mat-icon> without fontSet)
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
+.material-icons-outlined {
+  font-family: 'Material Icons Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
 }
 
 // ============================================
@@ -97,7 +145,7 @@ $border-strong-dark: #64748b;
 // ==========================================
 // FONT CONFIGURATION
 // ==========================================
-$font-family: 'Product Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+$font-family: 'Bahnschrift', 'Product Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
   'Helvetica Neue', Arial, sans-serif;
 $font-path: 'assets/fonts/';
 
@@ -331,6 +379,10 @@ img {
   --text-link-hover: var(--color-primary-700);
   --text-muted: #6b7280;
 
+  // TOOLTIP SYSTEM
+  --tooltip-bg: var(--text-primary);
+  --tooltip-text: white;
+
   // SURFACE SYSTEM
   --surface-base: #{$surface-base-light};
   --surface-raised: #{$surface-raised-light};
@@ -561,6 +613,10 @@ img {
   --text-link: var(--color-primary-400);
   --text-link-hover: var(--color-primary-300);
   --text-muted: #64748b;
+
+  // TOOLTIP SYSTEM
+  --tooltip-bg: var(--surface-base);
+  --tooltip-text: var(--text-primary);
 
   // SURFACE SYSTEM
   --surface-base: #{$surface-base-dark};
