@@ -1,0 +1,191 @@
+@use 'sass:color';
+
+:host {
+  display: block;      /* Ensure the host participates as a block-level flex item */
+  flex: 0 0 auto;      /* Do not shrink or grow; width is driven by inner aside */
+}
+
+.sidebar {
+  width: 240px;
+  /* Subtle gradient background to add depth */
+  background: linear-gradient(
+    180deg,
+    var(--surface-raised) 0%,
+    color-mix(in srgb, var(--primary-base) 8%, var(--surface-raised) 92%) 220px,
+    var(--surface-raised) 100%
+  );
+  border-right: 1px solid var(--border-default);
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  transition: width 200ms ease, transform 200ms ease;
+  z-index: 60;
+  /* Keep sidebar visible while page scrolls on desktop/tablet */
+  position: sticky;
+  top: 0;
+  height: 100dvh; /* support mobile address bar dynamics */
+  overflow: hidden; /* contain internal scrolling to the nav */
+  align-self: flex-start; /* ensure sticky works within flex container */
+}
+
+.sidebar.collapsed {
+  width: 72px;
+}
+
+.sidebar-top {
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: inherit;
+  text-decoration: none;
+  min-width: 0;
+}
+
+.brand-logo {
+  width: 36px;
+  height: 36px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--primary-base), var(--secondary-base));
+  color: white;
+  font-weight: 700;
+  flex: 0 0 auto;
+}
+
+.brand-text {
+  font-weight: 700;
+  transition: opacity 150ms ease, max-width 200ms ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+}
+
+.sidebar.collapsed .brand-text {
+  opacity: 0;
+  max-width: 0;
+}
+
+.sidebar-nav {
+  //flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem;
+  gap: 0.25rem;
+  overflow: auto; /* scroll menu when content exceeds viewport */
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: 10px;
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: background 150ms ease, color 150ms ease;
+  position: relative;
+  min-width: 0;
+}
+
+.nav-item .icon { font-size: 20px; flex: 0 0 auto; }
+
+.nav-item .label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: opacity 150ms ease, max-width 200ms ease;
+}
+
+.sidebar.collapsed .nav-item .label {
+  opacity: 0;
+  max-width: 0;
+}
+
+.nav-item:hover {
+  background: color-mix(in srgb, var(--surface-raised) 94%, #000 6%);
+}
+
+/* Micro‑interaction: nudge icon slightly on hover for affordance */
+.nav-item:hover .icon {
+  transform: translateX(2px);
+}
+
+.nav-item.active {
+  /* Stronger contrast so the active item is clearly visible */
+  background: color-mix(in srgb, var(--primary-base) 26%, var(--surface-raised) 74%);
+  color: var(--text-primary);
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary-base) 45%, transparent 55%);
+  transition: box-shadow 150ms ease, background 150ms ease;
+}
+
+/* Left indicator bar for the active item (visible in both expanded and collapsed) */
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 4px;
+  border-radius: 0 4px 4px 0;
+  background: var(--primary-base);
+}
+
+/* Accentuate icon color when active */
+.nav-item.active .icon {
+  color: var(--primary-base);
+  background: color-mix(in srgb, var(--primary-base) 18%, transparent 82%);
+  padding: 4px;
+  border-radius: 8px;
+  /* Pop animation when a link becomes active */
+  animation: sidebar-icon-pop 220ms ease-out both;
+}
+
+/* Improve keyboard accessibility */
+.nav-item:focus-visible {
+  outline: 2px solid var(--primary-base);
+  outline-offset: 2px;
+}
+
+.sidebar-footer {
+  padding: 0.5rem;
+  //margin-top: auto; /* pin to bottom within flex column */
+  border-top: 1px solid var(--border-default);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-raised);
+}
+.collapse-btn { background: transparent; border: none; cursor: pointer; padding: 0.45rem; border-radius: 8px; }
+
+/* Rotate chevron when collapsed for clearer affordance */
+.chevron { transition: transform 180ms ease; }
+.chevron.rotated { transform: rotate(180deg); }
+
+/* Keyframes */
+@keyframes sidebar-icon-pop {
+  0% { transform: scale(0.92); }
+  60% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+/* Respect user motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .nav-item .icon,
+  .chevron { transition: none; animation: none !important; }
+}
+
+/* Mobile behavior */
+@media (max-width: 900px) {
+  .sidebar { position: fixed; left: 0; top: 0; bottom: 0; transform: translateX(-110%); width: 260px; }
+  .sidebar.mobile-open { transform: translateX(0); }
+  .sidebar.collapsed { width: 260px; }
+}

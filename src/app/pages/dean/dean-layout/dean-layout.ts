@@ -1,25 +1,23 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, computed, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, DestroyRef, computed, inject, ChangeDetectorRef, HostListener, OnInit } from '@angular/core';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter, finalize } from 'rxjs/operators';
 
-import {
-  ButtonComponent,
-  TabsComponent,
-  type TabItem,
-} from '../../../components/ui';
+import { type TabItem } from '../../../components/ui';
 import { AuthService } from '../../../core/auth/auth.service';
 import { AuthStoreService } from '../../../core/auth/auth-store.service';
+import { SidebarComponent } from '../../../components/navigation/sidebar/sidebar.component';
+import { TopbarComponent } from '../../../components/navigation/topbar/topbar.component';
 
 @Component({
   selector: 'app-dean-layout',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonComponent, TabsComponent],
+  imports: [CommonModule, RouterModule, SidebarComponent, TopbarComponent],
   templateUrl: './dean-layout.html',
   styleUrl: './dean-layout.scss',
 })
-export class DeanLayout {
+export class DeanLayout implements OnInit {
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
   private readonly authStore = inject(AuthStoreService);
@@ -52,6 +50,46 @@ export class DeanLayout {
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe((e) => this.syncTabFromUrl(e.urlAfterRedirects));
+  }
+
+  // Sidebar state
+  isCollapsed = false;
+  isMobile = window.innerWidth <= 900;
+  mobileOpen = false;
+
+  menuItems = [
+    { id: 'dashboard', label: 'Dashboard', route: '/dean', icon: 'dashboard' },
+    { id: 'academic-years', label: 'Academic Years', route: '/dean/academic-years', icon: 'calendar_month' },
+    { id: 'semesters', label: 'Semesters', route: '/dean/semesters', icon: 'school' },
+    { id: 'exam-types', label: 'Exam Types', route: '/dean/exam-types', icon: 'assignment' },
+    { id: 'teaching-units', label: 'Teaching Units', route: '/dean/teaching-units', icon: 'menu_book' },
+    { id: 'mini-admins', label: 'Mini Admins', route: '/dean/mini-admins', icon: 'groups' },
+    { id: 'ai-analytics', label: 'AI Analytics', route: '/dean/ai-analytics', icon: 'insights' },
+  ];
+
+  get currentTitle(): string {
+    return this.tabs.find((t) => t.id === this.activeTab)?.label ?? 'Dashboard';
+  }
+
+  @HostListener('window:resize')
+  onResize(): void {
+    this.isMobile = window.innerWidth <= 900;
+    if (!this.isMobile) this.mobileOpen = false;
+  }
+
+  toggleCollapse(): void {
+    this.isCollapsed = !this.isCollapsed;
+    try {
+      localStorage.setItem('dean.sidebar.collapsed', String(this.isCollapsed));
+    } catch {}
+  }
+
+  toggleMobile(): void {
+    this.mobileOpen = !this.mobileOpen;
+  }
+
+  closeMobile(): void {
+    if (this.isMobile) this.mobileOpen = false;
   }
 
   private syncTabFromUrl(url: string): void {
@@ -115,5 +153,30 @@ export class DeanLayout {
           this.cdr.markForCheck();
         },
       });
+  }
+
+  ngOnInit(): void {
+    // Load persisted collapse state; if none, set responsive defaults
+    const saved = (() => {
+      try {
+        return localStorage.getItem('dean.sidebar.collapsed');
+      } catch {
+        return null;
+      }
+    })();
+
+    const width = window.innerWidth;
+    this.isMobile = width <= 900;
+
+    if (saved === 'true' || saved === 'false') {
+      this.isCollapsed = saved === 'true';
+    } else {
+      // Defaults: tablet collapsed, desktop expanded, mobile ignored (overlay)
+      if (!this.isMobile && width <= 1200) {
+        this.isCollapsed = true;
+      } else {
+        this.isCollapsed = false;
+      }
+    }
   }
 }

@@ -35,6 +35,20 @@ export class TooltipDirective implements OnDestroy {
     this.hide();
   }
 
+  // Keyboard accessibility: show on focus, hide on blur
+  @HostListener('focusin')
+  onFocusIn(): void {
+    if (this.tooltipDisabled || !this.content) return;
+    this.showTimeout = setTimeout(() => {
+      this.show();
+    }, this.tooltipDelay);
+  }
+
+  @HostListener('focusout')
+  onFocusOut(): void {
+    this.hide();
+  }
+
   @HostListener('click')
   onClick(): void {
     this.hide();

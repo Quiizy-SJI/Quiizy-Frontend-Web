@@ -57,6 +57,7 @@
           <ui-stat-card label="Quizzes" [value]="stats?.totals?.quizzes ?? 0" color="success" format="number"></ui-stat-card>
           <ui-stat-card label="Questions" [value]="stats?.totals?.questions ?? 0" color="warning" format="number"></ui-stat-card>
         </div>
+        <ui-chart [type]="'bar'" [data]="totalsChartData" [options]="barOptions"></ui-chart>
       </ui-card>
 
       <ui-card variant="outlined" title="Participation">
@@ -66,6 +67,7 @@
           <ui-stat-card label="Completed" [value]="stats?.participation?.completed ?? 0" color="success" format="number"></ui-stat-card>
           <ui-stat-card label="Missed" [value]="stats?.participation?.missed ?? 0" color="danger" format="number"></ui-stat-card>
         </div>
+        <ui-chart [type]="'doughnut'" [data]="participationChartData" [options]="doughnutOptions"></ui-chart>
       </ui-card>
 
       <ui-card variant="outlined" title="Scores">
@@ -75,6 +77,7 @@
           <ui-stat-card label="Avg total marks" [value]="stats?.scores?.averageTotalMarks ?? 0" color="accent" format="none"></ui-stat-card>
           <ui-stat-card label="Attempts w/score" [value]="stats?.scores?.completedAttemptsWithScore ?? 0" color="neutral" format="number"></ui-stat-card>
         </div>
+        <ui-chart [type]="'bar'" [data]="scoresChartData" [options]="barOptions"></ui-chart>
       </ui-card>
     </div>
   }
