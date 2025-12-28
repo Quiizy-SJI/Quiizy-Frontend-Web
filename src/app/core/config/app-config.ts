@@ -17,6 +17,6 @@ export function resolveAppConfig(): AppConfig {
   const cfg = globalThis.__QUIIZY_CONFIG__;
 
   return {
-    apiBaseUrl: cfg?.apiBaseUrl ?? 'http://localhost:3000',
+    apiBaseUrl: cfg?.apiBaseUrl ?? 'http://localhost:4000',
   };
 }
