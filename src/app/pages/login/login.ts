@@ -122,10 +122,26 @@ export class Login {
 
     try {
       const session = await firstValueFrom(this.authService.login(this.loginRequest));
-      if (session.user.role === 'DEAN') {
-        await this.router.navigateByUrl('/dean');
-      } else {
-        await this.router.navigateByUrl('/showcase');
+      
+      // Redirect based on user role
+      switch (session.user.role) {
+        case 'DEAN':
+          await this.router.navigateByUrl('/dean');
+          break;
+        case 'TEACHER':
+          await this.router.navigateByUrl('/teacher');
+          break;
+        case 'SPECIALITY_HEAD':
+          // Add mini-admin route when implemented
+          await this.router.navigateByUrl('/showcase');
+          break;
+        case 'STUDENT':
+          // Add student route when implemented
+          await this.router.navigateByUrl('/showcase');
+          break;
+        default:
+          await this.router.navigateByUrl('/showcase');
+          break;
       }
     } catch (error: unknown) {
       this.errorMessage =

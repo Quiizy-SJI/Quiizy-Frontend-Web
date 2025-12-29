@@ -1,0 +1,32 @@
+<div class="teacher layout">
+  <app-sidebar
+    [items]="menuItems"
+    [collapsed]="isCollapsed"
+    [isMobile]="isMobile"
+    [open]="mobileOpen"
+    brandLink="/teacher"
+    (toggle)="toggleCollapse()"
+    (itemSelected)="closeMobile()"
+  ></app-sidebar>
+
+  <div class="main">
+    <app-topbar
+      [title]="currentTitle"
+      [isMobile]="isMobile"
+      [userName]="session()?.user?.name"
+      [userSurname]="session()?.user?.surname"
+      [userRole]="session()?.user?.role"
+      [logoutLoading]="logoutLoading"
+      (menuClick)="toggleMobile()"
+      (logoutClick)="onLogout()"
+    />
+
+    <main class="teacher__content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+
+  @if (isMobile && mobileOpen) {
+    <div class="overlay" (click)="closeMobile()" aria-hidden="true"></div>
+  }
+</div>
