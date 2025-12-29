@@ -229,6 +229,10 @@ import { FormsModule } from '@angular/forms';
             <mat-icon>arrow_back</mat-icon>
             Cancel
           </button>
+          <!-- Debug button to test navigation -->
+          <button class="btn secondary" (click)="testNavigation()" style="background: orange; color: white;">
+            Test Navigation (Debug)
+          </button>
           <button class="btn primary" (click)="nextStep()" [disabled]="!isFormValid()">
             Next: Add Questions
             <mat-icon>arrow_forward</mat-icon>
@@ -531,7 +535,7 @@ export class TeacherCreateExam {
   constructor(private router: Router) {}
 
   isFormValid(): boolean {
-    return !!(
+    const isValid = !!(
       this.examForm.title.trim() &&
       this.examForm.subject &&
       this.examForm.type &&
@@ -539,18 +543,39 @@ export class TeacherCreateExam {
       this.examForm.endDate &&
       this.examForm.duration > 0
     );
+    
+    console.log('Form validation details:');
+    console.log('- Title:', this.examForm.title.trim() ? '✓' : '✗', this.examForm.title);
+    console.log('- Subject:', this.examForm.subject ? '✓' : '✗', this.examForm.subject);
+    console.log('- Type:', this.examForm.type ? '✓' : '✗', this.examForm.type);
+    console.log('- Start Date:', this.examForm.startDate ? '✓' : '✗', this.examForm.startDate);
+    console.log('- End Date:', this.examForm.endDate ? '✓' : '✗', this.examForm.endDate);
+    console.log('- Duration:', this.examForm.duration > 0 ? '✓' : '✗', this.examForm.duration);
+    console.log('Overall valid:', isValid);
+    
+    return isValid;
   }
 
   goBack(): void {
     this.router.navigate(['/teacher/exam-manager']);
   }
 
+  testNavigation(): void {
+    console.log('Test navigation button clicked!');
+    this.router.navigate(['/teacher/create-exam/step2']);
+  }
+
   nextStep(): void {
+    console.log('Next step button clicked!'); // Debug log
+    console.log('Form data:', this.examForm); // Debug log
+    console.log('Form valid:', this.isFormValid()); // Debug log
+    
     if (this.isFormValid()) {
-      console.log('Exam form data:', this.examForm);
+      console.log('Form is valid, navigating to step 2...'); // Debug log
       // Navigate to step 2
       this.router.navigate(['/teacher/create-exam/step2']);
     } else {
+      console.log('Form validation failed'); // Debug log
       alert('Please fill in all required fields.');
     }
   }

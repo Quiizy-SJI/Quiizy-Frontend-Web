@@ -106,85 +106,93 @@ import { FormsModule } from '@angular/forms';
               <mat-icon>add</mat-icon>
               Add Your First Question
             </button>
+            <!-- Debug indicator -->
+            <div *ngIf="showQuestionBuilder" style="color: red; margin-top: 1rem;">
+              DEBUG: Question builder should be visible (showQuestionBuilder = {{showQuestionBuilder}})
+            </div>
           </div>
         </div>
 
-        <!-- Question Builder Modal/Panel -->
-        <div class="question-builder" *ngIf="showQuestionBuilder">
-          <div class="builder-header">
-            <h3>{{editingIndex >= 0 ? 'Edit Question' : 'New Question'}}</h3>
-            <button class="close-btn" (click)="closeQuestionBuilder()">
-              <mat-icon>close</mat-icon>
-            </button>
-          </div>
-
-          <div class="builder-content">
-            <div class="form-group">
-              <label>Question Type</label>
-              <select [(ngModel)]="currentQuestion.type" class="form-select">
-                <option value="MCQ">Multiple Choice</option>
-                <option value="TF">True/False</option>
-                <option value="SA">Short Answer</option>
-                <option value="Essay">Essay</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label>Question Text *</label>
-              <textarea 
-                [(ngModel)]="currentQuestion.text" 
-                placeholder="Enter your question here..."
-                class="form-textarea"
-                rows="3"
-              ></textarea>
-            </div>
-
-            <div class="form-group" *ngIf="currentQuestion.type === 'MCQ'">
-              <label>Answer Options</label>
-              <div class="options-list">
-                <div class="option-input" *ngFor="let option of currentQuestion.options; let i = index">
-                  <input type="radio" [name]="'correct-' + editingIndex" [checked]="option.isCorrect" (change)="setCorrectOption(i)">
-                  <input type="text" [(ngModel)]="option.text" [placeholder]="'Option ' + getOptionLabel(i)" class="form-input">
-                  <button class="remove-option" (click)="removeOption(i)" *ngIf="currentQuestion.options.length > 2">
-                    <mat-icon>close</mat-icon>
-                  </button>
-                </div>
-              </div>
-              <button class="btn secondary small" (click)="addOption()" *ngIf="currentQuestion.options.length < 6">
-                <mat-icon>add</mat-icon>
-                Add Option
+        <!-- Question Builder Modal -->
+        <div class="modal-overlay" *ngIf="showQuestionBuilder" (click)="closeQuestionBuilder()">
+          <div class="modal-content large" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+              <h3>{{editingIndex >= 0 ? 'Edit Question' : 'Add New Question'}}</h3>
+              <button class="close-btn" (click)="closeQuestionBuilder()">
+                <mat-icon>close</mat-icon>
               </button>
             </div>
+            
+            <div class="modal-body">
+              <div class="form-group">
+                <label>Question Type</label>
+                <select [(ngModel)]="currentQuestion.type" class="form-select">
+                  <option value="MCQ">Multiple Choice</option>
+                  <option value="TF">True/False</option>
+                  <option value="SA">Short Answer</option>
+                  <option value="Essay">Essay</option>
+                </select>
+              </div>
 
-            <div class="form-group" *ngIf="currentQuestion.type === 'TF'">
-              <label>Correct Answer</label>
-              <div class="tf-options">
-                <label class="radio-option">
-                  <input type="radio" [(ngModel)]="currentQuestion.correctAnswer" value="true">
-                  <span>True</span>
-                </label>
-                <label class="radio-option">
-                  <input type="radio" [(ngModel)]="currentQuestion.correctAnswer" value="false">
-                  <span>False</span>
-                </label>
+              <div class="form-group">
+                <label>Question Text *</label>
+                <textarea 
+                  [(ngModel)]="currentQuestion.text" 
+                  placeholder="Enter your question here..."
+                  class="form-textarea"
+                  rows="3"
+                ></textarea>
+              </div>
+
+              <div class="form-group" *ngIf="currentQuestion.type === 'MCQ'">
+                <label>Answer Options</label>
+                <div class="options-list">
+                  <div class="option-input" *ngFor="let option of currentQuestion.options; let i = index">
+                    <input type="radio" [name]="'correct-option'" [checked]="option.isCorrect" (change)="setCorrectOption(i)">
+                    <input type="text" [(ngModel)]="option.text" [placeholder]="'Option ' + getOptionLabel(i)" class="form-input">
+                    <button class="remove-option" (click)="removeOption(i)" *ngIf="currentQuestion.options.length > 2">
+                      <mat-icon>close</mat-icon>
+                    </button>
+                  </div>
+                </div>
+                <button class="btn secondary small" (click)="addOption()" *ngIf="currentQuestion.options.length < 6">
+                  <mat-icon>add</mat-icon>
+                  Add Option
+                </button>
+              </div>
+
+              <div class="form-group" *ngIf="currentQuestion.type === 'TF'">
+                <label>Correct Answer</label>
+                <div class="tf-options">
+                  <label class="radio-option">
+                    <input type="radio" [(ngModel)]="currentQuestion.correctAnswer" value="true">
+                    <span>True</span>
+                  </label>
+                  <label class="radio-option">
+                    <input type="radio" [(ngModel)]="currentQuestion.correctAnswer" value="false">
+                    <span>False</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Difficulty Level</label>
+                  <select [(ngModel)]="currentQuestion.difficulty" class="form-select">
+                    <option value="easy">Easy</option>
+                    <option value="medium">Medium</option>
+                    <option value="hard">Hard</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label>Points</label>
+                  <input type="number" [(ngModel)]="currentQuestion.points" min="1" class="form-input" placeholder="1">
+                </div>
               </div>
             </div>
 
-            <div class="form-group">
-              <label>Difficulty Level</label>
-              <select [(ngModel)]="currentQuestion.difficulty" class="form-select">
-                <option value="easy">Easy</option>
-                <option value="medium">Medium</option>
-                <option value="hard">Hard</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label>Points</label>
-              <input type="number" [(ngModel)]="currentQuestion.points" min="1" class="form-input" placeholder="1">
-            </div>
-
-            <div class="builder-actions">
+            <div class="modal-footer">
               <button class="btn secondary" (click)="closeQuestionBuilder()">Cancel</button>
               <button class="btn primary" (click)="saveQuestion()" [disabled]="!isQuestionValid()">
                 {{editingIndex >= 0 ? 'Update Question' : 'Add Question'}}
@@ -561,23 +569,6 @@ import { FormsModule } from '@angular/forms';
       }
     }
 
-    .question-builder {
-      position: fixed;
-      top: 0;
-      right: 0;
-      width: 500px;
-      height: 100vh;
-      background: white;
-      box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
-      z-index: 1000;
-      display: flex;
-      flex-direction: column;
-      
-      @media (max-width: 768px) {
-        width: 100%;
-      }
-    }
-
     /* Modal Styles */
     .modal-overlay {
       position: fixed;
@@ -762,38 +753,6 @@ import { FormsModule } from '@angular/forms';
       }
     }
 
-    .builder-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1.5rem;
-      border-bottom: 1px solid var(--color-border);
-      
-      h3 {
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: var(--color-text-primary);
-      }
-      
-      .close-btn {
-        padding: 0.5rem;
-        background: transparent;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        
-        &:hover {
-          background: var(--color-background-subtle);
-        }
-      }
-    }
-
-    .builder-content {
-      flex: 1;
-      padding: 1.5rem;
-      overflow-y: auto;
-    }
-
     .form-group {
       margin-bottom: 1.5rem;
       
@@ -804,6 +763,12 @@ import { FormsModule } from '@angular/forms';
         color: var(--color-text-primary);
         margin-bottom: 0.5rem;
       }
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
     }
 
     .form-input, .form-select, .form-textarea {
@@ -878,13 +843,6 @@ import { FormsModule } from '@angular/forms';
       input[type="radio"] {
         margin: 0;
       }
-    }
-
-    .builder-actions {
-      display: flex;
-      gap: 0.5rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid var(--color-border);
     }
 
     .form-actions {
@@ -979,9 +937,11 @@ export class TeacherCreateExamStep2 {
   }
 
   addNewQuestion(): void {
+    console.log('Add New Question button clicked!'); // Debug log
     this.editingIndex = -1;
     this.currentQuestion = this.getEmptyQuestion();
     this.showQuestionBuilder = true;
+    console.log('Question builder should be visible:', this.showQuestionBuilder); // Debug log
   }
 
   editQuestion(index: number): void {
@@ -1002,17 +962,22 @@ export class TeacherCreateExamStep2 {
   }
 
   closeQuestionBuilder(): void {
+    console.log('Closing question builder'); // Debug log
     this.showQuestionBuilder = false;
     this.editingIndex = -1;
     this.currentQuestion = this.getEmptyQuestion();
   }
 
   saveQuestion(): void {
+    console.log('Saving question:', this.currentQuestion); // Debug log
     if (this.editingIndex >= 0) {
       this.questions[this.editingIndex] = { ...this.currentQuestion };
+      alert('Question updated successfully!');
     } else {
       this.questions.push({ ...this.currentQuestion });
+      alert('Question added successfully!');
     }
+    console.log('Total questions now:', this.questions.length); // Debug log
     this.closeQuestionBuilder();
   }
 
