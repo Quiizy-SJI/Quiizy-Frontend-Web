@@ -42,6 +42,10 @@ export interface TeachingUnitDto extends BaseEntityDto {
 
 export interface SpecialityDto extends BaseEntityDto {
   name: string;
+  head?: {
+    id: string;
+    user: UserDto;
+  } | null;
 }
 
 export interface UserDto extends BaseEntityDto {

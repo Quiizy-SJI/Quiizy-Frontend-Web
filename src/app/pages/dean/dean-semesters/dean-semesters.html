@@ -42,12 +42,12 @@
             @case ('status') { {{ row.status }} }
             @case ('class') { {{ row.classAcademicYear?.class?.name }} }
             @case ('academicYear') { {{ formatAcademicYear(row) }} }
-            @case ('dates') { {{ formatDates(row) }} }
+            @case ('dates') { {{ formatDates(row) }} } 
             @case ('updatedAt') { {{ row.updatedAt }} }
             @case ('actions') {
               <div class="row-actions">
-                <ui-button size="sm" variant="ghost" color="neutral" (clicked)="openEdit(row)">Edit</ui-button>
-                <ui-button size="sm" variant="ghost" color="danger" (clicked)="delete(row)">Delete</ui-button>
+                <ui-button size="sm" variant="soft" color="neutral" (clicked)="openEdit(row)">Edit</ui-button>
+                <ui-button size="sm" variant="soft" color="danger" (clicked)="delete(row)">Delete</ui-button>
               </div>
             }
           }

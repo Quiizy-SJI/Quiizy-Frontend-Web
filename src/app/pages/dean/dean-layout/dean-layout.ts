@@ -61,6 +61,7 @@ export class DeanLayout implements OnInit {
     { id: 'dashboard', label: 'Dashboard', route: '/dean', icon: 'dashboard' },
     { id: 'academic-years', label: 'Academic Years', route: '/dean/academic-years', icon: 'calendar_month' },
     { id: 'semesters', label: 'Semesters', route: '/dean/semesters', icon: 'school' },
+    { id: 'specialities', label: 'Specialities', route: '/dean/specialities', icon: 'badge' },
     { id: 'exam-types', label: 'Exam Types', route: '/dean/exam-types', icon: 'assignment' },
     { id: 'teaching-units', label: 'Teaching Units', route: '/dean/teaching-units', icon: 'menu_book' },
     { id: 'mini-admins', label: 'Mini Admins', route: '/dean/mini-admins', icon: 'groups' },
