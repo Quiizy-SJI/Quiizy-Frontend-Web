@@ -9,11 +9,13 @@ import {
   CardComponent,
   InputComponent,
   ModalComponent,
+  SelectComponent,
   SpinnerComponent,
   TableComponent,
+  type DropdownOption,
   type TableColumn,
 } from '../../../components/ui';
-import type { MiniAdminDto } from '../../../domain/dtos/dean/dean-shared.dto';
+import type { MiniAdminDto, SpecialityDto } from '../../../domain/dtos/dean/dean-shared.dto';
 import type { UpdateMiniAdminDto } from '../../../domain/dtos/dean/mini-admin.dto';
 import { DeanApiService } from '../../../services/dean-api.service';
 
@@ -25,6 +27,7 @@ type MiniAdminForm = {
   email: string;
   login: string;
   password: string;
+  specialityId: string;
 };
 
 @Component({
@@ -38,6 +41,7 @@ type MiniAdminForm = {
     ButtonComponent,
     ModalComponent,
     InputComponent,
+    SelectComponent,
     AlertComponent,
     SpinnerComponent,
   ],
@@ -52,6 +56,7 @@ export class DeanMiniAdmins {
   errorMessage = '';
 
   rows: MiniAdminDto[] = [];
+  specialities: SpecialityDto[] = [];
 
   readonly columns: TableColumn[] = [
     { key: 'name', label: 'Name' },
@@ -74,6 +79,7 @@ export class DeanMiniAdmins {
     email: '',
     login: '',
     password: '',
+    specialityId: '',
   };
 
   saveLoading = false;
@@ -88,6 +94,7 @@ export class DeanMiniAdmins {
 
     try {
       this.rows = await firstValueFrom(this.deanApi.listMiniAdmins());
+      this.specialities = await firstValueFrom(this.deanApi.listSpecialities());
     } catch (err: unknown) {
       this.errorMessage = err instanceof Error ? err.message : 'Failed to load mini admins.';
     } finally {
@@ -99,7 +106,7 @@ export class DeanMiniAdmins {
   openCreate(): void {
     this.modalMode = 'create';
     this.editingId = null;
-    this.form = { name: '', surname: '', email: '', login: '', password: '' };
+    this.form = { name: '', surname: '', email: '', login: '', password: '', specialityId: '' };
     this.isModalOpen = true;
   }
 
@@ -112,6 +119,7 @@ export class DeanMiniAdmins {
       email: row.user?.email ?? '',
       login: row.user?.login ?? '',
       password: '',
+      specialityId: row.speciality?.id ?? '',
     };
     this.isModalOpen = true;
   }
@@ -160,6 +168,7 @@ export class DeanMiniAdmins {
             email: this.form.email.trim(),
             login: this.form.login.trim(),
             password: this.form.password,
+            specialityId: this.form.specialityId || undefined,
           }),
         );
       } else if (this.editingId) {
@@ -168,6 +177,7 @@ export class DeanMiniAdmins {
           surname: this.form.surname.trim(),
           email: this.form.email.trim(),
           login: this.form.login.trim(),
+          specialityId: this.form.specialityId || null,
         };
         if (this.form.password) dto.password = this.form.password;
 
@@ -201,5 +211,13 @@ export class DeanMiniAdmins {
 
   modalTitle(): string {
     return this.modalMode === 'create' ? 'Create Mini Admin' : 'Edit Mini Admin';
+  }
+
+  specialityOptions(): DropdownOption<string>[] {
+    const opts: DropdownOption<string>[] = [{ value: '', label: '-- No Speciality --' }];
+    for (const s of this.specialities) {
+      opts.push({ value: s.id, label: s.name });
+    }
+    return opts;
   }
 }

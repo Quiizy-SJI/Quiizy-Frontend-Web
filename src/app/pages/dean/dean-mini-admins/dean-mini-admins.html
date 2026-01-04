@@ -71,6 +71,12 @@
         placeholder="Leave blank to keep current"
         [(ngModel)]="form.password"
       ></ui-input>
+
+      <ui-select
+        label="Speciality"
+        [options]="specialityOptions()"
+        [(ngModel)]="form.specialityId"
+      ></ui-select>
     </div>
 
     <div slot="footer" class="modal-actions">

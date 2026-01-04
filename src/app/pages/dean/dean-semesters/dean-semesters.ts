@@ -15,7 +15,12 @@ import {
   type DropdownOption,
   type TableColumn,
 } from '../../../components/ui';
-import type { AcademicYearDto, ClassAcademicYearDto, SemesterDto } from '../../../domain/dtos/dean/dean-shared.dto';
+import type {
+  AcademicYearDto,
+  ClassAcademicYearDto,
+  SemesterDto,
+  SemesterStatus,
+} from '../../../domain/dtos/dean/dean-shared.dto';
 import type { CreateSemesterDto, UpdateSemesterDto } from '../../../domain/dtos/dean/semester.dto';
 import { DeanApiService } from '../../../services/dean-api.service';
 
@@ -25,9 +30,9 @@ type SemesterForm = {
   name: string;
   shortCode: string;
   classAcademicYearId: string;
-  startDate: string;
-  endDate: string;
-  status: string;
+  startDate: Date | string;
+  endDate: Date | string ;
+  status: SemesterStatus;
 };
 
 @Component({
@@ -87,11 +92,35 @@ export class DeanSemesters {
 
   saveLoading = false;
 
-  readonly statusOptions: DropdownOption<string>[] = [
+  readonly statusOptions: DropdownOption<SemesterStatus>[] = [
     { value: 'SCHEDULED', label: 'Scheduled' },
-    { value: 'ONGOING', label: 'Ongoing' },
-    { value: 'COMPLETED', label: 'Completed' },
+    { value: 'ACTIVE', label: 'Active' },
+    { value: 'ACTION_NEEDED', label: 'Action needed' },
+    { value: 'ARCHIVED', label: 'Archived' },
   ];
+
+  private toDateInputValue(value?: string | null): string {
+    if (!value) return '';
+    // Backend serializes DATE columns as ISO strings; normalize to YYYY-MM-DD for the UI.
+    return value.length >= 10 ? value.slice(0, 10) : value;
+  }
+
+  /**
+   * Convert Date | string to ISO date string (YYYY-MM-DD) for backend.
+   * Returns undefined if input is empty/falsy.
+   */
+  private toIsoDateString(value: Date | string | null | undefined): string | undefined {
+    if (!value) return undefined;
+    if (value instanceof Date) {
+      // Convert Date to ISO string (YYYY-MM-DD)
+      return value.toISOString().slice(0, 10);
+    }
+    // If it's already a string, ensure it's in YYYY-MM-DD format
+    const trimmed = value.trim();
+    if (!trimmed) return undefined;
+    // If string has time component (e.g. from datetime), extract just the date
+    return trimmed.length >= 10 ? trimmed.slice(0, 10) : trimmed;
+  }
 
   async ngOnInit(): Promise<void> {
     await this.loadAcademicYears();
@@ -176,8 +205,8 @@ export class DeanSemesters {
       name: row.name ?? '',
       shortCode: row.shortCode ?? '',
       classAcademicYearId: row.classAcademicYear?.id ?? '',
-      startDate: row.startDate ?? '',
-      endDate: row.endDate ?? '',
+      startDate: this.toDateInputValue(row.startDate),
+      endDate: this.toDateInputValue(row.endDate),
       status: row.status ?? 'SCHEDULED',
     };
 
@@ -218,8 +247,8 @@ export class DeanSemesters {
           shortCode: this.form.shortCode.trim(),
           classAcademicYearId: this.form.classAcademicYearId,
           status: this.form.status,
-          startDate: this.form.startDate ? this.form.startDate : undefined,
-          endDate: this.form.endDate ? this.form.endDate : undefined,
+          startDate: this.toIsoDateString(this.form.startDate),
+          endDate: this.toIsoDateString(this.form.endDate),
         };
         await firstValueFrom(this.deanApi.createSemester(dto));
       } else if (this.editingId) {
@@ -227,8 +256,8 @@ export class DeanSemesters {
           name: this.form.name.trim(),
           shortCode: this.form.shortCode.trim(),
           status: this.form.status,
-          startDate: this.form.startDate ? this.form.startDate : undefined,
-          endDate: this.form.endDate ? this.form.endDate : undefined,
+          startDate: this.toIsoDateString(this.form.startDate),
+          endDate: this.toIsoDateString(this.form.endDate),
         };
         await firstValueFrom(this.deanApi.updateSemester(this.editingId, dto));
       }
@@ -264,8 +293,8 @@ export class DeanSemesters {
   }
 
   formatDates(row: SemesterDto): string {
-    const start = row.startDate ? row.startDate : '';
-    const end = row.endDate ? row.endDate : '';
+    const start = this.toDateInputValue(row.startDate);
+    const end = this.toDateInputValue(row.endDate);
     if (!start && !end) return '';
     if (start && end) return `${start} → ${end}`;
     return start || end;

@@ -40,15 +40,13 @@
 	</ui-card>
 
 	<ui-modal [isOpen]="isModalOpen" [title]="modalTitle()" [showFooter]="true" (closed)="closeModal()">
-		@if (modalMode === 'create' || modalMode === 'edit') {
-			<ui-alert *ngIf="errorMessage" type="danger" variant="outlined">{{ errorMessage }}</ui-alert>
-			<label>Name</label>
-			<ui-input [(ngModel)]="formName"></ui-input>
-		} @else if (modalMode === 'assign') {
-			<ui-alert *ngIf="errorMessage" type="danger" variant="outlined">{{ errorMessage }}</ui-alert>
-			<label>Head</label>
-			<ui-select [options]="miniAdminOptions()" [(ngModel)]="selectedHeadId"></ui-select>
-		}
+		<div class="form">
+			@if (modalMode === 'create' || modalMode === 'edit') {
+				<ui-input label="Name" placeholder="e.g. Computer Science" [(ngModel)]="formName"></ui-input>
+			} @else if (modalMode === 'assign') {
+				<ui-select label="Speciality Head" [options]="miniAdminOptions()" [(ngModel)]="selectedHeadId"></ui-select>
+			}
+		</div>
 
 		<div slot="footer" class="modal-actions">
 			@if (modalMode === 'create' || modalMode === 'edit') {

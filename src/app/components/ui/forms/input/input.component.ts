@@ -172,7 +172,7 @@ import { generateId } from '../../utils/class-utils';
 export class InputComponent implements ControlValueAccessor {
   @ViewChild('inputRef') inputRef!: ElementRef<HTMLInputElement>;
 
-  @Input() type: 'text' | 'email' | 'password' | 'number' | 'tel' | 'url' | 'search' = 'text';
+  @Input() type: 'text' | 'email' | 'password' | 'number' | 'tel' | 'url' | 'search' | 'date' | 'datetime-local' | 'time' = 'text';
   @Input() variant: InputVariant = 'outlined';
   @Input() size: Size = 'md';
   @Input() label?: string;

@@ -122,7 +122,10 @@ export class DeanApiService {
   }
 
   assignSpecialityHead(id: string, headId?: string | null): Observable<SpecialityDto | null> {
-    return this.api.patch<SpecialityDto | null>(`/dean/specialities/${id}/head`, { headId });
+    // Backend expects: { headId: string } to assign, or { } / { headId: undefined } to unassign
+    // @IsOptional() @IsString() means null is not valid, only undefined or a string
+    const body = headId ? { headId } : {};
+    return this.api.patch<SpecialityDto | null>(`/dean/specialities/${id}/head`, body);
   }
 
   createMiniAdmin(dto: CreateMiniAdminDto): Observable<MiniAdminDto> {

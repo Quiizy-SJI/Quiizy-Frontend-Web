@@ -19,7 +19,8 @@ export interface ClassAcademicYearDto extends BaseEntityDto {
   };
 }
 
-export type SemesterStatus = 'SCHEDULED' | 'ONGOING' | 'COMPLETED' | string;
+// Must match backend `quizzy-backend-api/src/entities/enums/semester-status.enum.ts`
+export type SemesterStatus = 'ACTIVE' | 'SCHEDULED' | 'ACTION_NEEDED' | 'ARCHIVED';
 
 export interface SemesterDto extends BaseEntityDto {
   name: string;

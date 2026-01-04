@@ -8,9 +8,9 @@ This repository contains the Angular web application used for web access (admini
 
 ### Roles
 
-- **Administrator**: manages academic structure (years/semesters), evaluation types, subjects/courses, and mini-admin accounts.
-- **Mini-Administrator (Branch Admin)**: manages classes, teacher accounts, and student accounts for a department/branch.
-- **Teacher**: creates/manages exams and questions, manages grading, creates mock tests.
+- **Administrator**: manages academic structure (years/semesters), evaluation types, subjects, and mini-admin accounts.
+- **Mini-Administrator (Branch Admin)**: manages classes, teacher accounts, and student accounts for a department/branch. Associate a class to a teacher and class in an academic year to create a course. 
+- **Teacher**: creates/manages exams and questions, manages grading, creates mock tests for the courses (association of teacher, class and teaching unit) assigned to him. Can access to all existing questions from the system grouped ny teaching unit. Can see detailed breakdowns of student answers to quizzes and do sentiment analysis.
 - **Student**: takes exams and views results (web and/or mobile, depending on deployment).
 
 ### Core features
