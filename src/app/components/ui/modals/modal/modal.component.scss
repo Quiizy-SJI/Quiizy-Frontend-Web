@@ -13,7 +13,12 @@
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(4px);
   animation: modal-overlay-in 0.2s ease-out;
-  overflow-y: auto;
+  overflow: hidden;
+}
+
+.modal-overlay--fullscreen {
+  padding: 0;
+  align-items: stretch;
 }
 
 .modal {
@@ -21,11 +26,16 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-height: calc(100vh - 4rem);
+  max-height: calc(100dvh - 4rem);
   background: var(--surface-base);
   border-radius: 20px;
   box-shadow: var(--elevation-5);
   animation: modal-in 0.25s ease-out;
+  overflow: hidden;
+
+  @supports not (height: 100dvh) {
+    max-height: calc(100vh - 4rem);
+  }
 
   // ==========================================
   // SIZES
@@ -138,12 +148,19 @@
 // MODAL BODY
 // ==========================================
 .modal__body {
-  flex: 1;
+  flex: 0 1 auto;
+  min-height: 0;
   padding: 1.5rem;
   overflow: hidden;
 
   &--scrollable {
     overflow-y: auto;
+  }
+}
+
+.modal--fullscreen {
+  .modal__body {
+    flex: 1 1 auto;
   }
 }
 
@@ -199,10 +216,21 @@
     align-items: flex-end;
   }
 
+  .modal-overlay--fullscreen {
+    padding: 0;
+    align-items: stretch;
+  }
+
   .modal {
     max-width: none;
     border-radius: 20px 20px 0 0;
     margin-bottom: 0;
+
+    max-height: calc(100dvh - 2rem);
+
+    @supports not (height: 100dvh) {
+      max-height: calc(100vh - 2rem);
+    }
 
     &--fullscreen {
       border-radius: 0;

@@ -1,17 +1,18 @@
+import type { SemesterStatus } from './dean-shared.dto';
+
 export interface CreateSemesterDto {
   name: string;
   shortCode: string;
   classAcademicYearId: string;
   startDate?: string;
   endDate?: string;
-  status?: string;
+  status?: SemesterStatus;
 }
 
 export interface UpdateSemesterDto {
   name?: string;
   shortCode?: string;
-  classAcademicYearId?: string;
-  startDate?: string | null;
-  endDate?: string | null;
-  status?: string;
+  startDate?: string;
+  endDate?: string;
+  status?: SemesterStatus;
 }

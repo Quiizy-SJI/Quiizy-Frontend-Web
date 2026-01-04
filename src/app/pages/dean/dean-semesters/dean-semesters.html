@@ -42,7 +42,7 @@
             @case ('status') { {{ row.status }} }
             @case ('class') { {{ row.classAcademicYear?.class?.name }} }
             @case ('academicYear') { {{ formatAcademicYear(row) }} }
-            @case ('dates') { {{ formatDates(row) }} } 
+            @case ('dates') { {{ formatDates(row) }} }
             @case ('updatedAt') { {{ row.updatedAt }} }
             @case ('actions') {
               <div class="row-actions">
@@ -70,6 +70,7 @@
         label="Class Academic Year"
         [options]="classAcademicYearOptions()"
         [(ngModel)]="form.classAcademicYearId"
+        [disabled]="modalMode === 'edit'"
       ></ui-select>
 
       <ui-select

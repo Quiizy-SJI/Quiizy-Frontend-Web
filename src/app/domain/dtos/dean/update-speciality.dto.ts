@@ -2,7 +2,6 @@ export interface UpdateSpecialityDto {
   name?: string;
 }
 
-export class AssignHeadDto {
-  // headId can be null to unassign
+export interface AssignHeadDto {
   headId?: string | null;
 }

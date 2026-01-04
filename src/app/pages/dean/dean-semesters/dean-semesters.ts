@@ -16,6 +16,7 @@ import {
   type TableColumn,
 } from '../../../components/ui';
 import type { AcademicYearDto, ClassAcademicYearDto, SemesterDto } from '../../../domain/dtos/dean/dean-shared.dto';
+import type { CreateSemesterDto, UpdateSemesterDto } from '../../../domain/dtos/dean/semester.dto';
 import { DeanApiService } from '../../../services/dean-api.service';
 
 type ModalMode = 'create' | 'edit';
@@ -49,6 +50,7 @@ type SemesterForm = {
 })
 export class DeanSemesters {
   private readonly deanApi = inject(DeanApiService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   isLoading = false;
   errorMessage = '';
@@ -140,7 +142,7 @@ export class DeanSemesters {
       this.errorMessage = err instanceof Error ? err.message : 'Failed to load semesters.';
     } finally {
       this.isLoading = false;
-      inject(ChangeDetectorRef).markForCheck();
+      this.cdr.markForCheck();
     }
   }
 
@@ -210,19 +212,25 @@ export class DeanSemesters {
     this.saveLoading = true;
 
     try {
-      const dtoBase = {
-        name: this.form.name.trim(),
-        shortCode: this.form.shortCode.trim(),
-        classAcademicYearId: this.form.classAcademicYearId,
-        status: this.form.status,
-        startDate: this.form.startDate ? this.form.startDate : undefined,
-        endDate: this.form.endDate ? this.form.endDate : undefined,
-      };
-
       if (this.modalMode === 'create') {
-        await firstValueFrom(this.deanApi.createSemester(dtoBase));
+        const dto: CreateSemesterDto = {
+          name: this.form.name.trim(),
+          shortCode: this.form.shortCode.trim(),
+          classAcademicYearId: this.form.classAcademicYearId,
+          status: this.form.status,
+          startDate: this.form.startDate ? this.form.startDate : undefined,
+          endDate: this.form.endDate ? this.form.endDate : undefined,
+        };
+        await firstValueFrom(this.deanApi.createSemester(dto));
       } else if (this.editingId) {
-        await firstValueFrom(this.deanApi.updateSemester(this.editingId, dtoBase));
+        const dto: UpdateSemesterDto = {
+          name: this.form.name.trim(),
+          shortCode: this.form.shortCode.trim(),
+          status: this.form.status,
+          startDate: this.form.startDate ? this.form.startDate : undefined,
+          endDate: this.form.endDate ? this.form.endDate : undefined,
+        };
+        await firstValueFrom(this.deanApi.updateSemester(this.editingId, dto));
       }
 
       this.closeModal();
@@ -231,7 +239,7 @@ export class DeanSemesters {
       this.errorMessage = err instanceof Error ? err.message : 'Save failed.';
     } finally {
       this.saveLoading = false;
-      inject(ChangeDetectorRef).markForCheck();
+      this.cdr.markForCheck();
     }
   }
 

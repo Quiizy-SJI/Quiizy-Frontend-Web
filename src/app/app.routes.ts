@@ -50,6 +50,11 @@ export const routes: Routes = [
         title: 'Teaching Units'
       },
       {
+        path: 'specialities',
+        loadComponent: () => import('./pages/dean/dean-specialities/dean-specialities').then(m => m.DeanSpecialities),
+        title: 'Specialities'
+      },
+      {
         path: 'mini-admins',
         loadComponent: () => import('./pages/dean/dean-mini-admins/dean-mini-admins').then(m => m.DeanMiniAdmins),
         title: 'Mini Admin Accounts'

@@ -122,26 +122,22 @@ export class Login {
 
     try {
       const session = await firstValueFrom(this.authService.login(this.loginRequest));
-      
-      // Redirect based on user role
-      switch (session.user.role) {
-        case 'DEAN':
-          await this.router.navigateByUrl('/dean');
-          break;
-        case 'TEACHER':
-          await this.router.navigateByUrl('/teacher');
-          break;
-        case 'SPECIALITY_HEAD':
-          // Add mini-admin route when implemented
-          await this.router.navigateByUrl('/showcase');
-          break;
-        case 'STUDENT':
-          // Add student route when implemented
-          await this.router.navigateByUrl('/showcase');
-          break;
-        default:
-          await this.router.navigateByUrl('/showcase');
-          break;
+
+      const targetUrl = this.getLandingUrlForRole(session.user.role);
+
+      // NOTE: With lazy-loaded standalone components, a stale tab (or a dev-server restart)
+      // can cause chunk URLs to change. Router navigation then fails with:
+      // "Failed to fetch dynamically imported module: ...chunk-XXXX.js".
+      // Falling back to a full-page navigation fixes it by reloading the latest index/chunks.
+      try {
+        await this.router.navigateByUrl(targetUrl);
+      } catch (navErr: unknown) {
+        const msg = navErr instanceof Error ? navErr.message : String(navErr);
+        if (msg.includes('Failed to fetch dynamically imported module')) {
+          window.location.assign(targetUrl);
+          return;
+        }
+        throw navErr;
       }
     } catch (error: unknown) {
       this.errorMessage =
@@ -152,6 +148,23 @@ export class Login {
     } finally {
       this.isLoading = false;
       this.cdr.markForCheck();
+    }
+  }
+
+  private getLandingUrlForRole(role: Role): string {
+    switch (role) {
+      case 'DEAN':
+        return '/dean';
+      case 'TEACHER':
+        return '/teacher';
+      case 'SPECIALITY_HEAD':
+        // Mini-admin web routes not yet implemented
+        return '/showcase';
+      case 'STUDENT':
+        // Student web routes not yet implemented
+        return '/showcase';
+      default:
+        return '/showcase';
     }
   }
 }

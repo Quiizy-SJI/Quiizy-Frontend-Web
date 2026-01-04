@@ -14,6 +14,7 @@ import {
   type TableColumn,
 } from '../../../components/ui';
 import type { MiniAdminDto } from '../../../domain/dtos/dean/dean-shared.dto';
+import type { UpdateMiniAdminDto } from '../../../domain/dtos/dean/mini-admin.dto';
 import { DeanApiService } from '../../../services/dean-api.service';
 
 type ModalMode = 'create' | 'edit';
@@ -162,7 +163,7 @@ export class DeanMiniAdmins {
           }),
         );
       } else if (this.editingId) {
-        const dto: any = {
+        const dto: UpdateMiniAdminDto = {
           name: this.form.name.trim(),
           surname: this.form.surname.trim(),
           email: this.form.email.trim(),

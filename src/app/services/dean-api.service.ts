@@ -18,7 +18,7 @@ import type { CreateSemesterDto, UpdateSemesterDto } from '../domain/dtos/dean/s
 import type { CreateExamTypeDto, UpdateExamTypeDto } from '../domain/dtos/dean/exam-type.dto';
 import type { CreateTeachingUnitDto, UpdateTeachingUnitDto } from '../domain/dtos/dean/teaching-unit.dto';
 import type { CreateSpecialityDto } from '../domain/dtos/dean/create-speciality.dto';
-import type { AssignHeadDto, UpdateSpecialityDto } from '../domain/dtos/dean/update-speciality.dto';
+import type { UpdateSpecialityDto } from '../domain/dtos/dean/update-speciality.dto';
 import type { CreateMiniAdminDto, UpdateMiniAdminDto } from '../domain/dtos/dean/mini-admin.dto';
 import type { DeanDashboardStatsDto } from '../domain/dtos/dean/stats.dto';
 import type { DeanAiAnalyticsDto } from '../domain/dtos/dean/ai-analytics.dto';
@@ -121,8 +121,8 @@ export class DeanApiService {
     return this.api.delete<{ deleted: boolean }>(`/dean/specialities/${id}`);
   }
 
-  assignSpecialityHead(id: string, headId?: string | null): Observable<AssignHeadDto | null> {
-    return this.api.patch<AssignHeadDto | null>(`/dean/specialities/${id}/head`, { headId });
+  assignSpecialityHead(id: string, headId?: string | null): Observable<SpecialityDto | null> {
+    return this.api.patch<SpecialityDto | null>(`/dean/specialities/${id}/head`, { headId });
   }
 
   createMiniAdmin(dto: CreateMiniAdminDto): Observable<MiniAdminDto> {

@@ -6,6 +6,6 @@ export interface CreateExamTypeDto {
 
 export interface UpdateExamTypeDto {
   name?: string;
-  description?: string | null;
+  description?: string;
   active?: boolean;
 }

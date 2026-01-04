@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 
 import {
@@ -103,7 +104,7 @@ export class DeanSpecialities {
   openAssign(row: SpecialityDto): void {
     this.modalMode = 'assign';
     this.editingId = row.id;
-    this.selectedHeadId = (row as any).head?.id ?? null;
+    this.selectedHeadId = row.head?.id ?? null;
     this.isModalOpen = true;
   }
 
@@ -146,19 +147,22 @@ export class DeanSpecialities {
 
     this.assignLoading = true;
     try {
-      // log payload for debugging server 400 errors
-      // ensure null/empty string are normalized to null
-      const payloadHeadId = String(this.selectedHeadId === '' ? null : this.selectedHeadId);
-      console.log('Assigning speciality head', { specialityId: this.editingId, headId: payloadHeadId });
-      await firstValueFrom(this.deanApi.assignSpecialityHead(String(this.editingId), String(payloadHeadId)));
+      const headId = this.selectedHeadId && this.selectedHeadId !== '' ? this.selectedHeadId : null;
+      await firstValueFrom(this.deanApi.assignSpecialityHead(this.editingId, headId));
       this.closeModal();
       await this.load();
     } catch (err: unknown) {
-      // HttpErrorResponse from Angular HttpClient contains useful info in `error`
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const anyErr = err as any;
-      console.error('Assign failed', anyErr);
-      this.errorMessage = anyErr?.error?.message ?? anyErr?.message ?? 'Assign failed.';
+      if (err instanceof HttpErrorResponse) {
+        const msg =
+          typeof (err.error as { message?: unknown } | null)?.message === 'string'
+            ? (err.error as { message: string }).message
+            : err.message;
+        this.errorMessage = msg || 'Assign failed.';
+      } else if (err instanceof Error) {
+        this.errorMessage = err.message;
+      } else {
+        this.errorMessage = 'Assign failed.';
+      }
     } finally {
       this.assignLoading = false;
       this.cdr.markForCheck();

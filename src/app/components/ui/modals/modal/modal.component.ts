@@ -9,7 +9,11 @@ import type { ModalSize } from '../../types/component.types';
   imports: [CommonModule],
   template: `
     @if (isOpen) {
-      <div class="modal-overlay" (click)="onOverlayClick($event)">
+      <div
+        class="modal-overlay"
+        [class.modal-overlay--fullscreen]="fullScreen"
+        (click)="onOverlayClick($event)"
+      >
         <div
           [class]="modalClasses"
           role="dialog"
