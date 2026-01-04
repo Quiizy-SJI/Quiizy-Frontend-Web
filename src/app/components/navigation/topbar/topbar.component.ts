@@ -21,12 +21,19 @@ import type { Role } from '../../../domain/dtos/login.dto';
             <mat-icon fontSet="material-symbols-outlined">menu</mat-icon>
           </ui-icon-button>
         }
-        <div class="topbar__title" [attr.title]="title">{{ title }}</div>
+        <div class="topbar__title h1" [attr.title]="title">{{ title }}</div>
       </div>
 
       <div class="topbar__right">
         @if (userName) {
-          <div class="user-profile" (click)="userMenuClick.emit()">
+          <div
+            class="user-profile"
+            role="button"
+            tabindex="0"
+            (click)="userMenuClick.emit()"
+            (keydown.enter)="userMenuClick.emit()"
+            (keydown.space)="userMenuClick.emit(); $event.preventDefault()"
+          >
             <div class="user-info">
               <div class="user-details">
                 <div class="user-name">{{ getFullName() }}</div>

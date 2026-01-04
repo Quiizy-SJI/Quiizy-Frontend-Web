@@ -26,7 +26,7 @@ export type SidebarItem = {
       <div class="sidebar-top">
         <a class="brand" [routerLink]="brandLink" aria-label="App home" (click)="onItemClick()">
           <span class="brand-logo">Q</span>
-          <span class="brand-text" [attr.aria-hidden]="(collapsed && !isMobile) ? 'true' : 'false'">Quizzy</span>
+          <span class="brand-text h1" [attr.aria-hidden]="(collapsed && !isMobile) ? 'true' : 'false'">Quizzy</span>
         </a>
       </div>
 

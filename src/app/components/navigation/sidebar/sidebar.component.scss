@@ -7,18 +7,14 @@
 
 .sidebar {
   width: 240px;
-  /* Subtle gradient background to add depth */
-  background: linear-gradient(
-    180deg,
-    var(--surface-raised) 0%,
-    color-mix(in srgb, var(--primary-base) 8%, var(--surface-raised) 92%) 220px,
-    var(--surface-raised) 100%
-  );
+  background: var(--surface-raised);
   border-right: 1px solid var(--border-default);
   color: var(--text-primary);
   display: flex;
   flex-direction: column;
-  transition: width 200ms ease, transform 200ms ease;
+  transition:
+    width var(--motion-duration-slow) var(--motion-ease-out),
+    transform var(--motion-duration-slow) var(--motion-ease-out);
   z-index: 60;
   /* Keep sidebar visible while page scrolls on desktop/tablet */
   position: sticky;
@@ -26,6 +22,33 @@
   height: 100dvh; /* support mobile address bar dynamics */
   overflow: hidden; /* contain internal scrolling to the nav */
   align-self: flex-start; /* ensure sticky works within flex container */
+
+  isolation: isolate;
+}
+
+.sidebar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    var(--gradient-aurora),
+    var(--gradient-secondary);
+  background-size: 260% 260%;
+  background-position: 0% 50%;
+  opacity: 0.10;
+  pointer-events: none;
+  z-index: -1;
+  animation: sidebar-gradient-shift 30s var(--motion-ease-in-out) infinite alternate;
+}
+
+.sidebar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--glass-noise);
+  opacity: 0.12;
+  pointer-events: none;
+  z-index: -1;
 }
 
 .sidebar.collapsed {
@@ -46,6 +69,7 @@
   color: inherit;
   text-decoration: none;
   min-width: 0;
+  font-size: 1.75rem;
 }
 
 .brand-logo {
@@ -54,10 +78,19 @@
   display: inline-grid;
   place-items: center;
   border-radius: 10px;
-  background: linear-gradient(135deg, var(--primary-base), var(--secondary-base));
+  background: var(--gradient-primary);
   color: white;
   font-weight: 700;
   flex: 0 0 auto;
+  box-shadow: var(--shadow-primary);
+  transition:
+    transform var(--motion-duration-normal) var(--motion-ease-spring),
+    box-shadow var(--motion-duration-normal) var(--motion-ease-out);
+}
+
+.brand:hover .brand-logo {
+  transform: translateY(-1px) rotate(-2deg) scale(1.02);
+  box-shadow: var(--elevation-3);
 }
 
 .brand-text {
@@ -74,12 +107,33 @@
 }
 
 .sidebar-nav {
-  //flex: 1;
+  flex: 1;
   display: flex;
   flex-direction: column;
   padding: 0.5rem;
   gap: 0.25rem;
   overflow: auto; /* scroll menu when content exceeds viewport */
+}
+
+.sidebar-nav {
+  scrollbar-color: color-mix(in srgb, var(--border-emphasis) 70%, transparent 30%) transparent;
+  scrollbar-width: thin;
+}
+
+.sidebar-nav::-webkit-scrollbar {
+  width: 10px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--border-emphasis) 70%, transparent 30%);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--border-strong) 70%, transparent 30%);
+  background-clip: content-box;
 }
 
 .nav-item {
@@ -90,9 +144,35 @@
   border-radius: 10px;
   color: var(--text-primary);
   text-decoration: none;
-  transition: background 150ms ease, color 150ms ease;
+  border: 1px solid transparent;
+  overflow: hidden;
+  isolation: isolate;
+  will-change: transform;
+
+  transition:
+    background-color var(--motion-duration-slow) var(--motion-ease-out),
+    color var(--motion-duration-slow) var(--motion-ease-out),
+    transform var(--motion-duration-slow) var(--motion-ease-out),
+    box-shadow var(--motion-duration-slow) var(--motion-ease-out),
+    border-color var(--motion-duration-slow) var(--motion-ease-out);
   position: relative;
   min-width: 0;
+}
+
+.nav-item::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: var(--hologram-border);
+  opacity: 0;
+  transform: translateX(-60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.nav-item > * {
+  position: relative;
+  z-index: 1;
 }
 
 .nav-item .icon { font-size: 20px; flex: 0 0 auto; }
@@ -101,7 +181,9 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  transition: opacity 150ms ease, max-width 200ms ease;
+  transition:
+    opacity var(--motion-duration-slow) var(--motion-ease-out),
+    max-width var(--motion-duration-slow) var(--motion-ease-out);
 }
 
 .sidebar.collapsed .nav-item .label {
@@ -110,21 +192,52 @@
 }
 
 .nav-item:hover {
-  background: color-mix(in srgb, var(--surface-raised) 94%, #000 6%);
+  background-color: var(--surface-hover);
+  border-color: color-mix(in srgb, var(--border-default) 70%, transparent 30%);
+  box-shadow: var(--elevation-1);
+  transform: translate3d(6px, 0, 0);
 }
 
-/* Micro‑interaction: nudge icon slightly on hover for affordance */
+.nav-item:active {
+  background-color: var(--surface-active);
+  transform: translate3d(5px, 0, 0) scale(0.99);
+  box-shadow: var(--elevation-0);
+}
+
+.nav-item:hover::after {
+  opacity: 0.55;
+  animation: nav-item-sheen 1.9s var(--motion-ease-in-out) both;
+}
+
+.nav-item .icon {
+  transition:
+    transform var(--motion-duration-slow) var(--motion-ease-spring),
+    color var(--motion-duration-slow) var(--motion-ease-out);
+}
+
 .nav-item:hover .icon {
-  transform: translateX(2px);
+  transform: translateX(3px) scale(1.04);
 }
 
 .nav-item.active {
   /* Stronger contrast so the active item is clearly visible */
-  background: color-mix(in srgb, var(--primary-base) 26%, var(--surface-raised) 74%);
+  background: color-mix(in srgb, var(--primary-base) 22%, var(--surface-raised) 78%);
   color: var(--text-primary);
   font-weight: 600;
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary-base) 45%, transparent 55%);
-  transition: box-shadow 150ms ease, background 150ms ease;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--primary-base) 45%, transparent 55%),
+    var(--elevation-1);
+}
+
+.nav-item.active::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--hologram-bg);
+  opacity: 0.22;
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* Left indicator bar for the active item (visible in both expanded and collapsed) */
@@ -146,7 +259,7 @@
   padding: 4px;
   border-radius: 8px;
   /* Pop animation when a link becomes active */
-  animation: sidebar-icon-pop 220ms ease-out both;
+  animation: sidebar-icon-pop 650ms var(--motion-ease-spring) both;
 }
 
 /* Improve keyboard accessibility */
@@ -157,7 +270,7 @@
 
 .sidebar-footer {
   padding: 0.5rem;
-  //margin-top: auto; /* pin to bottom within flex column */
+  margin-top: auto; /* pin to bottom within flex column */
   border-top: 1px solid var(--border-default);
   display: flex;
   align-items: center;
@@ -167,7 +280,9 @@
 .collapse-btn { background: transparent; border: none; cursor: pointer; padding: 0.45rem; border-radius: 8px; }
 
 /* Rotate chevron when collapsed for clearer affordance */
-.chevron { transition: transform 180ms ease; }
+.chevron {
+  transition: transform var(--motion-duration-normal) var(--motion-ease-spring);
+}
 .chevron.rotated { transform: rotate(180deg); }
 
 /* Keyframes */
@@ -181,6 +296,19 @@
 @media (prefers-reduced-motion: reduce) {
   .nav-item .icon,
   .chevron { transition: none; animation: none !important; }
+
+  .sidebar::before {
+    animation: none;
+  }
+
+  .nav-item,
+  .brand-logo {
+    transition: none;
+  }
+
+  .nav-item::after {
+    display: none;
+  }
 }
 
 /* Mobile behavior */
@@ -188,4 +316,23 @@
   .sidebar { position: fixed; left: 0; top: 0; bottom: 0; transform: translateX(-110%); width: 260px; }
   .sidebar.mobile-open { transform: translateX(0); }
   .sidebar.collapsed { width: 260px; }
+}
+
+@keyframes sidebar-gradient-shift {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+@keyframes nav-item-sheen {
+  0% {
+    transform: translateX(-70%);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.55;
+  }
+  100% {
+    transform: translateX(70%);
+    opacity: 0;
+  }
 }

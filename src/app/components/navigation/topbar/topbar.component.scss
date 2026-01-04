@@ -5,34 +5,106 @@
   padding: 0.75rem 1rem;
   gap: 1rem;
   border-bottom: 1px solid var(--border-default);
+
+  position: sticky;
+  top: 0;
+  z-index: 70;
+
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-bottom-color: color-mix(in srgb, var(--border-default) 70%, transparent 30%);
+  backdrop-filter: var(--glass-backdrop);
+  -webkit-backdrop-filter: var(--glass-backdrop);
+  box-shadow: var(--elevation-1);
+
+  isolation: isolate;
+  overflow: clip;
+}
+
+.topbar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-aurora), var(--gradient-primary);
+  background-size: 240% 240%;
+  background-position: 0% 50%;
+  opacity: 0.1;
+  pointer-events: none;
+  z-index: -1;
+  animation: topbar-gradient-shift 26s var(--motion-ease-in-out) infinite alternate;
+}
+
+.topbar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--glass-noise);
+  opacity: 0.18;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.topbar:hover::before {
+  opacity: 0.14;
 }
 
 .topbar__left {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  flex: 1 1 auto;
   min-width: 0; /* allow title to truncate */
 }
 
 /* Ensure the menu button never shrinks out of view on small screens */
 .topbar__left > ui-icon-button {
   flex: 0 0 auto;
+  min-width: 20px;
 }
 
 .topbar__title {
   font-weight: 700;
+  letter-spacing: -0.01em;
   flex: 1 1 auto;
   min-width: 0; /* so text-overflow works inside flex */
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 1px 0 color-mix(in srgb, var(--surface-raised) 70%, transparent 30%);
+  font-size: 1.75rem;
 }
 
 .topbar__right {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  flex: 0 0 auto;
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+/* Small screens: prevent right-side content from squeezing out the menu button */
+@media (max-width: 640px) {
+  .topbar {
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
+  }
+
+  .topbar__left {
+    flex: 1 1 auto;
+  }
+
+  .topbar__right {
+    flex: 1 1 100%;
+    justify-content: flex-end;
+  }
+
+  .topbar__title {
+    font-size: 1.25rem;
+  }
 }
 
 .user-profile {
@@ -40,12 +112,50 @@
   align-items: center;
   gap: 1rem;
   padding: 0.5rem 0.75rem;
-  border-radius: var(--border-radius);
-  transition: background-color var(--motion-duration-fast) ease;
+  border-radius: var(--border-radius, 12px);
+  border: 1px solid transparent;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+
+  transition: background-color var(--motion-duration-normal) var(--motion-ease-out),
+    box-shadow var(--motion-duration-normal) var(--motion-ease-out),
+    transform var(--motion-duration-normal) var(--motion-ease-spring),
+    border-color var(--motion-duration-normal) var(--motion-ease-out);
   cursor: pointer;
 
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: var(--hologram-border);
+    opacity: 0;
+    transform: translateX(-60%);
+    pointer-events: none;
+    z-index: -1;
+  }
+
   &:hover {
-    background-color: var(--surface-raised);
+    background-color: var(--surface-hover);
+    border-color: color-mix(in srgb, var(--border-default) 70%, transparent 30%);
+    box-shadow: var(--elevation-2);
+    transform: translateY(-1px);
+  }
+
+  &:hover::before {
+    opacity: 0.55;
+    animation: topbar-sheen 1.35s var(--motion-ease-in-out) both;
+  }
+
+  &:active {
+    background-color: var(--surface-active);
+    box-shadow: var(--elevation-1);
+    transform: translateY(0);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring-offset);
   }
 }
 
@@ -110,23 +220,72 @@
 
 .user-avatar {
   flex-shrink: 0;
-  transition: transform var(--motion-duration-fast) ease;
+  transition: transform var(--motion-duration-normal) var(--motion-ease-spring);
+}
 
-  &:hover {
-    transform: scale(1.05);
-  }
+.user-profile:hover .user-avatar {
+  transform: scale(1.04);
+}
 
-  &:active {
-    transform: scale(0.95);
-  }
+.user-profile:active .user-avatar {
+  transform: scale(0.98);
 }
 
 .logout-btn {
   margin-left: 0.5rem;
-  opacity: 0.8;
-  transition: opacity var(--motion-duration-fast) ease;
+  opacity: 0.85;
+  transition: opacity var(--motion-duration-normal) var(--motion-ease-out);
 
   &:hover {
     opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .topbar::before {
+    animation: none;
+  }
+
+  .user-profile,
+  .user-avatar,
+  .logout-btn {
+    transition: none;
+  }
+
+  .user-profile::before {
+    display: none;
+  }
+
+  .user-profile:hover,
+  .user-profile:active {
+    transform: none;
+  }
+
+  .user-profile:hover .user-avatar,
+  .user-profile:active .user-avatar {
+    transform: none;
+  }
+}
+
+@keyframes topbar-gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes topbar-sheen {
+  0% {
+    transform: translateX(-70%);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.55;
+  }
+  100% {
+    transform: translateX(70%);
+    opacity: 0;
   }
 }
