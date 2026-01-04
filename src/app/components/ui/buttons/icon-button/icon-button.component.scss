@@ -13,7 +13,9 @@
   position: relative;
   aspect-ratio: 1;
   flex-shrink: 0;
-  padding-top: 6px;
+  box-sizing: border-box;
+  padding: 0 !important;
+
 
   &:focus-visible {
     outline: none;
