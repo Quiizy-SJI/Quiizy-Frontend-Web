@@ -57,7 +57,7 @@ export const routes: Routes = [
       {
         path: 'mini-admins',
         loadComponent: () => import('./pages/dean/dean-mini-admins/dean-mini-admins').then(m => m.DeanMiniAdmins),
-        title: 'Mini Admin Accounts'
+        title: 'Speciality Head Accounts'
       },
       {
         path: 'ai-analytics',
@@ -104,22 +104,23 @@ export const routes: Routes = [
       {
         path: 'create-exam',
         loadComponent: () => import('./pages/teacher/teacher-create-exam/teacher-create-exam').then(m => m.TeacherCreateExam),
-        title: 'Create Exam - Step 1'
+        title: 'Create Quiz - Details'
       },
       {
         path: 'create-exam/step2',
         loadComponent: () => import('./pages/teacher/teacher-create-exam-step2/teacher-create-exam-step2').then(m => m.TeacherCreateExamStep2),
-        title: 'Create Exam - Step 2'
+        title: 'Create Quiz - Questions'
       },
       {
         path: 'create-exam/step3',
         loadComponent: () => import('./pages/teacher/teacher-create-exam-step3/teacher-create-exam-step3').then(m => m.TeacherCreateExamStep3),
-        title: 'Create Exam - Step 3'
+        title: 'Create Quiz - Review & Publish'
       },
       {
+        // Legacy route redirect - step4 is no longer used
         path: 'create-exam/step4',
-        loadComponent: () => import('./pages/teacher/teacher-create-exam-step4/teacher-create-exam-step4').then(m => m.TeacherCreateExamStep4),
-        title: 'Create Exam - Step 4'
+        redirectTo: 'create-exam/step3',
+        pathMatch: 'full'
       },
     ]
   }

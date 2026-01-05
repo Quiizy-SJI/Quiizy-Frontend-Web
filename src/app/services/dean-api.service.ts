@@ -125,6 +125,7 @@ export class DeanApiService {
     // Backend expects: { headId: string } to assign, or { } / { headId: undefined } to unassign
     // @IsOptional() @IsString() means null is not valid, only undefined or a string
     const body = headId ? { headId } : {};
+    console.log("Update head ", body);
     return this.api.patch<SpecialityDto | null>(`/dean/specialities/${id}/head`, body);
   }
 
@@ -142,6 +143,7 @@ export class DeanApiService {
 
   // AI analytics
   getAiAnalytics(academicYearId?: string): Observable<DeanAiAnalyticsDto> {
+    academicYearId = academicYearId ? String(academicYearId) : undefined;
     return this.api.get<DeanAiAnalyticsDto>('/dean/ai-analytics', {
       params: academicYearId ? { academicYearId } : undefined,
     });

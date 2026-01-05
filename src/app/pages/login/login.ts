@@ -60,7 +60,7 @@ export class Login {
   // Role options for the select dropdown
   roleOptions: DropdownOption<Role>[] = [
     { value: 'TEACHER', label: 'Teacher', icon: '👨‍🏫' },
-    { value: 'SPECIALITY_HEAD', label: 'Speciality Head (Mini Admin)', icon: '📋' },
+    { value: 'SPECIALITY_HEAD', label: 'Speciality Head (Speciality Head)', icon: '📋' },
     { value: 'DEAN', label: 'Dean (Administrator)', icon: '🏛️' }
   ];
 
