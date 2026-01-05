@@ -1,272 +1,310 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterModule, Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { firstValueFrom } from 'rxjs';
+
+import { TeacherApiService } from '../../../services/teacher-api.service';
+import type {
+  CreateTeacherQuizDto,
+  CreateQuestionDto,
+  QuizType,
+  QuestionType,
+  CourseDto,
+} from '../../../domain/dtos/teacher/teacher-quiz.dto';
+import {
+  CardComponent,
+  ButtonComponent,
+  BadgeComponent,
+  SpinnerComponent,
+  AlertComponent,
+} from '../../../components/ui';
+
+/** Local interface matching Step 2's question format */
+interface QuestionFormData {
+  question: string;
+  type: QuestionType;
+  proposedAnswers: string[];
+  correctAnswer: string;
+  markAllocation: number;
+}
+
+/** Step 1 form data */
+interface Step1Data {
+  courseId: string;
+  type: QuizType;
+  lectures: number;
+  date: string;
+  durationMinutes: number;
+}
+
+/** Step 2 form data */
+interface Step2Data {
+  questions: QuestionFormData[];
+}
 
 @Component({
   selector: 'app-teacher-create-exam-step3',
   standalone: true,
-  imports: [CommonModule, MatIconModule, RouterModule, FormsModule],
+  imports: [
+    CommonModule,
+    MatIconModule,
+    RouterModule,
+    CardComponent,
+    ButtonComponent,
+    BadgeComponent,
+    SpinnerComponent,
+    AlertComponent,
+  ],
   template: `
-    <div class="create-exam-step3">
+    <div class="review-publish">
       <div class="page-header">
-        <h1>Create New Exam - Step 3</h1>
-        <p>Configure exam settings, privacy options, and student visibility preferences.</p>
+        <h1>Review & Publish</h1>
+        <p>Review your quiz details before publishing. Students will be automatically invited.</p>
       </div>
 
-      <div class="progress-stepper">
-        <div class="step completed">
-          <div class="step-number">1</div>
-          <div class="step-info">
-            <span class="step-title">Basic Information</span>
-            <span class="step-desc">Exam details and settings</span>
-          </div>
-        </div>
-        <div class="step-connector completed"></div>
-        <div class="step completed">
-          <div class="step-number">2</div>
-          <div class="step-info">
-            <span class="step-title">Build Questions</span>
-            <span class="step-desc">Add and configure questions</span>
-          </div>
-        </div>
-        <div class="step-connector completed"></div>
-        <div class="step active">
-          <div class="step-number">3</div>
-          <div class="step-info">
-            <span class="step-title">Exam Settings</span>
-            <span class="step-desc">Configure timing and rules</span>
-          </div>
-        </div>
-        <div class="step-connector"></div>
-        <div class="step">
-          <div class="step-number">4</div>
-          <div class="step-info">
-            <span class="step-title">Review & Publish</span>
-            <span class="step-desc">Final review and publish</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="step-content">
-        <div class="settings-sections">
-          <!-- Privacy & Anonymity Section -->
-          <div class="settings-section">
-            <h2>Privacy & Anonymity</h2>
-            
-            <div class="setting-item">
-              <div class="setting-info">
-                <h3>Anonymous Sentiment Review</h3>
-                <p>Student identities will be hidden during sentiment analysis review. Teachers will see anonymous data only (e.g., "Student #001").</p>
-              </div>
-              <div class="setting-control">
-                <label class="toggle-switch">
-                  <input type="checkbox" [(ngModel)]="settings.anonymousSentiment">
-                  <span class="toggle-slider"></span>
-                </label>
-                <span class="toggle-label">{{settings.anonymousSentiment ? 'ON' : 'OFF'}}</span>
-              </div>
+      <!-- Progress Stepper -->
+      <ui-card variant="elevated" class="stepper-card">
+        <div class="progress-stepper">
+          <div class="step completed">
+            <div class="step-number">
+              <mat-icon>check</mat-icon>
+            </div>
+            <div class="step-info">
+              <span class="step-title">Quiz Details</span>
+              <span class="step-desc">Course, type & schedule</span>
             </div>
           </div>
-
-          <!-- Question Randomization Section -->
-          <div class="settings-section">
-            <h2>Question Randomization</h2>
-            
-            <div class="setting-item">
-              <div class="setting-info">
-                <h3>Randomize Objective Question Order</h3>
-                <p>MCQ questions will appear in random order for each student. Essay questions maintain their original sequence.</p>
-              </div>
-              <div class="setting-control">
-                <label class="toggle-switch">
-                  <input type="checkbox" [(ngModel)]="settings.randomizeQuestions">
-                  <span class="toggle-slider"></span>
-                </label>
-                <span class="toggle-label">{{settings.randomizeQuestions ? 'ON' : 'OFF'}}</span>
-              </div>
+          <div class="step-connector completed"></div>
+          <div class="step completed">
+            <div class="step-number">
+              <mat-icon>check</mat-icon>
             </div>
-
-            <div class="setting-item">
-              <div class="setting-info">
-                <h3>Randomize Answer Options</h3>
-                <p>Answer choices for each MCQ will appear in random order.</p>
-              </div>
-              <div class="setting-control">
-                <label class="toggle-switch">
-                  <input type="checkbox" [(ngModel)]="settings.randomizeOptions">
-                  <span class="toggle-slider"></span>
-                </label>
-                <span class="toggle-label">{{settings.randomizeOptions ? 'ON' : 'OFF'}}</span>
-              </div>
+            <div class="step-info">
+              <span class="step-title">Add Questions</span>
+              <span class="step-desc">Build your quiz</span>
             </div>
           </div>
-
-          <!-- Student Visibility Section -->
-          <div class="settings-section">
-            <h2>Student Visibility</h2>
-            
-            <div class="setting-item">
-              <div class="setting-info">
-                <h3>Allow Students to View AI Sentiment Summary</h3>
-                <p>After submission, students can see their sentiment analysis (Positive/Neutral/Negative) and detected emotions.</p>
-              </div>
-              <div class="setting-control">
-                <label class="toggle-switch">
-                  <input type="checkbox" [(ngModel)]="settings.showSentimentToStudents">
-                  <span class="toggle-slider"></span>
-                </label>
-                <span class="toggle-label">{{settings.showSentimentToStudents ? 'ON' : 'OFF'}}</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Advanced Settings Section -->
-          <div class="settings-section">
-            <h2>Advanced Settings</h2>
-            
-            <div class="setting-item">
-              <div class="setting-info">
-                <h3>Proctoring Mode</h3>
-                <p>Enable browser lockdown and monitoring during the exam.</p>
-              </div>
-              <div class="setting-control">
-                <label class="toggle-switch">
-                  <input type="checkbox" [(ngModel)]="settings.proctoringMode">
-                  <span class="toggle-slider"></span>
-                </label>
-                <span class="toggle-label">{{settings.proctoringMode ? 'ON' : 'OFF'}}</span>
-              </div>
-            </div>
-
-            <div class="setting-item">
-              <div class="setting-info">
-                <h3>Show Results Immediately</h3>
-                <p>Students can see their scores and correct answers immediately after submission.</p>
-              </div>
-              <div class="setting-control">
-                <label class="toggle-switch">
-                  <input type="checkbox" [(ngModel)]="settings.immediateResults">
-                  <span class="toggle-slider"></span>
-                </label>
-                <span class="toggle-label">{{settings.immediateResults ? 'ON' : 'OFF'}}</span>
-              </div>
-            </div>
-
-            <div class="setting-item">
-              <div class="setting-info">
-                <h3>Allow Review Before Submit</h3>
-                <p>Students can review and change their answers before final submission.</p>
-              </div>
-              <div class="setting-control">
-                <label class="toggle-switch">
-                  <input type="checkbox" [(ngModel)]="settings.allowReview">
-                  <span class="toggle-slider"></span>
-                </label>
-                <span class="toggle-label">{{settings.allowReview ? 'ON' : 'OFF'}}</span>
-              </div>
-            </div>
-
-            <div class="setting-item">
-              <div class="setting-info">
-                <h3>Prevent Copy/Paste</h3>
-                <p>Disable copy and paste functionality during the exam.</p>
-              </div>
-              <div class="setting-control">
-                <label class="toggle-switch">
-                  <input type="checkbox" [(ngModel)]="settings.preventCopyPaste">
-                  <span class="toggle-slider"></span>
-                </label>
-                <span class="toggle-label">{{settings.preventCopyPaste ? 'ON' : 'OFF'}}</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Time Settings Section -->
-          <div class="settings-section">
-            <h2>Time Settings</h2>
-            
-            <div class="setting-item">
-              <div class="setting-info">
-                <h3>Auto-Submit on Time Limit</h3>
-                <p>Automatically submit the exam when time runs out.</p>
-              </div>
-              <div class="setting-control">
-                <label class="toggle-switch">
-                  <input type="checkbox" [(ngModel)]="settings.autoSubmit">
-                  <span class="toggle-slider"></span>
-                </label>
-                <span class="toggle-label">{{settings.autoSubmit ? 'ON' : 'OFF'}}</span>
-              </div>
-            </div>
-
-            <div class="setting-item">
-              <div class="setting-info">
-                <h3>Show Timer to Students</h3>
-                <p>Display remaining time during the exam.</p>
-              </div>
-              <div class="setting-control">
-                <label class="toggle-switch">
-                  <input type="checkbox" [(ngModel)]="settings.showTimer">
-                  <span class="toggle-slider"></span>
-                </label>
-                <span class="toggle-label">{{settings.showTimer ? 'ON' : 'OFF'}}</span>
-              </div>
+          <div class="step-connector completed"></div>
+          <div class="step active">
+            <div class="step-number">3</div>
+            <div class="step-info">
+              <span class="step-title">Review & Publish</span>
+              <span class="step-desc">Final review</span>
             </div>
           </div>
         </div>
+      </ui-card>
 
-        <div class="settings-note">
-          <mat-icon>info</mat-icon>
-          <p><strong>Recommended settings are pre-selected.</strong> You can modify them anytime before publishing.</p>
+      <!-- Loading State -->
+      @if (isLoading()) {
+        <div class="loading-state">
+          <ui-spinner size="lg" />
+          <p>Loading quiz details...</p>
         </div>
+      }
 
+      <!-- Error State -->
+      @if (errorMessage()) {
+        <ui-alert variant="filled" color="danger">
+          {{ errorMessage() }}
+        </ui-alert>
+      }
+
+      @if (!isLoading() && !errorMessage()) {
+        <!-- Quiz Summary -->
+        <ui-card variant="elevated" title="Quiz Summary">
+          <div class="summary-grid">
+            <div class="summary-section">
+              <h3>Course & Type</h3>
+              <div class="summary-item">
+                <span class="label">Course</span>
+                <span class="value">{{ courseName() }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="label">Quiz Type</span>
+                <ui-badge [color]="getTypeColor(step1Data()?.type)" size="sm">
+                  {{ getTypeLabel(step1Data()?.type) }}
+                </ui-badge>
+              </div>
+              <div class="summary-item">
+                <span class="label">Lectures Covered</span>
+                <span class="value">{{ step1Data()?.lectures }}</span>
+              </div>
+            </div>
+
+            <div class="summary-section">
+              <h3>Schedule</h3>
+              <div class="summary-item">
+                <span class="label">Date & Time</span>
+                <span class="value">{{ formatDate(step1Data()?.date) }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="label">Duration</span>
+                <span class="value">{{ step1Data()?.durationMinutes }} minutes</span>
+              </div>
+            </div>
+
+            <div class="summary-section">
+              <h3>Questions</h3>
+              <div class="summary-item">
+                <span class="label">Total Questions</span>
+                <span class="value">{{ questions().length }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="label">Total Marks</span>
+                <span class="value">{{ totalMarks() }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="label">Question Types</span>
+                <div class="type-breakdown">
+                  @if (questionBreakdown().singleChoice > 0) {
+                    <ui-badge color="primary" size="sm">
+                      {{ questionBreakdown().singleChoice }} Single Choice
+                    </ui-badge>
+                  }
+                  @if (questionBreakdown().multipleChoice > 0) {
+                    <ui-badge color="secondary" size="sm">
+                      {{ questionBreakdown().multipleChoice }} Multi-Select
+                    </ui-badge>
+                  }
+                  @if (questionBreakdown().trueFalse > 0) {
+                    <ui-badge color="info" size="sm">
+                      {{ questionBreakdown().trueFalse }} True/False
+                    </ui-badge>
+                  }
+                  @if (questionBreakdown().openEnded > 0) {
+                    <ui-badge color="warning" size="sm">
+                      {{ questionBreakdown().openEnded }} Essay
+                    </ui-badge>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        </ui-card>
+
+        <!-- Questions Preview -->
+        <ui-card variant="elevated" title="Questions Preview">
+          <div class="questions-preview">
+            @for (q of questions(); track $index; let i = $index) {
+              <div class="question-preview-item">
+                <div class="question-preview-header">
+                  <span class="question-number">Q{{ i + 1 }}</span>
+                  <ui-badge [color]="getQuestionTypeColor(q.type)" size="sm">
+                    {{ getQuestionTypeLabel(q.type) }}
+                  </ui-badge>
+                  <span class="question-marks">{{ q.markAllocation }} {{ q.markAllocation === 1 ? 'mark' : 'marks' }}</span>
+                </div>
+                <p class="question-text">{{ q.question }}</p>
+
+                @if (q.type !== 'OPEN_ENDED' && q.proposedAnswers.length > 0) {
+                  <div class="answer-preview">
+                    @for (option of q.proposedAnswers; track $index; let j = $index) {
+                      <div class="answer-option" [class.correct]="option === q.correctAnswer">
+                        <span class="option-letter">{{ getOptionLetter(j) }}</span>
+                        <span class="option-text">{{ option }}</span>
+                        @if (option === q.correctAnswer) {
+                          <mat-icon class="correct-icon">check_circle</mat-icon>
+                        }
+                      </div>
+                    }
+                  </div>
+                }
+
+                @if (q.type === 'TRUE_FALSE') {
+                  <div class="tf-answer">
+                    <span class="answer-label">Answer:</span>
+                    <ui-badge [color]="q.correctAnswer === 'true' ? 'success' : 'danger'" size="sm">
+                      {{ q.correctAnswer === 'true' ? 'True' : 'False' }}
+                    </ui-badge>
+                  </div>
+                }
+
+                @if (q.type === 'OPEN_ENDED') {
+                  <div class="open-ended-note">
+                    <mat-icon>edit_note</mat-icon>
+                    <span>Open-ended response (for sentiment analysis)</span>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </ui-card>
+
+        <!-- Publishing Notice -->
+        <ui-card variant="elevated">
+          <div class="publish-notice">
+            <div class="notice-icon">
+              <mat-icon>info</mat-icon>
+            </div>
+            <div class="notice-content">
+              <h3>Ready to Publish</h3>
+              <p>When you publish this quiz:</p>
+              <ul>
+                <li>All students enrolled in the selected course will be automatically invited</li>
+                <li>The quiz will become available at the scheduled date and time</li>
+                <li>You can still edit questions before the quiz starts</li>
+              </ul>
+            </div>
+          </div>
+        </ui-card>
+
+        <!-- Form Actions -->
         <div class="form-actions">
-          <button class="btn secondary" (click)="goBack()">
-            <mat-icon>arrow_back</mat-icon>
-            Back: Questions
-          </button>
-          <button class="btn primary" (click)="nextStep()">
-            Next: Review & Publish
-            <mat-icon>arrow_forward</mat-icon>
-          </button>
+          <ui-button variant="outline" color="neutral" (clicked)="goBack()">
+            <mat-icon slot="icon-left">arrow_back</mat-icon>
+            Back
+          </ui-button>
+
+          <ui-button
+            variant="solid"
+            color="primary"
+            [loading]="isPublishing()"
+            [disabled]="isPublishing()"
+            (clicked)="publishQuiz()"
+          >
+            <mat-icon slot="icon-left">publish</mat-icon>
+            {{ isPublishing() ? 'Publishing...' : 'Publish Quiz' }}
+          </ui-button>
         </div>
-      </div>
+      }
     </div>
   `,
   styles: [`
-    .create-exam-step3 {
-      max-width: 1000px;
+    .review-publish {
+      max-width: 900px;
       margin: 0 auto;
+      padding: 1.5rem;
     }
 
     .page-header {
-      margin-bottom: 2rem;
-      
+      margin-bottom: 1.5rem;
+
       h1 {
-        font-size: 2rem;
+        font-size: 1.75rem;
         font-weight: 600;
         margin-bottom: 0.5rem;
         color: var(--color-text-primary);
       }
-      
+
       p {
         color: var(--color-text-secondary);
-        font-size: 1rem;
+        font-size: 0.938rem;
       }
+    }
+
+    .stepper-card {
+      margin-bottom: 1.5rem;
     }
 
     .progress-stepper {
       display: flex;
       align-items: center;
-      margin-bottom: 3rem;
-      padding: 2rem;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      
-      @media (max-width: 768px) {
+      justify-content: center;
+      padding: 1rem 0;
+
+      @media (max-width: 640px) {
         flex-direction: column;
         gap: 1rem;
       }
@@ -276,27 +314,10 @@ import { FormsModule } from '@angular/forms';
       display: flex;
       align-items: center;
       gap: 0.75rem;
-      
-      &.completed .step-number {
-        background: var(--color-success-600);
-        color: white;
-      }
-      
-      &.active {
-        .step-number {
-          background: var(--color-primary-600);
-          color: white;
-        }
-        
-        .step-title {
-          color: var(--color-primary-600);
-          font-weight: 600;
-        }
-      }
-      
+
       .step-number {
-        width: 2.5rem;
-        height: 2.5rem;
+        width: 2.25rem;
+        height: 2.25rem;
         border-radius: 50%;
         background: var(--color-background-muted);
         color: var(--color-text-secondary);
@@ -304,258 +325,485 @@ import { FormsModule } from '@angular/forms';
         align-items: center;
         justify-content: center;
         font-weight: 600;
-        font-size: 1rem;
+        font-size: 0.938rem;
+
+        mat-icon {
+          font-size: 1.25rem;
+          width: 1.25rem;
+          height: 1.25rem;
+        }
       }
-      
+
+      &.active .step-number {
+        background: var(--color-primary-600);
+        color: white;
+      }
+
+      &.completed .step-number {
+        background: var(--color-success-600);
+        color: white;
+      }
+
       .step-info {
         display: flex;
         flex-direction: column;
-        
-        .step-title {
-          font-size: 0.875rem;
-          font-weight: 500;
-          color: var(--color-text-primary);
-        }
-        
-        .step-desc {
-          font-size: 0.75rem;
-          color: var(--color-text-secondary);
-        }
+      }
+
+      .step-title {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--color-text-primary);
+      }
+
+      &.active .step-title {
+        color: var(--color-primary-600);
+        font-weight: 600;
+      }
+
+      .step-desc {
+        font-size: 0.75rem;
+        color: var(--color-text-tertiary);
       }
     }
 
     .step-connector {
       flex: 1;
       height: 2px;
-      background: var(--color-background-muted);
-      margin: 0 1rem;
-      
+      background: var(--color-border-default);
+      margin: 0 1.5rem;
+      max-width: 80px;
+
       &.completed {
         background: var(--color-success-600);
       }
-      
-      @media (max-width: 768px) {
+
+      @media (max-width: 640px) {
         display: none;
       }
     }
 
-    .step-content {
-      background: white;
-      border-radius: 12px;
-      padding: 2rem;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .settings-sections {
+    .loading-state {
       display: flex;
       flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 2rem;
+      color: var(--color-text-secondary);
+
+      p {
+        margin-top: 1rem;
+      }
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       gap: 2rem;
     }
 
-    .settings-section {
-      h2 {
-        font-size: 1.25rem;
-        font-weight: 600;
-        margin-bottom: 1.5rem;
-        color: var(--color-text-primary);
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid var(--color-background-subtle);
-      }
-    }
-
-    .setting-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      padding: 1.5rem;
-      border: 1px solid var(--color-border);
-      border-radius: 8px;
-      margin-bottom: 1rem;
-      
-      @media (max-width: 768px) {
-        flex-direction: column;
-        gap: 1rem;
-      }
-    }
-
-    .setting-info {
-      flex: 1;
-      margin-right: 2rem;
-      
-      @media (max-width: 768px) {
-        margin-right: 0;
-      }
-      
+    .summary-section {
       h3 {
-        font-size: 1rem;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        color: var(--color-text-primary);
-      }
-      
-      p {
         font-size: 0.875rem;
+        font-weight: 600;
         color: var(--color-text-secondary);
-        line-height: 1.5;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--color-border-subtle);
       }
     }
 
-    .setting-control {
+    .summary-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      margin-bottom: 0.875rem;
+
+      .label {
+        font-size: 0.813rem;
+        color: var(--color-text-tertiary);
+      }
+
+      .value {
+        font-size: 1rem;
+        color: var(--color-text-primary);
+        font-weight: 500;
+      }
+    }
+
+    .type-breakdown {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.25rem;
+    }
+
+    .questions-preview {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .question-preview-item {
+      padding: 1rem;
+      border: 1px solid var(--color-border-default);
+      border-radius: 8px;
+      background: var(--surface-base);
+    }
+
+    .question-preview-header {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      flex-shrink: 0;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+
+      .question-number {
+        font-weight: 600;
+        color: var(--color-primary-600);
+      }
+
+      .question-marks {
+        margin-left: auto;
+        font-size: 0.813rem;
+        color: var(--color-text-secondary);
+      }
     }
 
-    .toggle-switch {
-      position: relative;
-      display: inline-block;
-      width: 50px;
-      height: 24px;
-      
-      input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-        
-        &:checked + .toggle-slider {
-          background-color: var(--color-primary-600);
-          
-          &:before {
-            transform: translateX(26px);
-          }
+    .question-text {
+      font-size: 0.938rem;
+      color: var(--color-text-primary);
+      line-height: 1.5;
+      margin-bottom: 0.75rem;
+    }
+
+    .answer-preview {
+      display: flex;
+      flex-direction: column;
+      gap: 0.375rem;
+    }
+
+    .answer-option {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--color-border-subtle);
+      border-radius: 6px;
+      font-size: 0.875rem;
+
+      &.correct {
+        background: var(--color-success-50);
+        border-color: var(--color-success-300);
+      }
+
+      .option-letter {
+        font-weight: 600;
+        color: var(--color-text-secondary);
+        min-width: 1.25rem;
+      }
+
+      .option-text {
+        flex: 1;
+        color: var(--color-text-primary);
+      }
+
+      .correct-icon {
+        color: var(--color-success-600);
+        font-size: 1rem;
+        width: 1rem;
+        height: 1rem;
+      }
+    }
+
+    .tf-answer, .open-ended-note {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+
+      .answer-label {
+        color: var(--color-text-secondary);
+      }
+    }
+
+    .open-ended-note {
+      color: var(--color-text-secondary);
+      font-style: italic;
+
+      mat-icon {
+        font-size: 1.125rem;
+        width: 1.125rem;
+        height: 1.125rem;
+      }
+    }
+
+    .publish-notice {
+      display: flex;
+      gap: 1rem;
+      padding: 0.5rem;
+
+      .notice-icon {
+        flex-shrink: 0;
+
+        mat-icon {
+          font-size: 1.5rem;
+          width: 1.5rem;
+          height: 1.5rem;
+          color: var(--color-info-500);
         }
       }
-    }
 
-    .toggle-slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: var(--color-background-muted);
-      transition: 0.3s;
-      border-radius: 24px;
-      
-      &:before {
-        position: absolute;
-        content: "";
-        height: 18px;
-        width: 18px;
-        left: 3px;
-        bottom: 3px;
-        background-color: white;
-        transition: 0.3s;
-        border-radius: 50%;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      }
-    }
+      .notice-content {
+        h3 {
+          font-size: 1rem;
+          font-weight: 600;
+          color: var(--color-text-primary);
+          margin-bottom: 0.5rem;
+        }
 
-    .toggle-label {
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: var(--color-text-secondary);
-      min-width: 2rem;
-    }
+        p {
+          font-size: 0.875rem;
+          color: var(--color-text-secondary);
+          margin-bottom: 0.5rem;
+        }
 
-    .settings-note {
-      display: flex;
-      align-items: flex-start;
-      gap: 0.75rem;
-      padding: 1rem;
-      background: var(--color-primary-50);
-      border: 1px solid var(--color-primary-200);
-      border-radius: 8px;
-      margin: 2rem 0;
-      
-      mat-icon {
-        color: var(--color-primary-600);
-        margin-top: 0.125rem;
-      }
-      
-      p {
-        font-size: 0.875rem;
-        color: var(--color-primary-700);
-        margin: 0;
+        ul {
+          margin: 0;
+          padding-left: 1.25rem;
+
+          li {
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+            margin-bottom: 0.375rem;
+            line-height: 1.4;
+          }
+        }
       }
     }
 
     .form-actions {
       display: flex;
       justify-content: space-between;
-      margin-top: 2rem;
-      padding-top: 2rem;
-      border-top: 1px solid var(--color-border);
-      
-      @media (max-width: 768px) {
-        flex-direction: column;
-        gap: 1rem;
-      }
-    }
-
-    .btn {
-      display: flex;
       align-items: center;
-      gap: 0.5rem;
-      padding: 0.75rem 1.5rem;
-      border: none;
-      border-radius: 8px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-      text-decoration: none;
-      
-      &.primary {
-        background: var(--color-primary-600);
-        color: white;
-        
-        &:hover {
-          background: var(--color-primary-700);
-        }
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--color-border-subtle);
+    }
+
+    :host ::ng-deep {
+      ui-card {
+        margin-bottom: 1.5rem;
       }
-      
-      &.secondary {
-        background: var(--color-background-subtle);
-        color: var(--color-text-primary);
-        border: 1px solid var(--color-border);
-        
-        &:hover {
-          background: var(--color-background-muted);
-        }
-      }
-      
-      mat-icon {
-        font-size: 1.25rem;
-        width: 1.25rem;
-        height: 1.25rem;
+
+      .card__body {
+        padding: 1.5rem;
       }
     }
-  `]
+  `],
 })
-export class TeacherCreateExamStep3 {
-  settings = {
-    anonymousSentiment: true,
-    randomizeQuestions: true,
-    randomizeOptions: false,
-    showSentimentToStudents: true,
-    proctoringMode: false,
-    immediateResults: false,
-    allowReview: true,
-    preventCopyPaste: true,
-    autoSubmit: true,
-    showTimer: true
-  };
+export class TeacherCreateExamStep3 implements OnInit {
+  private readonly router = inject(Router);
+  private readonly teacherApi = inject(TeacherApiService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
-  constructor(private router: Router) {}
+  // State
+  isLoading = signal(false);
+  isPublishing = signal(false);
+  errorMessage = signal('');
+
+  step1Data = signal<Step1Data | null>(null);
+  step2Data = signal<Step2Data | null>(null);
+  courses = signal<CourseDto[]>([]);
+
+  // Computed
+  questions = computed(() => this.step2Data()?.questions ?? []);
+
+  totalMarks = computed(() =>
+    this.questions().reduce((sum, q) => sum + q.markAllocation, 0)
+  );
+
+  courseName = computed(() => {
+    const courseId = this.step1Data()?.courseId;
+    if (!courseId) return 'Not selected';
+    const course = this.courses().find(c => c.id === courseId);
+    if (!course) return 'Unknown Course';
+    const tuName = course.teachingUnit?.name ?? '';
+    const className = course.classAcademicYear?.class?.name ?? '';
+    return className ? `${tuName} — ${className}` : tuName;
+  });
+
+  questionBreakdown = computed(() => {
+    const qs = this.questions();
+    return {
+      singleChoice: qs.filter(q => q.type === 'SINGLE_CHOICE').length,
+      multipleChoice: qs.filter(q => q.type === 'MULTIPLE_CHOICE').length,
+      trueFalse: qs.filter(q => q.type === 'TRUE_FALSE').length,
+      openEnded: qs.filter(q => q.type === 'OPEN_ENDED').length,
+    };
+  });
+
+  async ngOnInit(): Promise<void> {
+    this.loadFormData();
+    await this.loadCourses();
+  }
+
+  private loadFormData(): void {
+    // Load Step 1 data
+    const step1Raw = sessionStorage.getItem('examFormStep1');
+    if (step1Raw) {
+      try {
+        this.step1Data.set(JSON.parse(step1Raw));
+      } catch {
+        this.errorMessage.set('Failed to load quiz details. Please go back and try again.');
+      }
+    }
+
+    // Load Step 2 data
+    const step2Raw = sessionStorage.getItem('examFormStep2');
+    if (step2Raw) {
+      try {
+        this.step2Data.set(JSON.parse(step2Raw));
+      } catch {
+        this.errorMessage.set('Failed to load questions. Please go back and try again.');
+      }
+    }
+
+    // Validate we have required data
+    if (!this.step1Data() || !this.step2Data()) {
+      this.errorMessage.set('Missing quiz data. Please start from the beginning.');
+    }
+  }
+
+  private async loadCourses(): Promise<void> {
+    try {
+      const courses = await firstValueFrom(this.teacherApi.getMyCourses());
+      this.courses.set(courses);
+    } catch {
+      // Non-critical, we can still show the review without course name
+    }
+  }
+
+  getTypeLabel(type: QuizType | undefined): string {
+    if (!type) return 'Unknown';
+    const labels: Record<QuizType, string> = {
+      CA: 'Continuous Assessment',
+      MEDIAN: 'Midterm',
+      FINAL: 'Final Exam',
+      MOCK: 'Mock Test',
+    };
+    return labels[type] || type;
+  }
+
+  getTypeColor(type: QuizType | undefined): 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'info' | 'neutral' {
+    if (!type) return 'neutral';
+    const colors: Record<QuizType, 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'info' | 'neutral'> = {
+      CA: 'info',
+      MEDIAN: 'warning',
+      FINAL: 'danger',
+      MOCK: 'secondary',
+    };
+    return colors[type] || 'neutral';
+  }
+
+  getQuestionTypeLabel(type: QuestionType): string {
+    const labels: Record<QuestionType, string> = {
+      SINGLE_CHOICE: 'Single Choice',
+      MULTIPLE_CHOICE: 'Multi-Select',
+      TRUE_FALSE: 'True/False',
+      OPEN_ENDED: 'Essay',
+    };
+    return labels[type] || type;
+  }
+
+  getQuestionTypeColor(type: QuestionType): 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'info' | 'neutral' {
+    const colors: Record<QuestionType, 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'info' | 'neutral'> = {
+      SINGLE_CHOICE: 'primary',
+      MULTIPLE_CHOICE: 'secondary',
+      TRUE_FALSE: 'info',
+      OPEN_ENDED: 'warning',
+    };
+    return colors[type] || 'neutral';
+  }
+
+  getOptionLetter(index: number): string {
+    return String.fromCharCode(65 + index);
+  }
+
+  formatDate(dateStr: string | undefined): string {
+    if (!dateStr) return 'Not set';
+    try {
+      const date = new Date(dateStr);
+      return date.toLocaleString('en-US', {
+        weekday: 'short',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } catch {
+      return dateStr;
+    }
+  }
 
   goBack(): void {
     this.router.navigate(['/teacher/create-exam/step2']);
   }
 
-  nextStep(): void {
-    console.log('Exam settings:', this.settings);
-    this.router.navigate(['/teacher/create-exam/step4']);
+  async publishQuiz(): Promise<void> {
+    const s1 = this.step1Data();
+    const s2 = this.step2Data();
+
+    if (!s1 || !s2 || s2.questions.length === 0) {
+      alert('Missing quiz data. Please go back and complete all steps.');
+      return;
+    }
+
+    this.isPublishing.set(true);
+
+    try {
+      // Build payload with explicit type conversions
+      const dto: CreateTeacherQuizDto = {
+        courseId: String(s1.courseId),
+        type: String(s1.type) as QuizType,
+        lectures: Number(s1.lectures),
+        date: String(s1.date),
+        durationMinutes: Number(s1.durationMinutes),
+        questions: s2.questions.map(q => {
+          const isOpenEnded = q.type === 'OPEN_ENDED';
+          return {
+            question: String(q.question).trim(),
+            type: String(q.type) as QuestionType,
+            // Only include proposedAnswers and correctAnswer for non-OPEN_ENDED questions
+            ...(isOpenEnded ? {} : {
+              proposedAnswers: q.proposedAnswers
+                .map(a => String(a).trim())
+                .filter(a => a.length > 0),
+              correctAnswer: String(q.correctAnswer).trim(),
+            }),
+            markAllocation: Number(q.markAllocation),
+          };
+        }),
+      };
+
+      // Debug: Log the payload
+      console.log('Publishing quiz with payload:', JSON.stringify(dto, null, 2));
+
+      await firstValueFrom(this.teacherApi.createQuiz(dto));
+
+      // Clear wizard data
+      sessionStorage.removeItem('examFormStep1');
+      sessionStorage.removeItem('examFormStep2');
+
+      alert('Quiz published successfully! Students have been invited.');
+      this.router.navigate(['/teacher/exam-manager']);
+    } catch (err: unknown) {
+      console.error('Failed to publish quiz:', err);
+      const message = err instanceof Error ? err.message : 'Failed to publish quiz. Please try again.';
+      alert(message);
+    } finally {
+      this.isPublishing.set(false);
+    }
   }
 }

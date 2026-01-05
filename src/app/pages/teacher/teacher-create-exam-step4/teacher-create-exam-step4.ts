@@ -1,7 +1,16 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterModule, Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
+
+import { TeacherApiService } from '../../../services/teacher-api.service';
+import type {
+  CreateTeacherQuizDto,
+  CreateQuestionDto,
+  QuizType,
+  QuestionType,
+} from '../../../domain/dtos/teacher/teacher-quiz.dto';
 
 @Component({
   selector: 'app-teacher-create-exam-step4',
@@ -188,14 +197,14 @@ import { RouterModule, Router } from '@angular/router';
 
     .page-header {
       margin-bottom: 2rem;
-      
+
       h1 {
         font-size: 2rem;
         font-weight: 600;
         margin-bottom: 0.5rem;
         color: var(--color-text-primary);
       }
-      
+
       p {
         color: var(--color-text-secondary);
         font-size: 1rem;
@@ -210,7 +219,7 @@ import { RouterModule, Router } from '@angular/router';
       background: white;
       border-radius: 12px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      
+
       @media (max-width: 768px) {
         flex-direction: column;
         gap: 1rem;
@@ -221,24 +230,24 @@ import { RouterModule, Router } from '@angular/router';
       display: flex;
       align-items: center;
       gap: 0.75rem;
-      
+
       &.completed .step-number {
         background: var(--color-success-600);
         color: white;
       }
-      
+
       &.active {
         .step-number {
           background: var(--color-primary-600);
           color: white;
         }
-        
+
         .step-title {
           color: var(--color-primary-600);
           font-weight: 600;
         }
       }
-      
+
       .step-number {
         width: 2.5rem;
         height: 2.5rem;
@@ -251,17 +260,17 @@ import { RouterModule, Router } from '@angular/router';
         font-weight: 600;
         font-size: 1rem;
       }
-      
+
       .step-info {
         display: flex;
         flex-direction: column;
-        
+
         .step-title {
           font-size: 0.875rem;
           font-weight: 500;
           color: var(--color-text-primary);
         }
-        
+
         .step-desc {
           font-size: 0.75rem;
           color: var(--color-text-secondary);
@@ -274,11 +283,11 @@ import { RouterModule, Router } from '@angular/router';
       height: 2px;
       background: var(--color-background-muted);
       margin: 0 1rem;
-      
+
       &.completed {
         background: var(--color-success-600);
       }
-      
+
       @media (max-width: 768px) {
         display: none;
       }
@@ -312,7 +321,7 @@ import { RouterModule, Router } from '@angular/router';
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 2rem;
-      
+
       @media (max-width: 768px) {
         grid-template-columns: 1fr;
       }
@@ -330,13 +339,13 @@ import { RouterModule, Router } from '@angular/router';
     .info-item {
       display: flex;
       margin-bottom: 0.75rem;
-      
+
       .label {
         font-weight: 500;
         color: var(--color-text-secondary);
         min-width: 120px;
       }
-      
+
       .value {
         color: var(--color-text-primary);
         flex: 1;
@@ -347,7 +356,7 @@ import { RouterModule, Router } from '@angular/router';
       display: flex;
       flex-direction: column;
       gap: 0.25rem;
-      
+
       span {
         font-size: 0.875rem;
       }
@@ -357,7 +366,7 @@ import { RouterModule, Router } from '@angular/router';
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 2rem;
-      
+
       @media (max-width: 768px) {
         grid-template-columns: 1fr;
       }
@@ -370,7 +379,7 @@ import { RouterModule, Router } from '@angular/router';
         margin-bottom: 1rem;
         color: var(--color-text-primary);
       }
-      
+
       p {
         font-size: 0.875rem;
         color: var(--color-text-secondary);
@@ -384,16 +393,16 @@ import { RouterModule, Router } from '@angular/router';
       gap: 0.5rem;
       margin-bottom: 0.75rem;
       font-size: 0.875rem;
-      
+
       .status-icon {
         font-size: 1.25rem;
         width: 1.25rem;
         height: 1.25rem;
-        
+
         &.enabled {
           color: var(--color-success-600);
         }
-        
+
         &.disabled {
           color: var(--color-text-tertiary);
         }
@@ -404,7 +413,7 @@ import { RouterModule, Router } from '@angular/router';
       display: flex;
       justify-content: space-between;
       align-items: center;
-      
+
       h2 {
         margin-bottom: 0;
         border-bottom: none;
@@ -424,11 +433,11 @@ import { RouterModule, Router } from '@angular/router';
       font-weight: 500;
       cursor: pointer;
       transition: all 0.2s;
-      
+
       &:hover {
         background: var(--color-primary-200);
       }
-      
+
       mat-icon {
         font-size: 1.25rem;
         width: 1.25rem;
@@ -449,13 +458,13 @@ import { RouterModule, Router } from '@angular/router';
       background: var(--color-warning-50);
       border: 1px solid var(--color-warning-200);
       border-radius: 8px;
-      
+
       mat-icon {
         color: var(--color-warning-600);
         margin-top: 0.125rem;
         flex-shrink: 0;
       }
-      
+
       .warning-content {
         h3 {
           font-size: 1rem;
@@ -463,12 +472,12 @@ import { RouterModule, Router } from '@angular/router';
           margin-bottom: 0.75rem;
           color: var(--color-warning-800);
         }
-        
+
         ul {
           margin: 0;
           padding-left: 1.25rem;
           color: var(--color-warning-700);
-          
+
           li {
             margin-bottom: 0.5rem;
             font-size: 0.875rem;
@@ -486,14 +495,14 @@ import { RouterModule, Router } from '@angular/router';
       background: var(--color-success-50);
       border: 1px solid var(--color-success-200);
       border-radius: 8px;
-      
+
       .ready-icon {
         color: var(--color-success-600);
         font-size: 1.5rem;
         width: 1.5rem;
         height: 1.5rem;
       }
-      
+
       .ready-text {
         font-size: 1rem;
         font-weight: 600;
@@ -508,7 +517,7 @@ import { RouterModule, Router } from '@angular/router';
       margin-top: 2rem;
       padding-top: 2rem;
       border-top: 1px solid var(--color-border);
-      
+
       @media (max-width: 768px) {
         flex-direction: column;
         gap: 1rem;
@@ -531,26 +540,26 @@ import { RouterModule, Router } from '@angular/router';
       cursor: pointer;
       transition: all 0.2s;
       text-decoration: none;
-      
+
       &.primary {
         background: var(--color-primary-600);
         color: white;
-        
+
         &:hover {
           background: var(--color-primary-700);
         }
       }
-      
+
       &.secondary {
         background: var(--color-background-subtle);
         color: var(--color-text-primary);
         border: 1px solid var(--color-border);
-        
+
         &:hover {
           background: var(--color-background-muted);
         }
       }
-      
+
       mat-icon {
         font-size: 1.25rem;
         width: 1.25rem;
@@ -559,8 +568,106 @@ import { RouterModule, Router } from '@angular/router';
     }
   `]
 })
-export class TeacherCreateExamStep4 {
-  constructor(private router: Router) {}
+export class TeacherCreateExamStep4 implements OnInit {
+  private readonly router = inject(Router);
+  private readonly teacherApi = inject(TeacherApiService);
+  private readonly cdr = inject(ChangeDetectorRef);
+
+  // Data loaded from previous steps
+  step1Data: any = null;
+  step2Data: any = null;
+  step3Data: any = null;
+
+  // Computed summary
+  examSummary = {
+    title: '',
+    description: '',
+    courseName: '',
+    courseId: '',
+    quizType: 'EXAM' as QuizType,
+    duration: 0,
+    totalQuestions: 0,
+    totalPoints: 0,
+    scheduledDate: '',
+    scheduledTime: '',
+    questionBreakdown: {
+      mcq: 0,
+      trueFalse: 0,
+      openEnded: 0,
+    },
+    settings: {
+      randomizeQuestions: false,
+      showResults: true,
+      allowReview: true,
+    },
+  };
+
+  isPublishing = false;
+  isSavingDraft = false;
+
+  ngOnInit(): void {
+    this.loadAllStepData();
+  }
+
+  private loadAllStepData(): void {
+    // Load step 1 data (basic info)
+    const step1Raw = sessionStorage.getItem('examFormStep1');
+    if (step1Raw) {
+      this.step1Data = JSON.parse(step1Raw);
+    }
+
+    // Load step 2 data (questions)
+    const step2Raw = sessionStorage.getItem('examFormStep2');
+    if (step2Raw) {
+      this.step2Data = JSON.parse(step2Raw);
+    }
+
+    // Load step 3 data (settings)
+    const step3Raw = sessionStorage.getItem('examFormStep3');
+    if (step3Raw) {
+      this.step3Data = JSON.parse(step3Raw);
+    }
+
+    // Compute summary
+    this.computeExamSummary();
+  }
+
+  private computeExamSummary(): void {
+    if (this.step1Data) {
+      this.examSummary.title = this.step1Data.title || '';
+      this.examSummary.description = this.step1Data.description || '';
+      this.examSummary.courseName = this.step1Data.courseName || '';
+      this.examSummary.courseId = this.step1Data.courseId || '';
+      this.examSummary.quizType = this.step1Data.quizType || 'EXAM';
+      this.examSummary.duration = this.step1Data.duration || 0;
+      this.examSummary.scheduledDate = this.step1Data.scheduledDate || '';
+      this.examSummary.scheduledTime = this.step1Data.scheduledTime || '';
+    }
+
+    if (this.step2Data?.questions) {
+      const questions = this.step2Data.questions;
+      this.examSummary.totalQuestions = questions.length;
+      this.examSummary.totalPoints = questions.reduce(
+        (sum: number, q: any) => sum + (q.points || 0),
+        0
+      );
+
+      // Count by type
+      this.examSummary.questionBreakdown = {
+        mcq: questions.filter((q: any) => q.type === 'MULTIPLE_CHOICE').length,
+        trueFalse: questions.filter((q: any) => q.type === 'TRUE_FALSE').length,
+        openEnded: questions.filter((q: any) => q.type === 'OPEN_ENDED').length,
+      };
+    }
+
+    if (this.step3Data?.settings) {
+      this.examSummary.settings = {
+        randomizeQuestions: this.step3Data.settings.randomizeQuestions ?? false,
+        showResults: this.step3Data.settings.showResults ?? true,
+        allowReview: this.step3Data.settings.allowReview ?? true,
+      };
+    }
+  }
 
   previewAsStudent(): void {
     console.log('Opening exam preview as student');
@@ -571,17 +678,92 @@ export class TeacherCreateExamStep4 {
     this.router.navigate(['/teacher/create-exam/step3']);
   }
 
-  saveAsDraft(): void {
-    console.log('Saving exam as draft');
-    alert('Exam saved as draft successfully!');
-    this.router.navigate(['/teacher/exam-manager']);
+  async saveAsDraft(): Promise<void> {
+    this.isSavingDraft = true;
+    try {
+      const quizDto = this.buildCreateQuizDto();
+      await firstValueFrom(this.teacherApi.createQuiz(quizDto));
+      this.clearWizardData();
+      alert('Exam saved as draft successfully!');
+      this.router.navigate(['/teacher/exam-manager']);
+    } catch (error) {
+      console.error('Error saving draft:', error);
+      alert('Failed to save draft. Please try again.');
+    } finally {
+      this.isSavingDraft = false;
+    }
   }
 
-  publishExam(): void {
-    console.log('Publishing exam');
-    if (confirm('Are you sure you want to publish this exam? Students will be able to see it immediately.')) {
+  async publishExam(): Promise<void> {
+    if (
+      !confirm(
+        'Are you sure you want to publish this exam? Students will be able to see it immediately.'
+      )
+    ) {
+      return;
+    }
+
+    this.isPublishing = true;
+    try {
+      const quizDto = this.buildCreateQuizDto();
+      await firstValueFrom(this.teacherApi.createQuiz(quizDto));
+      this.clearWizardData();
       alert('Exam published successfully!');
       this.router.navigate(['/teacher/exam-manager']);
+    } catch (error) {
+      console.error('Error publishing exam:', error);
+      alert('Failed to publish exam. Please try again.');
+    } finally {
+      this.isPublishing = false;
     }
+  }
+
+  private buildCreateQuizDto(): CreateTeacherQuizDto {
+    const questions: CreateQuestionDto[] =
+      this.step2Data?.questions?.map((q: any) => ({
+        question: q.text || q.question,
+        type: q.type as QuestionType,
+        markAllocation: q.points || 1,
+        proposedAnswers: q.options || q.proposedAnswers || [],
+        correctAnswer: q.correctAnswer || '',
+      })) || [];
+
+    // Build scheduled date string from date + time
+    let dateStr = this.examSummary.scheduledDate || new Date().toISOString().split('T')[0];
+    if (this.examSummary.scheduledTime) {
+      dateStr = `${dateStr}T${this.examSummary.scheduledTime}:00`;
+    }
+
+    return {
+      courseId: this.examSummary.courseId,
+      type: this.examSummary.quizType,
+      lectures: 1, // Default to 1 lecture
+      date: dateStr,
+      durationMinutes: this.examSummary.duration,
+      questions,
+    };
+  }
+
+  private clearWizardData(): void {
+    sessionStorage.removeItem('examFormStep1');
+    sessionStorage.removeItem('examFormStep2');
+    sessionStorage.removeItem('examFormStep3');
+  }
+
+  // Helper methods for template
+  getQuestionTypeName(type: string): string {
+    const names: Record<string, string> = {
+      MULTIPLE_CHOICE: 'Multiple Choice',
+      TRUE_FALSE: 'True/False',
+      OPEN_ENDED: 'Open Ended',
+    };
+    return names[type] || type;
+  }
+
+  formatDateTime(): string {
+    if (!this.examSummary.scheduledDate) return 'Not scheduled';
+    const date = this.examSummary.scheduledDate;
+    const time = this.examSummary.scheduledTime || '00:00';
+    return `${date} at ${time}`;
   }
 }

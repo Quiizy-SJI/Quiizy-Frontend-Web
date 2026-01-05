@@ -151,6 +151,7 @@ export class TeacherLayout implements OnInit {
         error: (err: unknown) => {
           this.errorMessage = err instanceof Error ? err.message : 'Logout failed.';
           this.cdr.markForCheck();
+          this.router.navigateByUrl('/login');
         },
       });
   }

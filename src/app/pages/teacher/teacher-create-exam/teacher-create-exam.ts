@@ -1,278 +1,230 @@
-import { Component } from '@angular/core';
+import { Component, inject, ChangeDetectorRef, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { firstValueFrom } from 'rxjs';
+
+import { TeacherApiService } from '../../../services/teacher-api.service';
+import type { CourseDto, QuizType } from '../../../domain/dtos/teacher/teacher-quiz.dto';
+import {
+  CardComponent,
+  ButtonComponent,
+  InputComponent,
+  SelectComponent,
+  SpinnerComponent,
+  AlertComponent,
+} from '../../../components/ui';
+import type { DropdownOption } from '../../../components/ui';
 
 @Component({
   selector: 'app-teacher-create-exam',
   standalone: true,
-  imports: [CommonModule, MatIconModule, RouterModule, FormsModule],
+  imports: [
+    CommonModule,
+    MatIconModule,
+    RouterModule,
+    FormsModule,
+    CardComponent,
+    ButtonComponent,
+    InputComponent,
+    SelectComponent,
+    SpinnerComponent,
+    AlertComponent,
+  ],
   template: `
     <div class="create-exam">
       <div class="page-header">
-        <h1>Create New Exam</h1>
-        <p>Follow the steps below to create a comprehensive exam for your students.</p>
+        <h1>Create New Quiz</h1>
+        <p>Set up your quiz details. Students will be automatically invited based on the selected course.</p>
       </div>
 
-      <div class="progress-stepper">
-        <div class="step active">
-          <div class="step-number">1</div>
-          <div class="step-info">
-            <span class="step-title">Basic Information</span>
-            <span class="step-desc">Exam details and settings</span>
+      <!-- Progress Stepper -->
+      <ui-card variant="elevated" class="stepper-card">
+        <div class="progress-stepper">
+          <div class="step active">
+            <div class="step-number">1</div>
+            <div class="step-info">
+              <span class="step-title">Quiz Details</span>
+              <span class="step-desc">Course, type & schedule</span>
+            </div>
           </div>
-        </div>
-        <div class="step-connector"></div>
-        <div class="step">
-          <div class="step-number">2</div>
-          <div class="step-info">
-            <span class="step-title">Add Questions</span>
-            <span class="step-desc">Select or create questions</span>
+          <div class="step-connector"></div>
+          <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-info">
+              <span class="step-title">Add Questions</span>
+              <span class="step-desc">Build your quiz</span>
+            </div>
           </div>
-        </div>
-        <div class="step-connector"></div>
-        <div class="step">
-          <div class="step-number">3</div>
-          <div class="step-info">
-            <span class="step-title">Exam Settings</span>
-            <span class="step-desc">Configure timing and rules</span>
-          </div>
-        </div>
-        <div class="step-connector"></div>
-        <div class="step">
-          <div class="step-number">4</div>
-          <div class="step-info">
-            <span class="step-title">Review & Publish</span>
-            <span class="step-desc">Final review and publish</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Step 1: Basic Information -->
-      <div class="step-content">
-        <div class="form-section">
-          <h2>Basic Information</h2>
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="examTitle">Exam Title *</label>
-              <input 
-                type="text" 
-                id="examTitle" 
-                placeholder="Enter exam title"
-                class="form-input"
-                [(ngModel)]="examForm.title"
-              >
-            </div>
-
-            <div class="form-group">
-              <label for="subject">Subject *</label>
-              <select id="subject" class="form-select" [(ngModel)]="examForm.subject">
-                <option value="">Select subject</option>
-                <option value="mathematics">Mathematics</option>
-                <option value="physics">Physics</option>
-                <option value="chemistry">Chemistry</option>
-                <option value="biology">Biology</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="examType">Exam Type *</label>
-              <select id="examType" class="form-select" [(ngModel)]="examForm.type">
-                <option value="">Select exam type</option>
-                <option value="midterm">Midterm</option>
-                <option value="final">Final Exam</option>
-                <option value="quiz">Quiz</option>
-                <option value="practice">Practice Test</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="difficulty">Difficulty Level</label>
-              <select id="difficulty" class="form-select" [(ngModel)]="examForm.difficulty">
-                <option value="easy">Easy</option>
-                <option value="medium">Medium</option>
-                <option value="hard">Hard</option>
-              </select>
-            </div>
-
-            <div class="form-group full-width">
-              <label for="description">Description</label>
-              <textarea 
-                id="description" 
-                placeholder="Enter exam description (optional)"
-                class="form-textarea"
-                rows="3"
-                [(ngModel)]="examForm.description"
-              ></textarea>
-            </div>
-
-            <div class="form-group">
-              <label for="totalMarks">Total Marks</label>
-              <input 
-                type="number" 
-                id="totalMarks" 
-                placeholder="100"
-                class="form-input"
-                min="1"
-                [(ngModel)]="examForm.totalMarks"
-              >
-            </div>
-
-            <div class="form-group">
-              <label for="passingMarks">Passing Marks</label>
-              <input 
-                type="number" 
-                id="passingMarks" 
-                placeholder="40"
-                class="form-input"
-                min="1"
-                [(ngModel)]="examForm.passingMarks"
-              >
+          <div class="step-connector"></div>
+          <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-info">
+              <span class="step-title">Review & Publish</span>
+              <span class="step-desc">Final review</span>
             </div>
           </div>
         </div>
+      </ui-card>
 
-        <div class="form-section">
-          <h2>Scheduling</h2>
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="startDate">Start Date *</label>
-              <input 
-                type="datetime-local" 
-                id="startDate" 
-                class="form-input"
-                [(ngModel)]="examForm.startDate"
-              >
-            </div>
-
-            <div class="form-group">
-              <label for="endDate">End Date *</label>
-              <input 
-                type="datetime-local" 
-                id="endDate" 
-                class="form-input"
-                [(ngModel)]="examForm.endDate"
-              >
-            </div>
-
-            <div class="form-group">
-              <label for="duration">Duration (minutes) *</label>
-              <input 
-                type="number" 
-                id="duration" 
-                placeholder="60"
-                class="form-input"
-                min="1"
-                [(ngModel)]="examForm.duration"
-              >
-            </div>
-
-            <div class="form-group">
-              <label for="attempts">Max Attempts</label>
-              <select id="attempts" class="form-select" [(ngModel)]="examForm.maxAttempts">
-                <option value="1">1 Attempt</option>
-                <option value="2">2 Attempts</option>
-                <option value="3">3 Attempts</option>
-                <option value="unlimited">Unlimited</option>
-              </select>
-            </div>
-          </div>
+      <!-- Loading State -->
+      @if (isLoading()) {
+        <div class="loading-state">
+          <ui-spinner size="lg" />
+          <p>Loading courses...</p>
         </div>
+      }
 
-        <div class="form-section">
-          <h2>Student Assignment</h2>
-          <div class="assignment-options">
-            <div class="assignment-option">
-              <input type="radio" id="allStudents" name="assignment" value="all" [(ngModel)]="examForm.assignmentType">
-              <label for="allStudents">
-                <div class="option-content">
-                  <mat-icon>groups</mat-icon>
-                  <div class="option-text">
-                    <span class="option-title">All Students</span>
-                    <span class="option-desc">Assign to all students in your classes</span>
-                  </div>
+      <!-- Error State -->
+      @if (errorMessage()) {
+        <ui-alert variant="filled" color="danger">
+          <mat-icon slot="icon">error</mat-icon>
+          {{ errorMessage() }}
+          <ui-button slot="action" variant="outline" color="danger" size="sm" (clicked)="loadCourses()">
+            Retry
+          </ui-button>
+        </ui-alert>
+      }
+
+      <!-- Main Form -->
+      @if (!isLoading() && !errorMessage()) {
+        <ui-card variant="elevated" title="Quiz Details">
+          <form class="quiz-form" (ngSubmit)="nextStep()">
+            <!-- Course Selection -->
+            <div class="form-section">
+              <h3>Select Course</h3>
+              <p class="section-hint">Choose the course for this quiz. All students enrolled in this course will be automatically invited.</p>
+
+              <ui-select
+                label="Course"
+                placeholder="Select a course"
+                [options]="courseOptions()"
+                [required]="true"
+                [(ngModel)]="quizForm.courseId"
+                name="courseId"
+              />
+
+              @if (selectedCourseInfo()) {
+                <div class="course-preview">
+                  <mat-icon>info</mat-icon>
+                  <span>{{ selectedCourseInfo() }}</span>
                 </div>
-              </label>
+              }
             </div>
 
-            <div class="assignment-option">
-              <input type="radio" id="specificClasses" name="assignment" value="classes" [(ngModel)]="examForm.assignmentType">
-              <label for="specificClasses">
-                <div class="option-content">
-                  <mat-icon>school</mat-icon>
-                  <div class="option-text">
-                    <span class="option-title">Specific Classes</span>
-                    <span class="option-desc">Choose specific classes or sections</span>
-                  </div>
-                </div>
-              </label>
+            <!-- Quiz Type & Lectures -->
+            <div class="form-section">
+              <h3>Quiz Configuration</h3>
+
+              <div class="form-row">
+                <ui-select
+                  label="Quiz Type"
+                  placeholder="Select quiz type"
+                  [options]="quizTypeOptions"
+                  [required]="true"
+                  [(ngModel)]="quizForm.type"
+                  name="type"
+                />
+
+                <ui-input
+                  type="number"
+                  label="Number of Lectures Covered"
+                  placeholder="e.g., 3"
+                  [required]="true"
+                  [min]="1"
+                  [(ngModel)]="quizForm.lectures"
+                  name="lectures"
+                  helperText="How many lectures does this quiz cover?"
+                />
+              </div>
             </div>
 
-            <div class="assignment-option">
-              <input type="radio" id="individualStudents" name="assignment" value="individual" [(ngModel)]="examForm.assignmentType">
-              <label for="individualStudents">
-                <div class="option-content">
-                  <mat-icon>person</mat-icon>
-                  <div class="option-text">
-                    <span class="option-title">Individual Students</span>
-                    <span class="option-desc">Select specific students manually</span>
-                  </div>
-                </div>
-              </label>
-            </div>
-          </div>
-        </div>
+            <!-- Scheduling -->
+            <div class="form-section">
+              <h3>Schedule</h3>
+              <p class="section-hint">Set when the quiz will be available and how long students have to complete it.</p>
 
-        <div class="form-actions">
-          <button class="btn secondary" (click)="goBack()">
-            <mat-icon>arrow_back</mat-icon>
-            Cancel
-          </button>
-          <!-- Debug button to test navigation -->
-          <button class="btn secondary" (click)="testNavigation()" style="background: orange; color: white;">
-            Test Navigation (Debug)
-          </button>
-          <button class="btn primary" (click)="nextStep()" [disabled]="!isFormValid()">
-            Next: Add Questions
-            <mat-icon>arrow_forward</mat-icon>
-          </button>
-        </div>
-      </div>
+              <div class="form-row">
+                <ui-input
+                  type="datetime-local"
+                  label="Quiz Date & Time"
+                  [required]="true"
+                  [(ngModel)]="quizForm.date"
+                  name="date"
+                  helperText="When the quiz becomes available"
+                />
+
+                <ui-input
+                  type="number"
+                  label="Duration (minutes)"
+                  placeholder="60"
+                  [required]="true"
+                  [min]="1"
+                  [(ngModel)]="quizForm.durationMinutes"
+                  name="durationMinutes"
+                  helperText="Time limit for completion"
+                />
+              </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+              <ui-button variant="outline" color="neutral" (clicked)="goBack()">
+                <mat-icon slot="icon-left">arrow_back</mat-icon>
+                Cancel
+              </ui-button>
+
+              <ui-button
+                variant="solid"
+                color="primary"
+                [disabled]="!isFormValid()"
+                (clicked)="nextStep()"
+              >
+                Next: Add Questions
+                <mat-icon slot="icon-right">arrow_forward</mat-icon>
+              </ui-button>
+            </div>
+          </form>
+        </ui-card>
+      }
+
     </div>
   `,
   styles: [`
     .create-exam {
-      max-width: 1000px;
+      max-width: 800px;
       margin: 0 auto;
+      padding: 1.5rem;
     }
 
     .page-header {
-      margin-bottom: 2rem;
-      
+      margin-bottom: 1.5rem;
+
       h1 {
-        font-size: 2rem;
+        font-size: 1.75rem;
         font-weight: 600;
         margin-bottom: 0.5rem;
         color: var(--color-text-primary);
       }
-      
+
       p {
         color: var(--color-text-secondary);
-        font-size: 1rem;
+        font-size: 0.938rem;
       }
+    }
+
+    .stepper-card {
+      margin-bottom: 1.5rem;
     }
 
     .progress-stepper {
       display: flex;
       align-items: center;
-      margin-bottom: 3rem;
-      padding: 2rem;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      
-      @media (max-width: 768px) {
+      justify-content: center;
+      padding: 1rem 0;
+
+      @media (max-width: 640px) {
         flex-direction: column;
         gap: 1rem;
       }
@@ -282,22 +234,10 @@ import { FormsModule } from '@angular/forms';
       display: flex;
       align-items: center;
       gap: 0.75rem;
-      
-      &.active {
-        .step-number {
-          background: var(--color-primary-600);
-          color: white;
-        }
-        
-        .step-title {
-          color: var(--color-primary-600);
-          font-weight: 600;
-        }
-      }
-      
+
       .step-number {
-        width: 2.5rem;
-        height: 2.5rem;
+        width: 2.25rem;
+        height: 2.25rem;
         border-radius: 50%;
         background: var(--color-background-muted);
         color: var(--color-text-secondary);
@@ -305,278 +245,263 @@ import { FormsModule } from '@angular/forms';
         align-items: center;
         justify-content: center;
         font-weight: 600;
-        font-size: 1rem;
+        font-size: 0.938rem;
+        transition: all 0.2s ease;
       }
-      
+
+      &.active .step-number {
+        background: var(--color-primary-600);
+        color: white;
+      }
+
+      &.completed .step-number {
+        background: var(--color-success-600);
+        color: white;
+      }
+
       .step-info {
         display: flex;
         flex-direction: column;
-        
-        .step-title {
-          font-size: 0.875rem;
-          font-weight: 500;
-          color: var(--color-text-primary);
-        }
-        
-        .step-desc {
-          font-size: 0.75rem;
-          color: var(--color-text-secondary);
-        }
+      }
+
+      .step-title {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--color-text-primary);
+      }
+
+      &.active .step-title {
+        color: var(--color-primary-600);
+        font-weight: 600;
+      }
+
+      .step-desc {
+        font-size: 0.75rem;
+        color: var(--color-text-tertiary);
       }
     }
 
     .step-connector {
       flex: 1;
       height: 2px;
-      background: var(--color-background-muted);
-      margin: 0 1rem;
-      
-      @media (max-width: 768px) {
+      background: var(--color-border-default);
+      margin: 0 1.5rem;
+      max-width: 80px;
+
+      @media (max-width: 640px) {
         display: none;
       }
     }
 
-    .step-content {
-      background: white;
-      border-radius: 12px;
-      padding: 2rem;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    .loading-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 2rem;
+      color: var(--color-text-secondary);
+
+      p {
+        margin-top: 1rem;
+      }
+    }
+
+    .quiz-form {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
     }
 
     .form-section {
-      margin-bottom: 2rem;
-      
-      &:last-of-type {
-        margin-bottom: 0;
-      }
-      
-      h2 {
-        font-size: 1.25rem;
+      h3 {
+        font-size: 1.125rem;
         font-weight: 600;
-        margin-bottom: 1.5rem;
-        color: var(--color-text-primary);
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid var(--color-background-subtle);
-      }
-    }
-
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1.5rem;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      
-      &.full-width {
-        grid-column: 1 / -1;
-      }
-      
-      label {
-        font-size: 0.875rem;
-        font-weight: 500;
-        color: var(--color-text-primary);
         margin-bottom: 0.5rem;
+        color: var(--color-text-primary);
+      }
+
+      .section-hint {
+        font-size: 0.875rem;
+        color: var(--color-text-secondary);
+        margin-bottom: 1rem;
       }
     }
 
-    .form-input, .form-select, .form-textarea {
-      padding: 0.75rem;
-      border: 1px solid var(--color-border);
-      border-radius: 6px;
-      font-size: 0.875rem;
-      transition: border-color 0.2s;
-      
-      &:focus {
-        outline: none;
-        border-color: var(--color-primary-500);
-      }
-    }
-
-    .form-textarea {
-      resize: vertical;
-      min-height: 80px;
-    }
-
-    .assignment-options {
-      display: flex;
-      flex-direction: column;
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 1rem;
     }
 
-    .assignment-option {
-      input[type="radio"] {
-        display: none;
-        
-        &:checked + label {
-          border-color: var(--color-primary-500);
-          background: var(--color-primary-50);
-          
-          .option-title {
-            color: var(--color-primary-600);
-          }
-        }
-      }
-      
-      label {
-        display: block;
-        padding: 1rem;
-        border: 2px solid var(--color-border);
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.2s;
-        
-        &:hover {
-          border-color: var(--color-primary-300);
-        }
-      }
-      
-      .option-content {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        
-        mat-icon {
-          color: var(--color-text-secondary);
-          font-size: 1.5rem;
-          width: 1.5rem;
-          height: 1.5rem;
-        }
-      }
-      
-      .option-text {
-        display: flex;
-        flex-direction: column;
-        
-        .option-title {
-          font-size: 1rem;
-          font-weight: 500;
-          color: var(--color-text-primary);
-          margin-bottom: 0.25rem;
-        }
-        
-        .option-desc {
-          font-size: 0.875rem;
-          color: var(--color-text-secondary);
-        }
-      }
-    }
-
-    .form-actions {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 2rem;
-      padding-top: 2rem;
-      border-top: 1px solid var(--color-border);
-      
-      @media (max-width: 768px) {
-        flex-direction: column;
-        gap: 1rem;
-      }
-    }
-
-    .btn {
+    .course-preview {
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      padding: 0.75rem 1.5rem;
-      border: none;
+      margin-top: 0.75rem;
+      padding: 0.75rem 1rem;
+      background: var(--color-primary-50);
+      border: 1px solid var(--color-primary-200);
       border-radius: 8px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-      text-decoration: none;
-      
-      &.primary {
-        background: var(--color-primary-600);
-        color: white;
-        
-        &:hover {
-          background: var(--color-primary-700);
-        }
-      }
-      
-      &.secondary {
-        background: var(--color-background-subtle);
-        color: var(--color-text-primary);
-        border: 1px solid var(--color-border);
-        
-        &:hover {
-          background: var(--color-background-muted);
-        }
-      }
-      
+      font-size: 0.875rem;
+      color: var(--color-primary-700);
+
       mat-icon {
         font-size: 1.25rem;
         width: 1.25rem;
         height: 1.25rem;
       }
     }
-  `]
+
+    .form-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--color-border-subtle);
+
+      @media (max-width: 480px) {
+        flex-direction: column;
+        gap: 1rem;
+
+        ui-button {
+          width: 100%;
+        }
+      }
+    }
+
+    :host ::ng-deep {
+      ui-card {
+        margin-bottom: 1.5rem;
+      }
+
+      .card__body {
+        padding: 1.5rem;
+      }
+    }
+  `],
 })
-export class TeacherCreateExam {
-  examForm = {
-    title: '',
-    subject: '',
-    type: '',
-    difficulty: 'medium',
-    description: '',
-    totalMarks: 100,
-    passingMarks: 40,
-    startDate: '',
-    endDate: '',
-    duration: 60,
-    maxAttempts: '1',
-    assignmentType: 'all'
+export class TeacherCreateExam implements OnInit {
+  private readonly teacherApi = inject(TeacherApiService);
+  private readonly router = inject(Router);
+  private readonly cdr = inject(ChangeDetectorRef);
+
+  // Reactive state using signals
+  isLoading = signal(false);
+  errorMessage = signal('');
+  courses = signal<CourseDto[]>([]);
+
+  // Quiz form - matches CreateTeacherQuizDto (excluding questions)
+  quizForm = {
+    courseId: '',
+    type: '' as QuizType | '',
+    lectures: 1,
+    date: '',
+    durationMinutes: 60,
   };
 
-  constructor(private router: Router) {}
+  // Quiz type options matching backend QuizType enum
+  readonly quizTypeOptions: DropdownOption[] = [
+    { value: 'CA', label: 'Continuous Assessment (CA)' },
+    { value: 'MEDIAN', label: 'Midterm Exam' },
+    { value: 'FINAL', label: 'Final Exam' },
+    { value: 'MOCK', label: 'Mock Test / Practice' },
+  ];
+
+  // Computed: Course dropdown options
+  courseOptions = computed<DropdownOption[]>(() =>
+    this.courses().map(course => ({
+      value: course.id,
+      label: this.getCourseLabel(course),
+    }))
+  );
+
+  // Computed: Selected course info preview
+  selectedCourseInfo = computed(() => {
+    if (!this.quizForm.courseId) return '';
+    const course = this.courses().find(c => c.id === this.quizForm.courseId);
+    if (!course) return '';
+
+    const className = course.classAcademicYear?.class?.name ?? '';
+    const level = course.classAcademicYear?.class?.level ?? course.level ?? '';
+    const credits = course.credits;
+
+    const parts: string[] = [];
+    if (className) parts.push(`Class: ${className}`);
+    if (level) parts.push(`Level: ${level}`);
+    if (credits) parts.push(`${credits} credits`);
+
+    return parts.join(' • ');
+  });
+
+  async ngOnInit(): Promise<void> {
+    // Load any saved data from previous session
+    this.loadSavedData();
+    await this.loadCourses();
+  }
+
+  private loadSavedData(): void {
+    const saved = sessionStorage.getItem('examFormStep1');
+    if (saved) {
+      try {
+        const data = JSON.parse(saved);
+        this.quizForm = { ...this.quizForm, ...data };
+      } catch {
+        // Ignore parse errors
+      }
+    }
+  }
+
+  async loadCourses(): Promise<void> {
+    this.isLoading.set(true);
+    this.errorMessage.set('');
+
+    try {
+      const courses = await firstValueFrom(this.teacherApi.getMyCourses());
+      this.courses.set(courses);
+    } catch (err: unknown) {
+      this.errorMessage.set(
+        err instanceof Error ? err.message : 'Failed to load courses. Please try again.'
+      );
+    } finally {
+      this.isLoading.set(false);
+      this.cdr.markForCheck();
+    }
+  }
+
+  getCourseLabel(course: CourseDto): string {
+    const tuName = course.teachingUnit?.name ?? 'Unknown Subject';
+    const className = course.classAcademicYear?.class?.name ?? '';
+    return className ? `${tuName} — ${className}` : tuName;
+  }
 
   isFormValid(): boolean {
-    const isValid = !!(
-      this.examForm.title.trim() &&
-      this.examForm.subject &&
-      this.examForm.type &&
-      this.examForm.startDate &&
-      this.examForm.endDate &&
-      this.examForm.duration > 0
+    return !!(
+      this.quizForm.courseId &&
+      this.quizForm.type &&
+      this.quizForm.date &&
+      this.quizForm.durationMinutes > 0 &&
+      this.quizForm.lectures > 0
     );
-    
-    console.log('Form validation details:');
-    console.log('- Title:', this.examForm.title.trim() ? '✓' : '✗', this.examForm.title);
-    console.log('- Subject:', this.examForm.subject ? '✓' : '✗', this.examForm.subject);
-    console.log('- Type:', this.examForm.type ? '✓' : '✗', this.examForm.type);
-    console.log('- Start Date:', this.examForm.startDate ? '✓' : '✗', this.examForm.startDate);
-    console.log('- End Date:', this.examForm.endDate ? '✓' : '✗', this.examForm.endDate);
-    console.log('- Duration:', this.examForm.duration > 0 ? '✓' : '✗', this.examForm.duration);
-    console.log('Overall valid:', isValid);
-    
-    return isValid;
   }
 
   goBack(): void {
     this.router.navigate(['/teacher/exam-manager']);
   }
 
-  testNavigation(): void {
-    console.log('Test navigation button clicked!');
-    this.router.navigate(['/teacher/create-exam/step2']);
-  }
-
   nextStep(): void {
-    console.log('Next step button clicked!'); // Debug log
-    console.log('Form data:', this.examForm); // Debug log
-    console.log('Form valid:', this.isFormValid()); // Debug log
-    
-    if (this.isFormValid()) {
-      console.log('Form is valid, navigating to step 2...'); // Debug log
-      // Navigate to step 2
-      this.router.navigate(['/teacher/create-exam/step2']);
-    } else {
-      console.log('Form validation failed'); // Debug log
-      alert('Please fill in all required fields.');
+    if (!this.isFormValid()) {
+      return;
     }
+
+    // Store form data for next steps with explicit type conversions
+    const formData = {
+      courseId: String(this.quizForm.courseId),
+      type: String(this.quizForm.type) as QuizType,
+      lectures: Number(this.quizForm.lectures),
+      date: String(this.quizForm.date),
+      durationMinutes: Number(this.quizForm.durationMinutes),
+    };
+    sessionStorage.setItem('examFormStep1', JSON.stringify(formData));
+    this.router.navigate(['/teacher/create-exam/step2']);
   }
 }
