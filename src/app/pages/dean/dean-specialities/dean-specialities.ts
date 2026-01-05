@@ -148,7 +148,7 @@ export class DeanSpecialities {
     this.assignLoading = true;
     try {
       const headId = this.selectedHeadId && this.selectedHeadId !== '' ? this.selectedHeadId : null;
-      await firstValueFrom(this.deanApi.assignSpecialityHead(this.editingId, headId));
+      await firstValueFrom(this.deanApi.assignSpecialityHead(this.editingId, String(headId)));
       this.closeModal();
       await this.load();
     } catch (err: unknown) {

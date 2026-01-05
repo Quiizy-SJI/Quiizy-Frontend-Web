@@ -96,7 +96,7 @@ export class DeanMiniAdmins {
       this.rows = await firstValueFrom(this.deanApi.listMiniAdmins());
       this.specialities = await firstValueFrom(this.deanApi.listSpecialities());
     } catch (err: unknown) {
-      this.errorMessage = err instanceof Error ? err.message : 'Failed to load mini admins.';
+      this.errorMessage = err instanceof Error ? err.message : 'Failed to load Speciality Head.';
     } finally {
       this.isLoading = false;
       this.cdr.markForCheck();
@@ -177,7 +177,7 @@ export class DeanMiniAdmins {
           surname: this.form.surname.trim(),
           email: this.form.email.trim(),
           login: this.form.login.trim(),
-          specialityId: this.form.specialityId || null,
+          specialityId: String(this.form.specialityId) || null,
         };
         if (this.form.password) dto.password = this.form.password;
 
@@ -197,7 +197,7 @@ export class DeanMiniAdmins {
   async delete(row: MiniAdminDto): Promise<void> {
     this.errorMessage = '';
 
-    const name = `${row.user?.name ?? ''} ${row.user?.surname ?? ''}`.trim() || 'this mini admin';
+    const name = `${row.user?.name ?? ''} ${row.user?.surname ?? ''}`.trim() || 'this Speciality Head';
     const ok = confirm(`Delete ${name}?`);
     if (!ok) return;
 
@@ -210,7 +210,7 @@ export class DeanMiniAdmins {
   }
 
   modalTitle(): string {
-    return this.modalMode === 'create' ? 'Create Mini Admin' : 'Edit Mini Admin';
+    return this.modalMode === 'create' ? 'Create Speciality Head' : 'Edit Speciality Head';
   }
 
   specialityOptions(): DropdownOption<string>[] {

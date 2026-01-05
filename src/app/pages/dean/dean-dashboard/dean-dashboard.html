@@ -1,84 +1,372 @@
-<div class="page">
-  <div class="page__top">
-    <div class="page__title">Dashboard</div>
+<div class="dashboard">
+  <!-- Header Section -->
+  <header class="dashboard__header">
+    <div class="dashboard__title-section">
+      <h1 class="dashboard__title">Dean Dashboard</h1>
+      <p class="dashboard__subtitle">Institution-wide performance overview and insights</p>
+    </div>
 
-    <div class="page__actions">
+    <div class="dashboard__actions">
       <ui-select
-        label="Scope"
+        label="Academic Year"
         placeholder="All years"
-        [options]="academicYearOptions"
-        [(ngModel)]="selectedAcademicYearId"
+        [options]="academicYearOptions()"
+        [ngModel]="selectedAcademicYearId()"
         (valueChange)="onAcademicYearChange($event)"
       ></ui-select>
 
       <ui-button
         variant="outline"
         color="primary"
-        [loading]="publishLoading"
+        [loading]="publishLoading()"
         (clicked)="onPublish()"
       >
-        Refresh / Publish
+        <mat-icon>refresh</mat-icon>
+        Refresh Data
       </ui-button>
     </div>
-  </div>
+  </header>
 
-  @if (errorMessage) {
-    <ui-alert variant="soft" color="danger">
-      {{ errorMessage }}
+  <!-- Error Alert -->
+  @if (errorMessage()) {
+    <ui-alert variant="soft" color="danger" [dismissible]="true">
+      {{ errorMessage() }}
     </ui-alert>
   }
 
-  @if (isLoading && !stats) {
-    <div class="page__loading">
-      <ui-spinner color="primary" label="Loading dashboard" [showLabel]="true"></ui-spinner>
+  <!-- Loading State -->
+  @if (isLoading() && !stats()) {
+    <div class="dashboard__loading">
+      <ui-spinner size="lg" color="primary" label="Loading dashboard insights..." [showLabel]="true"></ui-spinner>
     </div>
   } @else {
-    <ui-card variant="outlined" title="Live status" subtitle="Updates via SSE (dean:stats-updated)">
-      <div class="meta">
-        <div class="meta__row">
-          <span class="meta__label">Generated</span>
-          <span class="meta__value">{{ stats?.generatedAt || '—' }}</span>
+    <!-- Health Score & Overview Row -->
+    <div class="dashboard__overview">
+      <!-- Institution Health Score -->
+      <ui-card variant="elevated" class="health-card">
+        <div class="health-card__content">
+          <div class="health-card__gauge">
+            <ui-chart [type]="'doughnut'" [data]="healthGaugeData" [options]="gaugeOptions"></ui-chart>
+            <div class="health-card__score">
+              <span class="health-card__value">{{ healthScore() }}</span>
+              <span class="health-card__label">Health Score</span>
+            </div>
+          </div>
+          <div class="health-card__details">
+            <h3 class="health-card__title">Institution Health</h3>
+            <p class="health-card__description">
+              Combined metric based on average scores, completion rates, and participation.
+            </p>
+            <div class="health-card__status">
+              <ui-badge [color]="healthScoreColor()" variant="solid">
+                @if (healthScore() >= 80) {
+                  Excellent
+                } @else if (healthScore() >= 60) {
+                  Needs Attention
+                } @else {
+                  Critical
+                }
+              </ui-badge>
+            </div>
+          </div>
         </div>
-        <div class="meta__row">
-          <span class="meta__label">SSE</span>
-          <span class="meta__value">{{ (connectionState$ | async) || 'disconnected' }}</span>
-        </div>
-      </div>
-    </ui-card>
-
-    <div class="grid">
-      <ui-card variant="outlined" title="Totals">
-        <div class="cards">
-          <ui-stat-card label="Academic Years" [value]="stats?.totals?.academicYears ?? 0" color="neutral" format="number"></ui-stat-card>
-          <ui-stat-card label="Classes" [value]="stats?.totals?.classes ?? 0" color="primary" format="number"></ui-stat-card>
-          <ui-stat-card label="Students" [value]="stats?.totals?.students ?? 0" color="info" format="number"></ui-stat-card>
-          <ui-stat-card label="Teachers" [value]="stats?.totals?.teachers ?? 0" color="secondary" format="number"></ui-stat-card>
-          <ui-stat-card label="Teaching Units" [value]="stats?.totals?.teachingUnits ?? 0" color="accent" format="number"></ui-stat-card>
-          <ui-stat-card label="Quizzes" [value]="stats?.totals?.quizzes ?? 0" color="success" format="number"></ui-stat-card>
-          <ui-stat-card label="Questions" [value]="stats?.totals?.questions ?? 0" color="warning" format="number"></ui-stat-card>
-        </div>
-        <ui-chart [type]="'bar'" [data]="totalsChartData" [options]="barOptions"></ui-chart>
       </ui-card>
 
-      <ui-card variant="outlined" title="Participation">
-        <div class="cards">
-          <ui-stat-card label="Invited" [value]="stats?.participation?.invited ?? 0" color="neutral" format="number"></ui-stat-card>
-          <ui-stat-card label="In progress" [value]="stats?.participation?.inProgress ?? 0" color="info" format="number"></ui-stat-card>
-          <ui-stat-card label="Completed" [value]="stats?.participation?.completed ?? 0" color="success" format="number"></ui-stat-card>
-          <ui-stat-card label="Missed" [value]="stats?.participation?.missed ?? 0" color="danger" format="number"></ui-stat-card>
+      <!-- Quick Stats Summary -->
+      <ui-card variant="outlined" class="summary-card">
+        <div class="summary-card__header">
+          <mat-icon>analytics</mat-icon>
+          <h3>Quick Summary</h3>
         </div>
-        <ui-chart [type]="'doughnut'" [data]="participationChartData" [options]="doughnutOptions"></ui-chart>
+        <div class="summary-card__stats">
+          <div class="summary-stat">
+            <span class="summary-stat__value">{{ stats()?.scores?.averagePercent?.toFixed(1) ?? 0 }}%</span>
+            <span class="summary-stat__label">Avg Score</span>
+          </div>
+          <div class="summary-stat">
+            <span class="summary-stat__value">{{ participation().completionRate.toFixed(1) }}%</span>
+            <span class="summary-stat__label">Completion</span>
+          </div>
+          <div class="summary-stat">
+            <span class="summary-stat__value">{{ participation().participationRate.toFixed(1) }}%</span>
+            <span class="summary-stat__label">Participation</span>
+          </div>
+        </div>
       </ui-card>
 
-      <ui-card variant="outlined" title="Scores">
-        <div class="cards">
-          <ui-stat-card label="Avg %" [value]="stats?.scores?.averagePercent ?? 0" color="primary" format="none"></ui-stat-card>
-          <ui-stat-card label="Avg raw score" [value]="stats?.scores?.averageRawScore ?? 0" color="secondary" format="none"></ui-stat-card>
-          <ui-stat-card label="Avg total marks" [value]="stats?.scores?.averageTotalMarks ?? 0" color="accent" format="none"></ui-stat-card>
-          <ui-stat-card label="Attempts w/score" [value]="stats?.scores?.completedAttemptsWithScore ?? 0" color="neutral" format="number"></ui-stat-card>
+      <!-- Connection Status -->
+      <ui-card variant="outlined" class="status-card">
+        <div class="status-card__header">
+          <mat-icon>wifi</mat-icon>
+          <h3>Live Status</h3>
         </div>
-        <ui-chart [type]="'bar'" [data]="scoresChartData" [options]="barOptions"></ui-chart>
+        <div class="status-card__content">
+          <div class="status-row">
+            <span class="status-row__label">SSE Connection</span>
+            <ui-badge [color]="(connectionState$ | async) === 'connected' ? 'success' : 'warning'" variant="subtle">
+              {{ (connectionState$ | async) || 'disconnected' }}
+            </ui-badge>
+          </div>
+          <div class="status-row">
+            <span class="status-row__label">Last Updated</span>
+            <span class="status-row__value">{{ stats()?.generatedAt | date:'short' }}</span>
+          </div>
+        </div>
       </ui-card>
     </div>
+
+    <!-- KPI Cards Section -->
+    <section class="dashboard__section">
+      <h2 class="section__title">
+        <mat-icon>insights</mat-icon>
+        Key Performance Indicators
+      </h2>
+      <div class="kpi-grid">
+        @for (kpi of kpis(); track kpi.title) {
+          <div class="kpi-card" [class]="'kpi-card--' + kpi.color">
+            <div class="kpi-card__icon">
+              <mat-icon>{{ kpi.icon }}</mat-icon>
+            </div>
+            <div class="kpi-card__content">
+              <span class="kpi-card__label">{{ kpi.title }}</span>
+              <div class="kpi-card__value-row">
+                <span class="kpi-card__value">
+                  {{ kpi.metric.value | number:'1.0-1' }}{{ kpi.metric.unit === '%' ? '%' : '' }}
+                </span>
+                @if (kpi.metric.trend) {
+                  <mat-icon [class]="'trend-icon trend-icon--' + kpi.metric.trend">
+                    {{ getTrendIcon(kpi.metric.trend) }}
+                  </mat-icon>
+                }
+              </div>
+              @if (kpi.description) {
+                <span class="kpi-card__description">{{ kpi.description }}</span>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- Charts Row -->
+    <div class="dashboard__charts">
+      <!-- Score Distribution -->
+      <ui-card variant="outlined" title="Score Distribution" subtitle="Student performance breakdown">
+        <div class="chart-container">
+          <ui-chart [type]="'bar'" [data]="scoreDistributionChartData" [options]="barOptions"></ui-chart>
+        </div>
+        <div class="chart-legend">
+          @for (bucket of scoreDistribution().buckets; track bucket.range) {
+            <div class="legend-item">
+              <span class="legend-dot" [class]="'legend-dot--' + bucket.label"></span>
+              <span class="legend-label">{{ bucket.range }}: {{ bucket.count }} ({{ bucket.percentage.toFixed(1) }}%)</span>
+            </div>
+          }
+        </div>
+        <div class="chart-stats">
+          <div class="chart-stat">
+            <span class="chart-stat__label">Average</span>
+            <span class="chart-stat__value">{{ scoreDistribution().averageScore.toFixed(1) }}%</span>
+          </div>
+          <div class="chart-stat">
+            <span class="chart-stat__label">Median</span>
+            <span class="chart-stat__value">{{ scoreDistribution().medianScore.toFixed(1) }}%</span>
+          </div>
+          <div class="chart-stat">
+            <span class="chart-stat__label">Std Dev</span>
+            <span class="chart-stat__value">{{ scoreDistribution().standardDeviation.toFixed(1) }}</span>
+          </div>
+        </div>
+      </ui-card>
+
+      <!-- Participation Analytics -->
+      <ui-card variant="outlined" title="Participation Overview" subtitle="Quiz engagement metrics">
+        <div class="chart-container chart-container--doughnut">
+          <ui-chart [type]="'doughnut'" [data]="participationChartData" [options]="doughnutOptions"></ui-chart>
+        </div>
+        <div class="participation-stats">
+          <div class="participation-stat participation-stat--success">
+            <mat-icon>check_circle</mat-icon>
+            <div>
+              <span class="participation-stat__value">{{ stats()?.participation?.completed ?? 0 }}</span>
+              <span class="participation-stat__label">Completed</span>
+            </div>
+          </div>
+          <div class="participation-stat participation-stat--info">
+            <mat-icon>pending</mat-icon>
+            <div>
+              <span class="participation-stat__value">{{ stats()?.participation?.inProgress ?? 0 }}</span>
+              <span class="participation-stat__label">In Progress</span>
+            </div>
+          </div>
+          <div class="participation-stat participation-stat--danger">
+            <mat-icon>cancel</mat-icon>
+            <div>
+              <span class="participation-stat__value">{{ stats()?.participation?.missed ?? 0 }}</span>
+              <span class="participation-stat__label">Missed</span>
+            </div>
+          </div>
+        </div>
+      </ui-card>
+
+      <!-- Rates Comparison -->
+      <ui-card variant="outlined" title="Rate Comparison" subtitle="Participation vs Completion">
+        <div class="chart-container">
+          <ui-chart [type]="'bar'" [data]="participationRateChartData" [options]="verticalBarOptions"></ui-chart>
+        </div>
+        <div class="rate-insights">
+          @if (participation().participationRate - participation().completionRate > 20) {
+            <ui-alert variant="soft" color="warning" [showIcon]="true">
+              <strong>Insight:</strong> Many students start but don't complete quizzes. Consider reviewing quiz length or difficulty.
+            </ui-alert>
+          } @else if (participation().completionRate >= 80) {
+            <ui-alert variant="soft" color="success" [showIcon]="true">
+              <strong>Great!</strong> High completion rate indicates good student engagement.
+            </ui-alert>
+          }
+        </div>
+      </ui-card>
+    </div>
+
+    <!-- Alerts & Recommendations Row -->
+    <div class="dashboard__insights">
+      <!-- Alerts Section -->
+      <ui-card variant="outlined" class="alerts-card">
+        <div class="card-header">
+          <mat-icon>notifications_active</mat-icon>
+          <h3>Active Alerts</h3>
+          @if (alerts().length > 0) {
+            <ui-badge color="danger" variant="solid">{{ alerts().length }}</ui-badge>
+          }
+        </div>
+
+        @if (alerts().length === 0) {
+          <div class="empty-state">
+            <mat-icon>check_circle</mat-icon>
+            <p>No active alerts. Everything looks good!</p>
+          </div>
+        } @else {
+          <div class="alerts-list">
+            @for (alert of alerts(); track alert.id) {
+              <div class="alert-item" [class]="'alert-item--' + alert.severity">
+                <mat-icon class="alert-item__icon">{{ getAlertIcon(alert.severity) }}</mat-icon>
+                <div class="alert-item__content">
+                  <h4 class="alert-item__title">{{ alert.title }}</h4>
+                  <p class="alert-item__message">{{ alert.message }}</p>
+                </div>
+                <ui-badge [color]="alert.severity === 'critical' ? 'danger' : alert.severity === 'warning' ? 'warning' : 'info'" variant="subtle">
+                  {{ alert.severity }}
+                </ui-badge>
+              </div>
+            }
+          </div>
+        }
+      </ui-card>
+
+      <!-- Recommendations Section -->
+      <ui-card variant="outlined" class="recommendations-card">
+        <div class="card-header">
+          <mat-icon>lightbulb</mat-icon>
+          <h3>Recommendations</h3>
+        </div>
+
+        @if (recommendations().length === 0) {
+          <div class="empty-state">
+            <mat-icon>thumb_up</mat-icon>
+            <p>No recommendations at this time.</p>
+          </div>
+        } @else {
+          <div class="recommendations-list">
+            @for (rec of recommendations(); track rec.id) {
+              <div class="recommendation-item">
+                <div class="recommendation-item__header">
+                  <h4 class="recommendation-item__title">{{ rec.title }}</h4>
+                  <div class="recommendation-item__badges">
+                    <ui-badge [color]="getImpactColor(rec.impact)" variant="subtle">
+                      {{ rec.impact }} impact
+                    </ui-badge>
+                    <ui-badge color="neutral" variant="outline">
+                      {{ rec.effort }} effort
+                    </ui-badge>
+                  </div>
+                </div>
+                <p class="recommendation-item__description">{{ rec.description }}</p>
+                @if (rec.actionUrl) {
+                  <a class="recommendation-item__action" [href]="rec.actionUrl">
+                    Take Action <mat-icon>arrow_forward</mat-icon>
+                  </a>
+                }
+              </div>
+            }
+          </div>
+        }
+      </ui-card>
+    </div>
+
+    <!-- Totals Overview (Collapsible Details) -->
+    <section class="dashboard__section">
+      <h2 class="section__title">
+        <mat-icon>dashboard</mat-icon>
+        Institution Overview
+      </h2>
+      <div class="totals-grid">
+        <ui-stat-card
+          label="Academic Years"
+          [value]="stats()?.totals?.academicYears ?? 0"
+          color="neutral"
+          icon="calendar_today"
+          format="number"
+        ></ui-stat-card>
+        <ui-stat-card
+          label="Classes"
+          [value]="stats()?.totals?.classes ?? 0"
+          color="primary"
+          icon="class"
+          format="number"
+        ></ui-stat-card>
+        <ui-stat-card
+          label="Students"
+          [value]="stats()?.totals?.students ?? 0"
+          color="info"
+          icon="school"
+          format="number"
+        ></ui-stat-card>
+        <ui-stat-card
+          label="Teachers"
+          [value]="stats()?.totals?.teachers ?? 0"
+          color="secondary"
+          icon="person"
+          format="number"
+        ></ui-stat-card>
+        <ui-stat-card
+          label="Teaching Units"
+          [value]="stats()?.totals?.teachingUnits ?? 0"
+          color="accent"
+          icon="menu_book"
+          format="number"
+        ></ui-stat-card>
+        <ui-stat-card
+          label="Quizzes"
+          [value]="stats()?.totals?.quizzes ?? 0"
+          color="success"
+          icon="assignment"
+          format="number"
+        ></ui-stat-card>
+        <ui-stat-card
+          label="Questions"
+          [value]="stats()?.totals?.questions ?? 0"
+          color="warning"
+          icon="quiz"
+          format="number"
+        ></ui-stat-card>
+        <ui-stat-card
+          label="Assessments Completed"
+          [value]="stats()?.scores?.completedAttemptsWithScore ?? 0"
+          color="primary"
+          icon="task_alt"
+          format="number"
+        ></ui-stat-card>
+      </div>
+    </section>
   }
 </div>

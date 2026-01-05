@@ -35,7 +35,7 @@ export class DeanLayout implements OnInit {
     { id: 'semesters', label: 'Semesters' },
     { id: 'exam-types', label: 'Exam Types' },
     { id: 'teaching-units', label: 'Teaching Units' },
-    { id: 'mini-admins', label: 'Mini Admins' },
+    { id: 'mini-admins', label: 'Speciality Head' },
     { id: 'ai-analytics', label: 'AI Analytics' },
   ];
 
@@ -64,7 +64,7 @@ export class DeanLayout implements OnInit {
     { id: 'specialities', label: 'Specialities', route: '/dean/specialities', icon: 'badge' },
     { id: 'exam-types', label: 'Exam Types', route: '/dean/exam-types', icon: 'assignment' },
     { id: 'teaching-units', label: 'Teaching Units', route: '/dean/teaching-units', icon: 'menu_book' },
-    { id: 'mini-admins', label: 'Mini Admins', route: '/dean/mini-admins', icon: 'groups' },
+    { id: 'mini-admins', label: 'Speciality Head', route: '/dean/mini-admins', icon: 'groups' },
     { id: 'ai-analytics', label: 'AI Analytics', route: '/dean/ai-analytics', icon: 'insights' },
   ];
 
@@ -152,7 +152,9 @@ export class DeanLayout implements OnInit {
         error: (err: unknown) => {
           this.errorMessage = err instanceof Error ? err.message : 'Logout failed.';
           this.cdr.markForCheck();
+          this.router.navigateByUrl('/login');
         },
+
       });
   }
 

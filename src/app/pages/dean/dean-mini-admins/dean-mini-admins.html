@@ -1,7 +1,7 @@
 <div class="page">
   <div class="page__top">
     <div>
-      <div class="page__title">Mini Admin Accounts</div>
+      <div class="page__title">Speciality Head Accounts</div>
       <div class="page__subtitle">Create and manage speciality head accounts.</div>
     </div>
 
@@ -10,7 +10,7 @@
         Refresh
       </ui-button>
       <ui-button variant="solid" color="primary" (clicked)="openCreate()">
-        New Mini Admin
+        New Speciality Head
       </ui-button>
     </div>
   </div>
@@ -21,7 +21,7 @@
     </ui-alert>
   }
 
-  <ui-card title="Mini Admins" [hoverable]="false">
+  <ui-card title="Speciality Head" [hoverable]="false">
     @if (isLoading) {
       <div class="page__loading">
         <ui-spinner size="lg"></ui-spinner>
