@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" fill="none">
+  <!-- Modern University Campus Background -->
+  <defs>
+    <!-- Main gradient for sky/atmosphere -->
+    <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f172a;stop-opacity:1" />
+      <stop offset="30%" style="stop-color:#1e293b;stop-opacity:1" />
+      <stop offset="70%" style="stop-color:#1e3a5f;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0f172a;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- Accent gradient -->
+    <linearGradient id="accent-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3572ef;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:0.2" />
+    </linearGradient>
+
+    <!-- Grid pattern -->
+    <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M 60 0 L 0 0 0 60" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+    </pattern>
+
+    <!-- Dot pattern -->
+    <pattern id="dots" width="30" height="30" patternUnits="userSpaceOnUse">
+      <circle cx="15" cy="15" r="1" fill="rgba(255,255,255,0.05)"/>
+    </pattern>
+  </defs>
+
+  <!-- Main Background -->
+  <rect width="1920" height="1080" fill="url(#bg-gradient)"/>
+
+  <!-- Grid Pattern Overlay -->
+  <rect width="1920" height="1080" fill="url(#grid)"/>
+  <rect width="1920" height="1080" fill="url(#dots)"/>
+
+  <!-- Large decorative blobs -->
+  <ellipse cx="300" cy="200" rx="400" ry="300" fill="url(#accent-grad)" opacity="0.5"/>
+  <ellipse cx="1700" cy="900" rx="500" ry="350" fill="url(#accent-grad)" opacity="0.4"/>
+  <ellipse cx="1000" cy="600" rx="600" ry="400" fill="rgba(6, 182, 212, 0.08)"/>
+
+  <!-- Abstract geometric shapes -->
+  <g opacity="0.1">
+    <!-- Hexagons representing knowledge/connectivity -->
+    <polygon points="200,400 260,430 260,490 200,520 140,490 140,430" fill="none" stroke="#3572ef" stroke-width="2"/>
+    <polygon points="1700,200 1760,230 1760,290 1700,320 1640,290 1640,230" fill="none" stroke="#8b5cf6" stroke-width="2"/>
+    <polygon points="1500,700 1560,730 1560,790 1500,820 1440,790 1440,730" fill="none" stroke="#10b981" stroke-width="2"/>
+  </g>
+
+  <!-- Building silhouettes in the distance -->
+  <g opacity="0.08" fill="white">
+    <!-- Modern university buildings -->
+    <rect x="100" y="650" width="120" height="430" rx="4"/>
+    <rect x="240" y="580" width="80" height="500" rx="4"/>
+    <rect x="340" y="700" width="100" height="380" rx="4"/>
+
+    <rect x="1400" y="620" width="140" height="460" rx="4"/>
+    <rect x="1560" y="550" width="100" height="530" rx="4"/>
+    <rect x="1680" y="680" width="120" height="400" rx="4"/>
+
+    <!-- Central iconic building -->
+    <path d="M920 500 L960 450 L1000 500 L1000 700 L920 700 Z"/>
+    <rect x="880" y="700" width="200" height="380"/>
+  </g>
+
+  <!-- Floating academic elements -->
+  <g opacity="0.06" fill="white">
+    <!-- Graduation cap -->
+    <g transform="translate(1600, 150)">
+      <path d="M0 30 L50 10 L100 30 L50 50 Z"/>
+      <path d="M20 35 L20 60 C20 70 35 80 50 80 C65 80 80 70 80 60 L80 35"/>
+    </g>
+
+    <!-- Open book -->
+    <g transform="translate(250, 600)">
+      <path d="M0 0 C20 10 40 10 60 0 L60 80 C40 90 20 90 0 80 Z"/>
+      <path d="M60 0 C80 10 100 10 120 0 L120 80 C100 90 80 90 60 80 Z"/>
+      <line x1="60" y1="0" x2="60" y2="80" stroke="white" stroke-width="2"/>
+    </g>
+
+    <!-- Lightbulb/idea -->
+    <g transform="translate(1300, 350)">
+      <circle cx="30" cy="30" r="25" fill="none" stroke="white" stroke-width="3"/>
+      <path d="M20 55 L40 55 L40 70 L20 70 Z"/>
+      <path d="M25 70 L35 70 L35 80 L25 80 Z"/>
+    </g>
+  </g>
+
+  <!-- Connecting lines representing network/community -->
+  <g stroke="rgba(53, 114, 239, 0.1)" stroke-width="1" fill="none">
+    <path d="M100 200 Q 500 100 960 300"/>
+    <path d="M1820 400 Q 1400 200 960 300"/>
+    <path d="M200 900 Q 600 700 960 800"/>
+    <path d="M1700 950 Q 1300 750 960 800"/>
+  </g>
+
+  <!-- Small floating particles -->
+  <g fill="rgba(255,255,255,0.1)">
+    <circle cx="150" cy="300" r="3"/>
+    <circle cx="400" cy="150" r="2"/>
+    <circle cx="700" cy="250" r="4"/>
+    <circle cx="1200" cy="180" r="3"/>
+    <circle cx="1500" cy="300" r="2"/>
+    <circle cx="1750" cy="450" r="3"/>
+    <circle cx="300" cy="800" r="2"/>
+    <circle cx="600" cy="900" r="3"/>
+    <circle cx="1100" cy="850" r="2"/>
+    <circle cx="1400" cy="950" r="4"/>
+  </g>
+</svg>
