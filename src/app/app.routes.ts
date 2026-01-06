@@ -64,6 +64,11 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/dean/dean-ai-analytics/dean-ai-analytics').then(m => m.DeanAiAnalytics),
         title: 'AI Analytics'
       },
+      {
+        path: 'sentiment-analysis',
+        loadComponent: () => import('./pages/shared/sentiment-analysis-page/sentiment-analysis-page').then(m => m.SentimentAnalysisPage),
+        title: 'Sentiment Analysis'
+      },
     ]
   },
   {
@@ -83,8 +88,8 @@ export const routes: Routes = [
       },
       {
         path: 'sentiment-review',
-        loadComponent: () => import('./pages/teacher/teacher-sentiment-review/teacher-sentiment-review').then(m => m.TeacherSentimentReview),
-        title: 'Sentiment Review'
+        loadComponent: () => import('./pages/shared/sentiment-analysis-page/sentiment-analysis-page').then(m => m.SentimentAnalysisPage),
+        title: 'Sentiment Analysis'
       },
       {
         path: 'question-bank',
