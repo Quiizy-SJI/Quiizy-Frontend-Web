@@ -1,0 +1,44 @@
+<ui-card title="My Quizzes" [showHeader]="true" [showFooter]="true">
+  <div slot="header-right" class="quiz-manager__header-actions">
+    <ui-button color="primary" size="sm" (clicked)="load()">Refresh</ui-button>
+    <ui-button color="secondary" size="sm" (clicked)="onCreate()">Create Quiz</ui-button>
+  </div>
+
+  <div class="quiz-manager__table">
+    <ui-table
+      [columns]="columns"
+      [data]="(quizzes$ | async) || []"
+      [loading]="loading"
+      [showHeader]="true"
+      [showActions]="false"
+    >
+      <ng-template #cell let-row let-rowObj="row" let-column="column" let-index="index">
+        @if (column.key !== 'date') {
+          {{ rowObj[column.key] }}
+        } @else {
+          <div class="quiz-manager__actions">
+            <ui-button variant="soft" size="sm" (clicked)="onEdit(rowObj)">Edit</ui-button>
+            @if (rowObj.status === 'DRAFT') {
+              <ui-button color="primary" size="sm" (clicked)="onPublish(rowObj)">Publish</ui-button>
+            }
+            <ui-button color="danger" size="sm" (clicked)="onDelete(rowObj)">Delete</ui-button>
+            <ui-button variant="ghost" size="sm" (clicked)="onCreateFrom(rowObj)">Create From</ui-button>
+          </div>
+        }
+      </ng-template>
+    </ui-table>
+  </div>
+
+  <ui-modal
+    [isOpen]="confirmOpen"
+    [title]="confirmTitle"
+    [showFooter]="true"
+    (closed)="closeConfirm()"
+  >
+    <div class="confirm-body">{{ confirmMessage }}</div>
+    <div slot="footer">
+      <ui-button variant="soft" size="sm" (clicked)="closeConfirm()">Cancel</ui-button>
+      <ui-button color="primary" size="sm" (clicked)="confirm()">Continue</ui-button>
+    </div>
+  </ui-modal>
+</ui-card>

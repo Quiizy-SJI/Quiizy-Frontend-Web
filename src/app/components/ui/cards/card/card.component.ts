@@ -91,8 +91,9 @@ export class CardComponent {
   @Input() imagePosition: 'top' | 'left' | 'right' | 'background' = 'top';
   @Input() imageCover = false;
   @Input() imageOverlay = false;
-  @Input() showHeader = false;
-  @Input() showFooter = false;
+  // Accept boolean or string to support HTML boolean attributes in templates
+  @Input() showHeader: boolean | string = false;
+  @Input() showFooter: boolean | string = false;
   @Input() hoverable = false;
   @Input() clickable = false;
   @Input() expandable = false;
