@@ -381,8 +381,18 @@
 .chart-container {
   height: 180px;
   display: flex;
+  align-items: stretch;
   justify-content: center;
   margin-bottom: 1rem;
+
+  /* Ensure ui-chart fills the container and can flex correctly inside grids/flex parents */
+  ui-chart {
+    flex: 1 1 auto;
+    min-width: 0; /* allow the chart to shrink/grow within flex/grid */
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
 }
 
 .difficulty-legend {

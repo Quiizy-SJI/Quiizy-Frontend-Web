@@ -1,7 +1,8 @@
 .chart-host {
   position: relative;
+  /* Fill the parent - parent must provide explicit height */
   width: 100%;
-  height: stretch; /* sensible default height */
+  height: 100%;
   // Prevent layout shifts during chart initialization
   contain: layout style;
   // Fade in when ready to prevent initial render flicker
@@ -16,6 +17,9 @@
 .chart-host > canvas {
   position: absolute;
   inset: 0;
+  box-sizing: border-box;
+  width: 100% !important;
+  height: 100% !important;
   // Prevent canvas from causing repaints
   will-change: contents;
   // Ensure crisp rendering
