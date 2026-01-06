@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
+import { MatIconModule } from '@angular/material/icon';
 import { firstValueFrom } from 'rxjs';
 
 import {
@@ -28,6 +29,7 @@ type ModalMode = 'create' | 'edit' | 'assign';
   imports: [
     CommonModule,
     FormsModule,
+    MatIconModule,
     CardComponent,
     TableComponent,
     ButtonComponent,

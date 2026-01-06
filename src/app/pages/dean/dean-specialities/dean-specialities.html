@@ -37,9 +37,18 @@
 						@case ('updatedAt') { {{ row.updatedAt }} }
 						@case ('actions') {
 							<div class="row-actions">
-								<ui-button size="sm" variant="ghost" color="neutral" (clicked)="openEdit(row)">Edit</ui-button>
-								<ui-button size="sm" variant="ghost" color="primary" (clicked)="openAssign(row)" style="margin-left:8px">Assign Head</ui-button>
-								<ui-button size="sm" variant="ghost" color="danger" (clicked)="delete(row)" style="margin-left:8px">Delete</ui-button>
+								<ui-button size="sm" variant="soft" color="neutral" [iconLeft]="true" (clicked)="openEdit(row)">
+									<mat-icon slot="icon-left">edit</mat-icon>
+									Edit
+								</ui-button>
+								<ui-button size="sm" variant="soft" color="primary" [iconLeft]="true" (clicked)="openAssign(row)">
+									<mat-icon slot="icon-left">person_add</mat-icon>
+									Assign Head
+								</ui-button>
+								<ui-button size="sm" variant="soft" color="danger" [iconLeft]="true" (clicked)="delete(row)">
+									<mat-icon slot="icon-left">delete</mat-icon>
+									Delete
+								</ui-button>
 							</div>
 						}
 						@default { {{ row[column.key] }} }
