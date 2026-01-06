@@ -4,10 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
 import {
-  CardComponent,
+  
   InputComponent,
   SelectComponent,
-  CheckboxComponent,
+  
   ButtonComponent,
   AlertComponent,
   ThemeToggleComponent,
@@ -24,10 +24,10 @@ import { firstValueFrom } from 'rxjs';
     CommonModule,
     FormsModule,
     MatIconModule,
-    CardComponent,
+    
     InputComponent,
     SelectComponent,
-    CheckboxComponent,
+    
     ButtonComponent,
     AlertComponent,
     ThemeToggleComponent

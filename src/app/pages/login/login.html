@@ -11,6 +11,7 @@
         <div class="login-page__logo-circle">
           <span class="login-page__logo-text">Q</span>
         </div>
+        <img src="assets/images/logos/iusj-logo.png" alt="IUSJ logo" class="login-page__school-logo" />
         <span class="login-page__brand-text">QUIZZY</span>
       </div>
 
@@ -72,8 +73,8 @@
       <!-- Login Form -->
       <form class="login-page__form" (ngSubmit)="onSubmit()" #loginForm="ngForm">
         <!-- Error Alert -->
-        @if (errorMessage) {
         <ui-alert
+          *ngIf="errorMessage"
           variant="soft"
           color="danger"
           [title]="'Authentication Failed'"
@@ -82,7 +83,6 @@
         >
           {{ errorMessage }}
         </ui-alert>
-        }
 
         <!-- Role Selection -->
         <div class="login-page__field">
@@ -101,12 +101,12 @@
           </ui-select>
         </div>
 
-        <!-- Email Address -->
+        <!-- Identifier (email or matricule) -->
         <div class="login-page__field">
-          <label class="login-page__label">Email Address</label>
+          <label class="login-page__label">{{ identifierLabel }}</label>
           <ui-input
-            placeholder="Enter your email"
-            type="email"
+            [placeholder]="identifierPlaceholder"
+            [type]="loginRequest.role === 'STUDENT' ? 'text' : 'email'"
             [(ngModel)]="loginRequest.identifier"
             name="identifier"
             [required]="true"
@@ -161,7 +161,7 @@
         <!-- Sign Up Link -->
         <div class="login-page__signup">
           <p class="login-page__signup-text">
-            Don't have an account? <a href="#" class="login-page__signup-link">Sign Up</a>
+            Don't have an account? <a href="#" class="login-page__signup-link">Contact Administrator</a>
           </p>
         </div>
       </form>

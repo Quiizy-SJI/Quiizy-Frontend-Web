@@ -3,34 +3,13 @@
 // ============================================
 // Perfect Harvest-style design with proper white/dark theme
 
-// ==========================================
-// SCSS VARIABLES FOR CONSISTENCY
-// ==========================================
-$primary-blue: #3b82f6;
-$primary-blue-dark: #2563eb;
-$secondary-blue: #5b5ff5;
-$light-blue: #60a5fa;
-$lighter-blue: #93c5fd;
-
-$white: #ffffff;
-$gray-50: #f9fafb;
-$gray-100: #f3f4f6;
-$gray-400: #9ca3af;
-$gray-500: #6b7280;
-$gray-700: #374151;
-$gray-800: #1f2937;
-$gray-900: #111827;
-
-$dark-bg: #0f172a;
-$dark-bg-light: #1e293b;
-$dark-text: #e2e8f0;
-$dark-text-muted: #94a3b8;
-
+// Use global CSS custom properties from `src/styles.scss` for colors and surfaces
+// Local layout and timing variables (kept for component scope)
 $border-radius: 20px;
 $border-radius-sm: 15px;
-$shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-$shadow-md: 0 8px 32px rgba(0, 0, 0, 0.1);
-$shadow-dark: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+$shadow-lg: var(--elevation-5);
+$shadow-md: var(--elevation-2);
+$shadow-dark: 0 25px 50px -12px rgba( 0, 0, 0, 0.5);
 
 $transition: all 0.2s ease;
 $transition-slow: opacity 1.5s ease-in-out;
@@ -45,12 +24,7 @@ $transition-slow: opacity 1.5s ease-in-out;
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  background: $white;
-
-  // DARK MODE: Whole page background
-  [data-theme='dark'] & {
-    background: $dark-bg;
-  }
+  background: var(--surface-base);
 
   @media (max-width: 768px) {
     padding: 1rem;
@@ -81,12 +55,8 @@ $transition-slow: opacity 1.5s ease-in-out;
       left: 0;
       right: 0;
       bottom: 0;
-      background: linear-gradient(135deg, rgba($secondary-blue, 0.15) 0%, rgba($primary-blue, 0.1) 100%);
-    }
-
-    // Dark mode overlay
-    [data-theme='dark'] &::after {
-      background: linear-gradient(135deg, rgba($dark-bg, 0.8) 0%, rgba($dark-bg-light, 0.7) 100%);
+      background: var(--gradient-primary);
+      opacity: 0.12;
     }
   }
 
@@ -120,13 +90,10 @@ $transition-slow: opacity 1.5s ease-in-out;
   &__image-card {
     flex: 1;
     position: relative;
-    background: $white;
+    background: var(--surface-base);
     min-height: 600px;
 
-    // Dark mode background
-    [data-theme='dark'] & {
-      background: $dark-bg-light;
-    }
+    // component surface uses CSS vars; dark mode handled globally
 
     @media (max-width: 768px) {
       min-height: 350px;
@@ -142,47 +109,56 @@ $transition-slow: opacity 1.5s ease-in-out;
     display: flex;
     align-items: center;
     gap: 1rem;
-    background: rgba($white, 0.95);
+    background: var(--glass-bg);
     padding: 1rem 1.5rem;
     border-radius: $border-radius-sm;
     backdrop-filter: blur(10px);
-    box-shadow: $shadow-md;
+    box-shadow: var(--elevation-2);
 
-    // Dark mode logo background
+    // Dark mode logo background uses theme glass variable
     [data-theme='dark'] & {
-      background: rgba($dark-bg-light, 0.95);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      background: var(--glass-bg);
+      box-shadow: var(--elevation-3);
     }
   }
 
   &__logo-circle {
     width: 48px;
     height: 48px;
-    background: linear-gradient(135deg, $secondary-blue 0%, $primary-blue 100%);
+    background: linear-gradient(135deg, var(--color-secondary-500) 0%, var(--color-primary-500) 100%);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    box-shadow: 0 4px 20px rgba($secondary-blue, 0.3);
+    box-shadow: var(--shadow-primary);
+  }
+
+  // School logo image inside brand area
+  &__school-logo {
+    height: 40px;
+    width: auto;
+    display: block;
+    object-fit: contain;
+    margin-right: 0.25rem;
   }
 
   &__logo-text {
     font-size: 1.5rem;
     font-weight: 800;
-    color: $white;
+    color: var(--text-inverse);
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }
 
   &__brand-text {
     font-size: 1.25rem;
     font-weight: 800;
-    color: $gray-800;
+    color: var(--text-primary);
     letter-spacing: 0.1em;
 
     // Dark mode logo text
     [data-theme='dark'] & {
-      color: $dark-text;
+      color: var(--text-inverse);
     }
   }
 
@@ -214,7 +190,7 @@ $transition-slow: opacity 1.5s ease-in-out;
       object-fit: cover;
     }
 
-    // Light mode overlay - reduced opacity at top
+    // Light mode overlay - use theme gradient with reduced opacity
     &::after {
       content: '';
       position: absolute;
@@ -222,24 +198,14 @@ $transition-slow: opacity 1.5s ease-in-out;
       left: 0;
       right: 0;
       bottom: 0;
-      background: linear-gradient(
-        to bottom,
-        rgba($secondary-blue, 0.3) 0%,
-        rgba($secondary-blue, 0.5) 40%,
-        rgba($secondary-blue, 0.8) 60%,
-        rgba($primary-blue, 0.6) 100%
-      );
+      background: var(--gradient-primary);
+      opacity: 0.16;
     }
 
-    // Dark mode overlay
+    // Dark mode overlay - use surface overlay token
     [data-theme='dark'] &::after {
-      background: linear-gradient(
-        to bottom,
-        rgba($dark-bg, 0.4) 0%,
-        rgba($dark-bg, 0.6) 40%,
-        rgba($dark-bg-light, 0.8) 60%,
-        rgba($dark-bg-light, 0.7) 100%
-      );
+      background: var(--surface-overlay);
+      opacity: 0.7;
     }
   }
 
@@ -251,7 +217,7 @@ $transition-slow: opacity 1.5s ease-in-out;
     right: 0;
     transform: translateY(-50%);
     padding: 3rem 2rem;
-    color: $white;
+    color: var(--text-inverse);
     z-index: 2;
     display: flex;
     align-items: center;
@@ -289,7 +255,7 @@ $transition-slow: opacity 1.5s ease-in-out;
     line-height: 1.1;
     text-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
     text-align: center;
-    color: $white;
+    color: var(--text-inverse);
 
     @media (max-width: 1024px) {
       font-size: 2.25rem;
@@ -305,17 +271,14 @@ $transition-slow: opacity 1.5s ease-in-out;
   // ==========================================
   &__form-card {
     flex: 1;
-    background: $white;
+    background: var(--surface-raised);
     padding: 3rem;
     position: relative;
     display: flex;
     flex-direction: column;
     justify-content: center;
 
-    // Dark mode form background
-    [data-theme='dark'] & {
-      background: $dark-bg-light;
-    }
+    // form surface uses CSS variables from global theme
 
     @media (max-width: 768px) {
       padding: 2rem 1.5rem;
@@ -339,14 +302,14 @@ $transition-slow: opacity 1.5s ease-in-out;
     font-size: 2rem;
     font-weight: 800;
     margin: 0 0 0.75rem 0;
-    background: linear-gradient(135deg, $primary-blue 0%, $secondary-blue 100%);
+    background: var(--gradient-primary);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
 
-    // Dark mode title
+    // Dark mode title uses theme variables
     [data-theme='dark'] & {
-      background: linear-gradient(135deg, $light-blue 0%, #818cf8 100%);
+      background: var(--gradient-primary);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -355,12 +318,12 @@ $transition-slow: opacity 1.5s ease-in-out;
 
   &__form-subtitle {
     font-size: 0.95rem;
-    color: $gray-500;
+    color: var(--text-muted);
     margin: 0;
 
     // Dark mode subtitle
     [data-theme='dark'] & {
-      color: $dark-text-muted;
+      color: var(--text-muted);
     }
   }
 
@@ -379,12 +342,12 @@ $transition-slow: opacity 1.5s ease-in-out;
     display: block;
     font-size: 0.9rem;
     font-weight: 600;
-    color: $gray-700;
+    color: var(--text-secondary);
     margin-bottom: 0.6rem;
 
     // Dark mode labels
     [data-theme='dark'] & {
-      color: $dark-text;
+      color: var(--text-inverse);
     }
   }
 
@@ -395,22 +358,22 @@ $transition-slow: opacity 1.5s ease-in-out;
 
   &__forgot-link {
     font-size: 0.875rem;
-    color: $primary-blue;
+    color: var(--color-primary-500);
     text-decoration: none;
     font-weight: 600;
     transition: $transition;
 
     &:hover {
-      color: $primary-blue-dark;
+      color: var(--color-primary-600);
       text-decoration: underline;
     }
 
     // Dark mode forgot link
     [data-theme='dark'] & {
-      color: $light-blue;
+      color: var(--color-primary-400);
 
       &:hover {
-        color: $lighter-blue;
+        color: var(--color-primary-200);
       }
     }
   }
@@ -426,32 +389,32 @@ $transition-slow: opacity 1.5s ease-in-out;
 
   &__signup-text {
     font-size: 0.875rem;
-    color: $gray-500;
+    color: var(--text-muted);
     margin: 0;
 
     // Dark mode signup text
     [data-theme='dark'] & {
-      color: $dark-text-muted;
+      color: var(--text-muted);
     }
   }
 
   &__signup-link {
-    color: $primary-blue;
+    color: var(--color-primary-500);
     text-decoration: none;
     font-weight: 600;
     transition: $transition;
 
     &:hover {
-      color: $primary-blue-dark;
+      color: var(--color-primary-600);
       text-decoration: underline;
     }
 
     // Dark mode signup link
     [data-theme='dark'] & {
-      color: $light-blue;
+      color: var(--color-primary-400);
 
       &:hover {
-        color: $lighter-blue;
+        color: var(--color-primary-200);
       }
     }
   }
@@ -565,7 +528,7 @@ $transition-slow: opacity 1.5s ease-in-out;
     left: -2px;
     right: -2px;
     bottom: -2px;
-    background: linear-gradient(45deg, #3b82f6, #5b5ff5, #8b5cf6, #3b82f6);
+    background: linear-gradient(45deg, var(--color-primary-500), var(--color-secondary-500), var(--color-secondary-500), var(--color-primary-500));
     border-radius: 22px;
     z-index: -1;
     animation: borderGlow 3s ease-in-out infinite;
