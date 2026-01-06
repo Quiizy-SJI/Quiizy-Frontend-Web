@@ -32,7 +32,7 @@ export class TeacherLayout implements OnInit {
   readonly tabs: TabItem[] = [
     { id: 'dashboard', label: 'Dashboard' },
     { id: 'exam-manager', label: 'Exam Manager' },
-    { id: 'sentiment-review', label: 'Sentiment Review' },
+    { id: 'sentiment-review', label: 'Sentiment Analysis' },
     { id: 'question-bank', label: 'Question Bank' },
     { id: 'mock-tests', label: 'Mock Tests' },
     { id: 'statistics', label: 'Statistics' },
@@ -60,9 +60,9 @@ export class TeacherLayout implements OnInit {
   menuItems = [
     { id: 'dashboard', label: 'Dashboard', route: '/teacher', icon: 'dashboard' },
     { id: 'exam-manager', label: 'Exam Manager', route: '/teacher/exam-manager', icon: 'assignment' },
-    { id: 'sentiment-review', label: 'Sentiment Review', route: '/teacher/sentiment-review', icon: 'sentiment_satisfied' },
+    { id: 'sentiment-review', label: 'Sentiment Analysis', route: '/teacher/sentiment-review', icon: 'psychology' },
     { id: 'question-bank', label: 'Question Bank', route: '/teacher/question-bank', icon: 'quiz' },
-    { id: 'mock-tests', label: 'Mock Tests', route: '/teacher/mock-tests', icon: 'psychology' },
+    { id: 'mock-tests', label: 'Mock Tests', route: '/teacher/mock-tests', icon: 'science' },
     { id: 'statistics', label: 'Statistics', route: '/teacher/statistics', icon: 'analytics' },
     { id: 'create-exam', label: 'Create Exam', route: '/teacher/create-exam', icon: 'add_circle' },
   ];

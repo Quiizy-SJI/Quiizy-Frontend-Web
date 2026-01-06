@@ -37,6 +37,7 @@ export class DeanLayout implements OnInit {
     { id: 'teaching-units', label: 'Teaching Units' },
     { id: 'mini-admins', label: 'Speciality Head' },
     { id: 'ai-analytics', label: 'AI Analytics' },
+    { id: 'sentiment-analysis', label: 'Sentiment Analysis' },
   ];
 
   activeTab: TabItem['id'] = 'dashboard';
@@ -66,6 +67,7 @@ export class DeanLayout implements OnInit {
     { id: 'teaching-units', label: 'Teaching Units', route: '/dean/teaching-units', icon: 'menu_book' },
     { id: 'mini-admins', label: 'Speciality Head', route: '/dean/mini-admins', icon: 'groups' },
     { id: 'ai-analytics', label: 'AI Analytics', route: '/dean/ai-analytics', icon: 'insights' },
+    { id: 'sentiment-analysis', label: 'Sentiment Analysis', route: '/dean/sentiment-analysis', icon: 'psychology' },
   ];
 
   get currentTitle(): string {
@@ -100,6 +102,7 @@ export class DeanLayout implements OnInit {
     else if (url.includes('/dean/teaching-units')) this.activeTab = 'teaching-units';
     else if (url.includes('/dean/mini-admins')) this.activeTab = 'mini-admins';
     else if (url.includes('/dean/ai-analytics')) this.activeTab = 'ai-analytics';
+    else if (url.includes('/dean/sentiment-analysis')) this.activeTab = 'sentiment-analysis';
     else this.activeTab = 'dashboard';
   }
 
@@ -128,6 +131,9 @@ export class DeanLayout implements OnInit {
         break;
       case 'ai-analytics':
         void this.router.navigateByUrl('/dean/ai-analytics');
+        break;
+      case 'sentiment-analysis':
+        void this.router.navigateByUrl('/dean/sentiment-analysis');
         break;
     }
   }
