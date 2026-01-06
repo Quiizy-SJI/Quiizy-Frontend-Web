@@ -1,0 +1,72 @@
+/* Light Mode Widget */
+    .widget {
+      background-color: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      transition: all 0.3s ease;
+    }
+    
+    /* Dark Mode Widget */
+    .widget[data-theme="dark"] {
+      background-color: #1a1f2e;
+      border: 1px solid #374151;
+    }
+    
+    .widget-title {
+      color: #111827;
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0 0 20px 0;
+      transition: color 0.3s ease;
+    }
+    
+    .widget[data-theme="dark"] .widget-title {
+      color: white;
+    }
+    
+    .activity-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    
+    .activity-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    
+    .activity-indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-top: 4px;
+      flex-shrink: 0;
+    }
+    
+    .activity-content {
+      flex: 1;
+    }
+    
+    .activity-text {
+      color: #374151;
+      font-size: 14px;
+      line-height: 1.5;
+      transition: color 0.3s ease;
+    }
+    
+    .widget[data-theme="dark"] .activity-text {
+      color: #e5e7eb;
+    }
+    
+    .activity-time {
+      color: #9ca3af;
+      font-size: 12px;
+      margin-top: 4px;
+      transition: color 0.3s ease;
+    }
+    
+    .widget[data-theme="dark"] .activity-time {
+      color: #6b7280;
+    }

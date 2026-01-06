@@ -1,0 +1,26 @@
+  <div class="stats-container" [attr.data-theme]="themeService.getCurrentTheme()">
+      <h3>Exam Statistics</h3>
+      <p class="subtitle">Overview of exam creation and publication</p>
+      
+      <div class="stats-grid">
+        <div class="stat-card published">
+          <div class="stat-value">{{ stats.published }}</div>
+          <div class="stat-label">Published Exams</div>
+        </div>
+        
+        <div class="stat-card draft">
+          <div class="stat-value">{{ stats.draft }}</div>
+          <div class="stat-label">Draft Exams</div>
+        </div>
+        
+        <div class="stat-card scheduled">
+          <div class="stat-value">{{ stats.scheduled }}</div>
+          <div class="stat-label">Scheduled</div>
+        </div>
+      </div>
+      
+      <div class="action-links">
+        <a href="#" class="link">View all exams →</a>
+        <a href="#" class="link">Export report →</a>
+      </div>
+    </div>

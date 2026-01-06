@@ -1,0 +1,15 @@
+ <div class="widget" [attr.data-theme]="themeService.getCurrentTheme()">
+      <h3>Weight Distribution</h3>
+      
+      <div class="distribution-list">
+        <div *ngFor="let item of distribution" class="distribution-item">
+          <div class="bar-container">
+            <div class="bar" 
+                 [style.width.%]="item.percentage"
+                 [style.background-color]="item.color">
+            </div>
+          </div>
+          <span class="label">{{ item.label }}</span>
+        </div>
+      </div>
+    </div>

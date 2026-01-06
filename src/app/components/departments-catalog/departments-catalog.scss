@@ -1,0 +1,128 @@
+.catalog-container {
+      background-color: #ffffff;
+      border-radius: 12px;
+      padding: 24px;
+      transition: background-color 0.3s ease;
+    }
+    
+    .catalog-container[data-theme="dark"] {
+      background-color: #1a1f2e;
+    }
+    
+    .catalog-header {
+      margin-bottom: 20px;
+    }
+    
+    .catalog-header h3 {
+      color: #111827;
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0 0 4px 0;
+      transition: color 0.3s ease;
+    }
+    
+    .catalog-container[data-theme="dark"] .catalog-header h3 {
+      color: white;
+    }
+    
+    .catalog-header p {
+      color: #6b7280;
+      font-size: 13px;
+      margin: 0;
+    }
+    
+    .departments-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    
+    .departments-table th {
+      text-align: left;
+      padding: 12px;
+      color: #6b7280;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      border-bottom: 2px solid #e5e7eb;
+    }
+    
+    .catalog-container[data-theme="dark"] .departments-table th {
+      border-bottom-color: #374151;
+    }
+    
+    .departments-table td {
+      padding: 16px 12px;
+      color: #374151;
+      font-size: 14px;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    
+    .catalog-container[data-theme="dark"] .departments-table td {
+      color: #e5e7eb;
+      border-bottom-color: #2d3748;
+    }
+    
+    .dept-row {
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .dept-row:hover {
+      background-color: #f9fafb;
+    }
+    
+    .catalog-container[data-theme="dark"] .dept-row:hover {
+      background-color: #252b3b;
+    }
+    
+    .dept-name {
+      font-weight: 500;
+      color: #111827;
+    }
+    
+    .catalog-container[data-theme="dark"] .dept-name {
+      color: white;
+    }
+    
+    .students-count {
+      font-weight: 600;
+      color: #6366f1;
+    }
+    
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    
+    .status-balanced {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+    
+    .status-over {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+    
+    .status-under {
+      background-color: #fee2e2;
+      color: #991b1b;
+    }
+    
+    .create-button {
+      background: none;
+      border: none;
+      color: #6366f1;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 8px 0;
+    }
+    
+    .create-button:hover {
+      text-decoration: underline;
+    }

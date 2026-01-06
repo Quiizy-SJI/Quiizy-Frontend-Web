@@ -1,0 +1,60 @@
+ .bulk-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .bulk-label {
+      color: #111827;
+      font-size: 16px;
+      font-weight: 600;
+      transition: color 0.3s ease;
+      display: block;
+    }
+    
+    .bulk-actions[data-theme="dark"] .bulk-label {
+      color: white;
+    }
+    
+    .actions-group {
+      display: flex;
+      gap: 12px;
+    }
+    
+    .action-btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .action-btn.archive {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+    
+    .action-btn.archive:hover {
+      background-color: #a7f3d0;
+    }
+    
+    .action-btn.import {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+    
+    .action-btn.import:hover {
+      background-color: #fde68a;
+    }
+    
+    .action-btn.export {
+      background-color: #ddd6fe;
+      color: #5b21b6;
+    }
+    
+    .action-btn.export:hover {
+      background-color: #c4b5fd;
+    }

@@ -1,0 +1,81 @@
+.sidebar {
+      width: 218px;
+      background-color: #ffffff;
+      position: fixed;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 24px 0;
+      border-right: 1px solid #e5e7eb;
+      transition: background-color 0.3s ease;
+    }
+    
+    /* Dark Mode Sidebar */
+    .sidebar[data-theme="dark"] {
+      background-color: #0f1729;
+      border-right: 1px solid #1f2937;
+    }
+    
+    .brand {
+      padding: 0 24px 32px;
+    }
+    
+    .brand h1 {
+      color: #111827;
+      font-size: 20px;
+      font-weight: 600;
+      margin: 0;
+      transition: color 0.3s ease;
+    }
+    
+    .sidebar[data-theme="dark"] .brand h1 {
+      color: white;
+    }
+    
+    .nav-main {
+      flex: 1;
+    }
+    
+    .nav-section-title {
+      color: #9ca3af;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 0 24px 12px;
+      letter-spacing: 0.5px;
+    }
+    
+    .nav-item {
+      display: block;
+      color: #6b7280;
+      padding: 12px 24px;
+      text-decoration: none;
+      font-size: 14px;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    
+    .nav-item:hover {
+      background-color: #f3f4f6;
+      color: #111827;
+    }
+    
+    .sidebar[data-theme="dark"] .nav-item {
+      color: #9ca3af;
+    }
+    
+    .sidebar[data-theme="dark"] .nav-item:hover {
+      background-color: #1a2236;
+      color: white;
+    }
+    
+    .nav-item.active {
+      background-color: #f3f4f6;
+      color: #6366f1;
+      border-left: 3px solid #6366f1;
+      font-weight: 500;
+    }
+    
+    .sidebar[data-theme="dark"] .nav-item.active {
+      background-color: #1e293b;
+      color: white;
+    }

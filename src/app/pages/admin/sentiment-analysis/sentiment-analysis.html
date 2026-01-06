@@ -1,0 +1,65 @@
+ <div class="page-container" [attr.data-theme]="themeService.getCurrentTheme()">
+      <app-sidebar role="admin" [menuItem]="'AI Analysis'"></app-sidebar>
+      
+      <!-- Main Content Area -->
+      <div class="main-content">
+        <!-- Page Header -->
+        <app-header title="AI Sentiment Analysis"></app-header>
+         <!-- Filters Bar -->
+      <app-filters></app-filters>
+      
+      <!-- Stats Cards Row -->
+       <div class="stats-grid" [attr.data-theme]="themeService.getCurrentTheme()">
+      <!-- Total Essays Card -->
+      <div class="stat-card">
+        <div class="stat-label">Total Essays</div>
+        <div class="stat-value">{{ totalEssays.toLocaleString() }}</div>
+        <div class="stat-meta">+284 this month</div>
+      </div>
+      
+      <!-- Positive Sentiment Card -->
+      <div class="stat-card positive">
+        <div class="stat-label">Positive Sentiment</div>
+        <div class="stat-value">{{ positiveSentiment }}%</div>
+        <div class="stat-meta">2,050 responses</div>
+      </div>
+      
+      <!-- Critical Alerts Card -->
+      <div class="stat-card critical">
+        <div class="stat-label">Critical Alerts</div>
+        <div class="stat-value">{{ criticalAlerts }}</div>
+        <div class="stat-meta">Require immediate follow-up</div>
+      </div>
+    </div>
+      
+      <!-- Charts Row -->
+      <div class="charts-row">
+        <div class="widget" [attr.data-theme]="themeService.getCurrentTheme()">
+      <div class="widget-header">
+        <h3>Sentiment Trends</h3>
+        <p class="subtitle">Positive/Neutral/Negative over last 90 days</p>
+      </div>
+      
+      <div class="chart-placeholder">
+        <div class="chart-lines">
+          <div class="trend-line positive"></div>
+          <div class="trend-line neutral"></div>
+          <div class="trend-line negative"></div>
+        </div>
+        <p class="chart-label">[Line chart placeholder]</p>
+        <div class="legend">
+          <span class="legend-item"><span class="dot positive"></span> Positive</span>
+          <span class="legend-item"><span class="dot neutral"></span> Neutral</span>
+          <span class="legend-item"><span class="dot negative"></span> Negative</span>
+        </div>
+      </div>
+    </div>
+        <!-- <app-sentiment-trends></app-sentiment-trends> -->
+        <app-keywords [keywords]="topKeywords"></app-keywords>
+      </div>
+      
+      <!-- Critical Alerts Table -->
+      <app-critical-alerts-table [alerts]="sentimentAlerts"></app-critical-alerts-table>
+   
+      </div>
+      </div>

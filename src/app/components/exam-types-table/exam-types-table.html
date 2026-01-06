@@ -1,0 +1,45 @@
+<div class="table-container" [attr.data-theme]="themeService.getCurrentTheme()">
+      <div class="table-header">
+        <div>
+          <h3>Exam Types</h3>
+          <p class="subtitle">Define grading rules and visibility</p>
+        </div>
+      </div>
+      
+      <table class="exam-types-table">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Weight</th>
+            <th>Anonymous</th>
+            <th>Auto Publish</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let type of examTypes">
+            <td class="type-name">{{ type.type }}</td>
+            <td class="weight">{{ type.weight }}</td>
+            <td>
+              <span class="toggle-badge" [class.on]="type.anonymous">
+                {{ type.anonymous ? 'On' : 'Off' }}
+              </span>
+            </td>
+            <td>
+              <span class="toggle-badge" [class.on]="type.autoPublish">
+                {{ type.autoPublish ? 'Yes' : 'No' }}
+              </span>
+            </td>
+            <td>
+              <span class="status-badge" [ngClass]="getStatusClass(type.status)">
+                {{ type.status }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <button class="add-custom-btn" (click)="addType.emit()">
+        + Add custom type
+      </button>
+    </div>

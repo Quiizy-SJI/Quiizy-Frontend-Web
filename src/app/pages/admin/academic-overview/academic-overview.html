@@ -1,0 +1,87 @@
+ <div class="page-container" [attr.data-theme]="themeService.getCurrentTheme()">
+      <!-- Stats Cards Row -->
+      <!-- <app-stats-cards
+        [studentsCount]="studentsCount"
+        [teachersCount]="teachersCount"
+        [questionOwnerCoverage]="questionOwnerCoverage">
+      </app-stats-cards> -->
+
+    <app-sidebar role="admin" [menuItem]="'Academic Structure'"></app-sidebar>
+
+    <div class="main-content">
+
+        <app-header title="Academic Structure"></app-header>
+
+        <app-filters
+          (filtersChange)="onFiltersChange($event)">
+        </app-filters>
+
+        <div class="stats-container" [attr.data-theme]="themeService.getCurrentTheme()">
+      <!-- Students Count Card -->
+      <div class="stat-card">
+        <div class="stat-icon students">👥</div>
+        <div class="stat-content">
+          <div class="stat-label">Number of Students</div>
+          <div class="stat-value">{{ studentsCount }}</div>
+          <div class="stat-meta">Enrolled this year</div>
+        </div>
+      </div>
+
+      <!-- Teachers Count Card -->
+      <div class="stat-card">
+        <div class="stat-icon teachers">👨‍🏫</div>
+        <div class="stat-content">
+          <div class="stat-label">Number of Teachers</div>
+          <div class="stat-value">{{ teachersCount }}</div>
+          <div class="stat-meta">Active coordinators</div>
+        </div>
+      </div>
+
+      <!-- Question Owner Coverage Card -->
+      <div class="stat-card highlight">
+        <div class="stat-content">
+          <div class="stat-label">Question Owner Coverage</div>
+          <div class="stat-value-large">{{ questionOwnerCoverage }}%</div>
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width.%]="questionOwnerCoverage"></div>
+          </div>
+          <div class="stat-warning">3 courses missing coordinators</div>
+        </div>
+      </div>
+        </div>
+      
+      <!-- Main Content Grid -->
+      <div class="content-grid">
+        <!-- Left Column -->
+        <div class="left-column">
+            <div class="widget" [attr.data-theme]="themeService.getCurrentTheme()">
+            <h3>Semesters</h3>
+        
+            <div class="semesters-list">
+                <div *ngFor="let semester of semesters" class="semester-item">
+                <div class="semester-indicator" [style.background-color]="semester.color"></div>
+                <div class="semester-content">
+                    <div class="semester-header">
+                    <span class="semester-name">{{ semester.name }}</span>
+                    <span class="semester-status" [ngClass]="getStatusClass(semester.status)">
+                        {{ semester.status }}
+                    </span>
+                    </div>
+                    <div class="semester-dates">{{ semester.dateRange }}</div>
+                </div>
+                </div>
+            </div>
+        </div>
+        <app-question-bank [banks]="questionBanks"></app-question-bank>
+        </div>
+        
+        <!-- Right Column -->
+        <div class="right-column">
+          <app-activity-alerts [alerts]="activityAlerts"></app-activity-alerts>
+        </div>
+      </div>
+    </div>
+
+
+      
+    </div>

@@ -1,0 +1,88 @@
+ .widget {
+      background-color: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      transition: all 0.3s ease;
+    }
+    
+    .widget[data-theme="dark"] {
+      background-color: #1a1f2e;
+      border-color: #374151;
+    }
+    
+    .widget-header {
+      margin-bottom: 20px;
+    }
+    
+    .widget h3 {
+      color: #111827;
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0 0 4px 0;
+    }
+    
+    .widget[data-theme="dark"] h3 {
+      color: white;
+    }
+    
+    .subtitle {
+      color: #6b7280;
+      font-size: 13px;
+      margin: 0;
+    }
+    
+    .keywords-container {
+      height: 280px;
+      background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
+      border: 2px dashed #e5e7eb;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+    }
+    
+    .widget[data-theme="dark"] .keywords-container {
+      background: linear-gradient(135deg, #252b3b 0%, #1a1f2e 100%);
+      border-color: #374151;
+    }
+    
+    .word-cloud {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: flex-start;
+      width: 100%;
+      padding: 0 40px;
+    }
+    
+    .keyword-item {
+      color: #6366f1;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+    
+    .keyword-item:hover {
+      color: #4f46e5;
+      transform: scale(1.05);
+    }
+    
+    .keyword-count {
+      color: #6b7280;
+      font-size: 12px;
+      font-weight: 400;
+    }
+    
+    .chart-label {
+      color: #6b7280;
+      font-size: 14px;
+      font-style: italic;
+      margin: 20px 0 0 0;
+    }

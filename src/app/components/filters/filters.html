@@ -1,0 +1,14 @@
+<div class="filters-container" [attr.data-theme]="themeService.getCurrentTheme()">
+     
+      <ui-select label="" placeholder="Select academic year" (valueChange)="onFilterChange()" variant='outlined'></ui-select>
+      <ng-content></ng-content>
+      <!-- @if (selectDept) {
+        <ui-select label="Department" placeholder="Choose department" (valueChange)="onFilterChange()"></ui-select>
+      } -->
+      <!-- @if (selectStatus) {
+        <ui-select  label="Status"></ui-select>
+      }
+      @if (selectSubject) {
+        <ui-input placeholder="Search subject name/code"></ui-input>
+      } -->
+    </div>

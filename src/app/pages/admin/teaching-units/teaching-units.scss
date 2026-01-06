@@ -1,0 +1,16 @@
+.page-container {
+      display: flex;
+      min-height: 100vh;
+      background-color: #f3f4f6;
+      transition: background-color 0.3s ease;
+    }
+    
+    .page-container[data-theme="dark"] {
+      background-color: #0a0e1a;
+    }
+    
+    .main-content {
+      flex: 1;
+      padding: 24px;
+      margin-left: 250px;
+    }

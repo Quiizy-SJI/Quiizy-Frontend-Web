@@ -1,0 +1,17 @@
+ <div class="bulk-actions" [attr.data-theme]="themeService.getCurrentTheme()">
+      <!-- <div class="bulk-label">Bulk Actions</div> -->
+      
+      <div class="actions-group">
+        <button class="action-btn archive" (click)="onArchive()">
+          Archive Selected
+        </button>
+        
+        <button class="action-btn import" (click)="onImport()">
+          Import Excel
+        </button>
+        
+        <button class="action-btn export" (click)="onExport()">
+          Export Excel
+        </button>
+      </div>
+    </div>

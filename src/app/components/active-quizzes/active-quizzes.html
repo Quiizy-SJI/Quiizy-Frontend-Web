@@ -1,0 +1,19 @@
+ <div class="quizzes-container" [attr.data-theme]="themeService.getCurrentTheme()">
+      <h3>Active Quizzes</h3>
+      <p class="subtitle">Currently running assessments</p>
+      
+      <div class="quizzes-list">
+        <div *ngFor="let quiz of quizzes" class="quiz-card">
+          <div class="quiz-header">
+            <h4>{{ quiz.name }}</h4>
+            <span class="time-badge">{{ quiz.timeRemaining }}</span>
+          </div>
+          <div class="quiz-info">
+            <span class="dept-tag">{{ quiz.department }}</span>
+            <span class="participants">👥 {{ quiz.participants }} participants</span>
+          </div>
+        </div>
+      </div>
+      
+      <button class="view-all-btn">View all active quizzes</button>
+    </div>

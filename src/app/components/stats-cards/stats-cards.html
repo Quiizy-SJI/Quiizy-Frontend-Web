@@ -1,0 +1,16 @@
+<div class="stats-grid">
+  <ui-stat-card 
+  *ngFor="let stat of stats" 
+  class="stat-card"
+  [label]="stat.label"
+  [value]="stat.value"
+  [description]="stat.description!"
+  [color]="stat.color"
+  [trendSuffix]="stat.trendSuffix!"
+  [showProgress]="stat.showProgress!"
+  [progress]="stat.progress"
+  [showTrend]="true"
+  [trendValue]="stat.trendValue"
+  >
+
+  </ui-stat-card>

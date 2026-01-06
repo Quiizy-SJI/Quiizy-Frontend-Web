@@ -1,0 +1,41 @@
+ <div class="page-container" [attr.data-theme]="themeService.getCurrentTheme()">
+      <!-- Sidebar Navigation -->
+      <app-sidebar role="admin" [menuItem]="'Exam Types & Mini-admins'"></app-sidebar>
+      
+      <!-- Main Content Area -->
+      <div class="main-content">
+        <!-- Page Header -->
+        <app-header title="Exam types and Specialty heads"></app-header>
+        
+        <!-- Two Column Layout -->
+        <div class="content-grid">
+          <!-- Left Column: Exam Types & Mini-Admins -->
+          <div class="left-column">
+            <app-exam-types-table
+              [examTypes]="examTypes"
+              (addType)="onAddType()"
+              (editType)="onEditType($event)">
+            </app-exam-types-table>
+            
+            <app-mini-admins-table
+              [miniAdmins]="miniAdmins"
+              (manageAdmin)="onManageAdmin($event)"
+              (remindAdmin)="onRemindAdmin($event)"
+              (inviteAdmin)="onInviteAdmin()">
+            </app-mini-admins-table>
+          </div>
+          
+          <!-- Right Column: Weight Distribution & Rules -->
+          <div class="right-column">
+            <app-weight-distribution
+              [distribution]="weightDistribution">
+            </app-weight-distribution>
+            
+            <!-- <app-global-rules
+              [rules]="globalRules"
+              (toggleRule)="onToggleRule($event)">
+            </app-global-rules> -->
+          </div>
+        </div>
+      </div>
+    </div>

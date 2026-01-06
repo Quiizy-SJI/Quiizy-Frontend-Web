@@ -1,0 +1,36 @@
+ <div class="widget" [attr.data-theme]="themeService.getCurrentTheme()">
+      <div class="widget-header">
+        <h3>Critical Sentiment Alerts</h3>
+        <p class="subtitle">Essays flagged for immediate counselor review</p>
+      </div>
+      
+      <table class="alerts-table">
+        <thead>
+          <tr>
+            <th>Student</th>
+            <th>Department</th>
+            <th>Exam</th>
+            <th>Mood</th>
+            <th>Flagged</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let alert of alerts" 
+              [ngClass]="'alert-' + alert.severity">
+            <td class="student-name">{{ alert.student }}</td>
+            <td>{{ alert.department }}</td>
+            <td>{{ alert.exam }}</td>
+            <td class="mood-cell">
+              <span class="mood-badge" [ngClass]="'mood-' + alert.severity">
+                {{ alert.mood }} • {{ alert.moodPercentage }}%
+              </span>
+            </td>
+            <td class="flagged-time">{{ alert.flagged }}</td>
+            <td>
+              <button class="review-button">Review</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>

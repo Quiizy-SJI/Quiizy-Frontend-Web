@@ -1,0 +1,60 @@
+<div class="table-container" [attr.data-theme]="themeService.getCurrentTheme()">
+      <div class="table-header">
+        <div>
+          <h3>Mini-Admins (Specialty Heads)</h3>
+          <p class="subtitle">Assign departmental oversight, track activation</p>
+        </div>
+      </div>
+      
+      <table class="mini-admins-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Department</th>
+            <th>Classes</th>
+            <th>Students</th>
+            <th>Status</th>
+            <th>Actions</th>
+            <th>Access</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let admin of miniAdmins">
+            <td class="admin-name">{{ admin.name }}</td>
+            <td [class.unassigned]="admin.department === 'Unassigned'">
+              {{ admin.department }}
+            </td>
+            <td>{{ admin.classes || '—' }}</td>
+            <td>{{ admin.students || '—' }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="getStatusClass(admin.status)">
+                {{ admin.status }}
+              </span>
+            </td>
+            <td class="actions">
+              <button *ngIf="admin.status === 'ACTIVE'" 
+                      class="action-btn manage"
+                      (click)="manageAdmin.emit(admin)">
+                Manage
+              </button>
+              <button *ngIf="admin.status === 'PENDING'" 
+                      class="action-btn remind"
+                      (click)="remindAdmin.emit(admin)">
+                Remind
+              </button>
+              <button *ngIf="admin.status === 'INVITE'" 
+                      class="action-btn invite"
+                      (click)="inviteAdmin.emit()">
+                Send Invite
+              </button>
+            </td>
+            <td class="access-info">
+              <div *ngIf="admin.access" class="access-details">
+                <div class="access-dept">{{ admin.access.department }}</div>
+                <div class="access-text">{{ admin.access.info }}</div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>

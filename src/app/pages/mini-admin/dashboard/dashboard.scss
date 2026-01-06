@@ -1,0 +1,79 @@
+ .dashboard-container {
+      display: flex;
+      min-height: 100vh;
+      background-color: #f3f4f6;
+      transition: background-color 0.3s ease;
+    }
+    
+    /* Dark Mode */
+    .dashboard-container[data-theme="dark"] {
+      background-color: #0a0e1a;
+    }
+    
+    .main-content {
+      flex: 1;
+      padding: 24px;
+      margin-left: 218px;
+    }
+    
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 24px;
+      
+    }
+    
+    .bottom-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 24px;
+    }
+
+ .table-container {
+      background-color: #ffffff;
+      border-radius: 12px;
+      padding: 24px;
+      transition: background-color 0.3s ease;
+    }
+    
+    .table-container[data-theme="dark"] {
+      background-color: #1a1f2e;
+    }
+    
+    .table-header {
+      margin-bottom: 20px;
+    }
+    
+    .table-header h3 {
+      color: #111827;
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0 0 4px 0;
+    }
+    
+    .table-container[data-theme="dark"] .table-header h3 {
+      color: white;
+    }
+    
+    .table-subtitle {
+      color: #6b7280;
+      font-size: 13px;
+      margin: 0;
+    }
+
+    
+
+    @media (max-width: 1200px) {
+      .bottom-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+     .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+

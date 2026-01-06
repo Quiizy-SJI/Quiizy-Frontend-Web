@@ -1,0 +1,85 @@
+<div class="dashboard-container" [attr.data-theme]="themeService.getCurrentTheme()">
+  <!-- Left Sidebar Navigation -->
+  <app-sidebar role="mini-admin" menuItem="Students">
+    
+  </app-sidebar>
+
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <!-- Top Header -->
+    <app-header buttonText="+ Add student" subtitle="Create, import students and details" [title]="'Student Management'">
+        <app-filters>
+            <ui-select placeholder="Select level" (valueChange)="onFilterChange()"></ui-select>
+        </app-filters>
+    </app-header>
+
+    <app-bulk-actions></app-bulk-actions>
+
+    <!-- Stats Cards Row -->
+    <!-- Two Column Layout for Activity and Exams -->
+    <div class="content-grid" st>
+      <div class="table-container" style="height: 20rem;" [attr.data-theme]="themeService.getCurrentTheme()">
+        <div class="table-header">
+          <h3>Students Directory</h3>
+          <p class="table-subtitle">
+            <span class="note">View student matricule, name, class and other info.</span>
+          </p>
+        </div>
+
+        <ui-table [data]="rowData" (sortChange)="handleSort($event)" [showActions]="true"
+          [columns]="tableColumns"></ui-table>
+      </div>
+
+      <div class="detail-container" [attr.data-theme]="themeService.getCurrentTheme()">
+      <div class="detail-header">
+        <h3>Student Details</h3>
+        <h4 class="dept-title">{{ selectedStudent.className }}</h4>
+      </div>
+      
+      <div *ngIf="selectedStudent" class="detail-content">
+        <div class="info-row">
+          <span class="label">Matricule</span>
+          <span class="value">{{ selectedStudent.matricule }}</span>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">Class</span>
+          <span class="value">{{ selectedStudent.className }} </span>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">Carryover</span>
+          <span class="value">
+          @for (item of carriedOver; track $index) {
+            <span>{{item + ', '}}</span>
+          }
+            
+          </span>
+        </div>
+
+        <div class="info-row">
+          <span class="label">Email</span>
+          <span class="value">{{ selectedStudent.email }}</span>
+        </div>
+      </div>
+    </div>
+
+
+      <!-- <app-upcoming-exams></app-upcoming-exams> -->
+    </div>
+
+    <!-- Three Column Layout for Bottom Widgets -->
+    <div class="bottom-grid">
+        <app-activity-alerts></app-activity-alerts>
+        <div class="table-container">
+            <div class="table-header">
+            <h3>Filter & Export</h3>
+        </div>
+         <ui-button-group>
+            <ui-button variant="soft">Class Filter</ui-button>
+            <ui-button variant="soft" color="neutral">Export students</ui-button>
+         </ui-button-group>   
+        </div>
+    </div>
+  </div>
+</div>

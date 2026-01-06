@@ -1,0 +1,25 @@
+<header class="header" [attr.data-theme]="themeService.getCurrentTheme()">
+  <div>
+    <h2 class="page-title">{{ title }}</h2>
+    <p class="page-subtitle">{{subtitle}}</p>
+  </div>
+
+
+  <div class="header-actions">
+
+
+    @if (buttonText) {
+    <ui-button color="primary" variant="solid">{{buttonText}}</ui-button>
+    }
+    <ng-content></ng-content>
+
+    <div class="user-badge">AD</div>
+
+    <div class="notification-badge">
+      <span class="bell">🔔</span>
+      <span class="count">8</span>
+    </div>
+    <ui-theme-toggle></ui-theme-toggle>
+
+  </div>
+</header>

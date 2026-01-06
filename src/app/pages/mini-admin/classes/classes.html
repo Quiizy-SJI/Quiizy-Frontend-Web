@@ -1,0 +1,68 @@
+<div class="dashboard-container" [attr.data-theme]="themeService.getCurrentTheme()">
+  <!-- Left Sidebar Navigation -->
+  <app-sidebar role="mini-admin" menuItem="Classes">
+    
+  </app-sidebar>
+
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <!-- Top Header -->
+    <app-header buttonText="+ Create Class" subtitle="Create, import classes" [title]="'Class Management'">
+        <app-filters>
+        </app-filters>
+    </app-header>
+
+    <app-bulk-actions></app-bulk-actions>
+
+    <!-- Stats Cards Row -->
+    <!-- Two Column Layout for Activity and Exams -->
+    <div class="content-grid">
+      <div class="table-container" [attr.data-theme]="themeService.getCurrentTheme()">
+        <div class="table-header">
+          <h3>Classes Overview</h3>
+          <p class="table-subtitle">
+            <span class="note">Teacher/class assignments are completed by specialty heads.</span>
+          </p>
+        </div>
+
+        <ui-table [data]="rowData" (sortChange)="handleSort($event)" [showActions]="true"
+          [columns]="tableColumns"></ui-table>
+      </div>
+
+      <div class="detail-container" [attr.data-theme]="themeService.getCurrentTheme()">
+      <div class="detail-header">
+        <h3>Class Detail</h3>
+        <h4 class="dept-title">{{ classDetail.name || 'Select a department' }}</h4>
+      </div>
+      
+      <div *ngIf="classDetail" class="detail-content">
+        <div class="info-row">
+          <span class="label">Students</span>
+          <span class="value">{{ classDetail.studentsEnrolled }}</span>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">Teachers</span>
+          <span class="value">{{ classDetail.teachers }} </span>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">Subjects</span>
+          <span class="value">{{ classDetail.subjects }}</span>
+        </div>
+      </div>
+    </div>
+
+
+      <app-recent-activity></app-recent-activity>
+      <!-- <app-upcoming-exams></app-upcoming-exams> -->
+    </div>
+
+    <!-- Three Column Layout for Bottom Widgets -->
+    <!-- <div class="bottom-grid">
+      <app-quick-actions></app-quick-actions>
+      <app-evaluation-pipeline></app-evaluation-pipeline>
+      <app-recent-exam-publishing></app-recent-exam-publishing>
+    </div> -->
+  </div>
+</div>

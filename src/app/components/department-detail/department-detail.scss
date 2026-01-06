@@ -1,0 +1,152 @@
+ .detail-container {
+      background-color: #ffffff;
+      border-radius: 12px;
+      padding: 24px;
+      transition: background-color 0.3s ease;
+    }
+    
+    .detail-container[data-theme="dark"] {
+      background-color: #1a1f2e;
+    }
+    
+    .detail-header h3 {
+      color: #111827;
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0 0 8px 0;
+      transition: color 0.3s ease;
+    }
+    
+    .detail-container[data-theme="dark"] .detail-header h3 {
+      color: white;
+    }
+    
+    .dept-title {
+      color: #6366f1;
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0 0 20px 0;
+    }
+    
+    .detail-content {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    
+    .detail-container[data-theme="dark"] .info-row {
+      border-bottom-color: #2d3748;
+    }
+    
+    .label {
+      color: #6b7280;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    
+    .value {
+      color: #111827;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    
+    .detail-container[data-theme="dark"] .value {
+      color: #e5e7eb;
+    }
+    
+    .alert-box {
+      background-color: #fee2e2;
+      color: #991b1b;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      margin: 12px 0;
+    }
+    
+    .section-title {
+      color: #111827;
+      font-size: 16px;
+      font-weight: 600;
+      margin: 20px 0 12px 0;
+    }
+    
+    .detail-container[data-theme="dark"] .section-title {
+      color: white;
+    }
+    
+    .roster-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .roster-table th {
+      text-align: left;
+      padding: 8px;
+      color: #6b7280;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .roster-table td {
+      padding: 12px 8px;
+      font-size: 13px;
+      color: #374151;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    
+    .detail-container[data-theme="dark"] .roster-table td {
+      color: #e5e7eb;
+      border-bottom-color: #2d3748;
+    }
+    
+    .teacher-name {
+      font-weight: 500;
+    }
+    
+    .subjects {
+      color: #6b7280;
+      font-size: 12px;
+    }
+    
+    .exam-warning {
+      color: #dc2626;
+      font-weight: 600;
+    }
+    
+    .exam-good {
+      color: #10b981;
+      font-weight: 600;
+    }
+    
+    .status-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    
+    .status-healthy {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+    
+    .status-review {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+    
+    .status-action {
+      background-color: #fee2e2;
+      color: #991b1b;
+    }

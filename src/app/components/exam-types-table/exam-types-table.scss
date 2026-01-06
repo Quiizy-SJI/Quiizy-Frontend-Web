@@ -1,0 +1,135 @@
+.table-container {
+      background-color: #ffffff;
+      border-radius: 12px;
+      padding: 24px;
+      transition: background-color 0.3s ease;
+    }
+    
+    .table-container[data-theme="dark"] {
+      background-color: #1a1f2e;
+    }
+    
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .table-header h3 {
+      color: #111827;
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0 0 4px 0;
+    }
+    
+    .table-container[data-theme="dark"] .table-header h3 {
+      color: white;
+    }
+    
+    .subtitle {
+      color: #6b7280;
+      font-size: 13px;
+      margin: 0;
+    }
+    
+    .exam-types-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 16px;
+    }
+    
+    .exam-types-table th {
+      text-align: left;
+      padding: 12px;
+      color: #6b7280;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      border-bottom: 2px solid #e5e7eb;
+    }
+    
+    .table-container[data-theme="dark"] .exam-types-table th {
+      border-bottom-color: #374151;
+    }
+    
+    .exam-types-table td {
+      padding: 16px 12px;
+      font-size: 14px;
+      color: #374151;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    
+    .table-container[data-theme="dark"] .exam-types-table td {
+      color: #e5e7eb;
+      border-bottom-color: #2d3748;
+    }
+    
+    .exam-types-table tbody tr:hover {
+      background-color: #f9fafb;
+    }
+    
+    .table-container[data-theme="dark"] .exam-types-table tbody tr:hover {
+      background-color: #252b3b;
+    }
+    
+    .type-name {
+      font-weight: 600;
+      color: #111827;
+    }
+    
+    .table-container[data-theme="dark"] .type-name {
+      color: white;
+    }
+    
+    .weight {
+      font-weight: 600;
+      color: #6366f1;
+    }
+    
+    .toggle-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+      background-color: #fee2e2;
+      color: #991b1b;
+    }
+    
+    .toggle-badge.on {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+    
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .status-active {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+    
+    .status-draft {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+    
+    .add-custom-btn {
+      background: none;
+      border: none;
+      color: #6366f1;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 8px 0;
+    }
+    
+    .add-custom-btn:hover {
+      text-decoration: underline;
+    }

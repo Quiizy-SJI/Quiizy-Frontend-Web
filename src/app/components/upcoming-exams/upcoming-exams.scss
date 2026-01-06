@@ -1,0 +1,74 @@
+/* Light Mode Widget */
+    .widget {
+      background-color: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      transition: all 0.3s ease;
+    }
+    
+    /* Dark Mode Widget */
+    .widget[data-theme="dark"] {
+      background-color: #1a1f2e;
+      border: 1px solid #374151;
+    }
+    
+    .widget-title {
+      color: #111827;
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0 0 16px 0;
+      transition: color 0.3s ease;
+    }
+    
+    .widget[data-theme="dark"] .widget-title {
+      color: white;
+    }
+    
+    .calendar-header {
+      color: #6b7280;
+      font-size: 13px;
+      margin-bottom: 16px;
+      transition: color 0.3s ease;
+    }
+    
+    .widget[data-theme="dark"] .calendar-header {
+      color: #9ca3af;
+    }
+    
+    .calendar-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    
+    .weekday {
+      color: #6b7280;
+      font-size: 12px;
+      text-align: center;
+      font-weight: 500;
+    }
+    
+    .exams-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .exam-item {
+      padding: 12px;
+      border-radius: 8px;
+    }
+    
+    .exam-name {
+      color: #1a1f2e;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    
+    .exam-time {
+      color: #374151;
+      font-size: 12px;
+    }

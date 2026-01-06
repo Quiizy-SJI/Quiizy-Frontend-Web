@@ -1,0 +1,15 @@
+ <div class="widget">
+      <h3 class="widget-title">Evaluation Pipeline</h3>
+      
+      <div class="pipeline-list">
+        <div *ngFor="let metric of metrics" class="pipeline-item">
+          <div class="metric-label">{{ metric.label }}</div>
+          <div class="metric-bar-container">
+            <div class="metric-bar" 
+                 [style.width]="metric.percentage"
+                 [style.background-color]="metric.color"></div>
+          </div>
+          <div class="metric-value">{{ metric.value }}</div>
+        </div>
+      </div>
+    </div>

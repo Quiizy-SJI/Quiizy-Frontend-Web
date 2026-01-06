@@ -1,0 +1,35 @@
+ <div class="catalog-container" [attr.data-theme]="themeService.getCurrentTheme()">
+      <div class="catalog-header">
+        <h3>Departments Catalog</h3>
+        <p>Overview of heads, teaching units and capacity</p>
+      </div>
+      
+      <table class="departments-table">
+        <thead>
+          <tr>
+            <th>Department</th>
+            <th>Head</th>
+            <th>Teaching Units</th>
+            <th>Students</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let dept of departments" 
+              (click)="departmentSelect.emit(dept)"
+              class="dept-row">
+            <td class="dept-name">{{ dept.name }}</td>
+            <td>{{ dept.head }}</td>
+            <td>{{ dept.teachingUnits }}</td>
+            <td class="students-count">{{ dept.students }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="getStatusClass(dept.status)">
+                {{ dept.status }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <button class="create-button">+ Create from template</button>
+    </div>

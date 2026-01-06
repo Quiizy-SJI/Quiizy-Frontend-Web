@@ -1,0 +1,103 @@
+.widget {
+      background-color: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      transition: all 0.3s ease;
+    }
+    
+    .widget[data-theme="dark"] {
+      background-color: #1a1f2e;
+      border-color: #374151;
+    }
+    
+    .widget h3 {
+      color: #111827;
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0 0 20px 0;
+    }
+    
+    .widget[data-theme="dark"] h3 {
+      color: white;
+    }
+    
+    .alerts-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    
+    .alert-item {
+      display: flex;
+      gap: 12px;
+      padding: 16px;
+      background-color: #f9fafb;
+      border-radius: 8px;
+      border-left: 3px solid #e5e7eb;
+      transition: all 0.2s;
+    }
+    
+    .widget[data-theme="dark"] .alert-item {
+      background-color: #252b3b;
+      border-left-color: #374151;
+    }
+    
+    .alert-item:hover {
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transform: translateY(-2px);
+    }
+    
+    .alert-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-top: 6px;
+      flex-shrink: 0;
+    }
+    
+    .alert-content {
+      flex: 1;
+    }
+    
+    .alert-title {
+      color: #111827;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    
+    .widget[data-theme="dark"] .alert-title {
+      color: white;
+    }
+    
+    .alert-description {
+      color: #6b7280;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+    
+    .alert-time {
+      color: #9ca3af;
+      font-size: 11px;
+    }
+    
+    .view-all-btn {
+      width: 100%;
+      background-color: transparent;
+      border: 2px dashed #d1d5db;
+      color: #6b7280;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .view-all-btn:hover {
+      border-color: #6366f1;
+      color: #6366f1;
+      background-color: #eef2ff;
+    }

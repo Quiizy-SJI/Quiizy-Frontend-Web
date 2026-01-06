@@ -1,0 +1,16 @@
+<div class="widget" [attr.data-theme]="themeService.getCurrentTheme()">
+      <h3>Activity & Alerts</h3>
+      
+      <div class="alerts-list">
+        <div *ngFor="let alert of alerts" class="alert-item">
+          <div class="alert-indicator" [style.background-color]="alert.color"></div>
+          <div class="alert-content">
+            <div class="alert-title">{{ alert.title }}</div>
+            <div class="alert-description">{{ alert.description }}</div>
+            <div class="alert-time" *ngIf="alert.time">{{ alert.time }}</div>
+          </div>
+        </div>
+      </div>
+      
+      <button class="view-all-btn">View all alerts →</button>
+    </div>

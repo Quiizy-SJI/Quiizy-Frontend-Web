@@ -1,0 +1,37 @@
+ <div class="page-container" [attr.data-theme]="">
+      <!-- Sidebar Navigation -->
+      <app-sidebar role="admin" [menuItem]="'Subjects'"></app-sidebar>
+      
+      <!-- Main Content Area -->
+      <div class="main-content">
+        <!-- Page Header -->
+        <app-header 
+          [title]="'Teaching Units Catalog'"
+          [buttonText]="'+ New Subject'"
+          (buttonClick)="onNewSubject()">
+        </app-header>
+        
+        <!-- Filters Section -->
+        <app-filters
+          (filtersChange)="onFiltersChange($event)">
+        </app-filters>
+        
+        <!-- Bulk Actions Bar -->
+        <app-bulk-actions></app-bulk-actions>
+        
+        <!-- Teaching Units Table -->
+        <app-teaching-units-table
+          [units]="filteredUnits"
+          (editUnit)="onEditUnit($event)"
+          (viewUnit)="onViewUnit($event)">
+        </app-teaching-units-table>
+        
+        <!-- Pagination -->
+        <app-pagination
+          [currentPage]="currentPage"
+          [totalPages]="totalPages"
+          [totalItems]="totalItems"
+          (pageChange)="onPageChange($event)">
+        </app-pagination>
+      </div>
+    </div>

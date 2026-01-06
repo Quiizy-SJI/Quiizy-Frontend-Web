@@ -1,0 +1,49 @@
+ /* Light Mode Widget */
+    .widget {
+      background-color: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      transition: all 0.3s ease;
+    }
+    
+    /* Dark Mode Widget */
+    .widget[data-theme="dark"] {
+      background-color: #1a1f2e;
+      border: 1px solid #374151;
+    }
+    
+    .widget-title {
+      color: #111827;
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0 0 20px 0;
+      transition: color 0.3s ease;
+    }
+    
+    .widget[data-theme="dark"] .widget-title {
+      color: white;
+    }
+    
+    .actions-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .action-button {
+      padding: 14px 16px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: white;
+    }
+    
+    .action-button:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }

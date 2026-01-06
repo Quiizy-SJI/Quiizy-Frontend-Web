@@ -1,0 +1,62 @@
+<div class="dashboard-container" [attr.data-theme]="themeService.getCurrentTheme()">
+  <!-- Left Sidebar Navigation -->
+  <app-sidebar role="mini-admin" [menuItem]="'Dashboard'"></app-sidebar>
+
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <!-- Top Header -->
+    <app-header subtitle="Monitor classes, students and teachers" [title]="'Dashboard Overview'">
+      <app-filters>
+      </app-filters>
+    </app-header>
+
+
+    <!-- Stats Cards Row -->
+    <!-- <app-stats-cards></app-stats-cards> -->
+    <div class="stats-grid">
+      <ui-stat-card icon="class" label="Classes managed" value="12" color="accent"></ui-stat-card>
+      <ui-stat-card label="Students" color="secondary" value="5"></ui-stat-card>
+      <ui-stat-card label="Teachers" value="12"></ui-stat-card>
+      <ui-stat-card label="Upcoming exams" value="12" color="warning"></ui-stat-card>
+    </div>
+
+    <!-- Two Column Layout for Activity and Exams -->
+    <div class="content-grid">
+      <div class="table-container" [attr.data-theme]="themeService.getCurrentTheme()">
+        <div class="table-header">
+          <h3>Classes Overview</h3>
+          <p class="table-subtitle">
+            <span class="note">Teacher/class assignments are completed by specialty heads.</span>
+          </p>
+        </div>
+
+        <ui-table [data]="rowData" (sortChange)="handleSort($event)" [showActions]="true"
+          [columns]="tableColumns"></ui-table>
+      </div>
+
+      <app-upcoming-exams></app-upcoming-exams>
+
+
+      <!-- <div class="table-container" [attr.data-theme]="themeService.getCurrentTheme()">
+        <div class="table-header">
+          <h3>Upcoming Exams</h3>
+          <p class="table-subtitle">
+            <span class="note">Teacher/class assignments are completed by specialty heads.</span>
+          </p>
+        </div>
+        <ui-table [data]="rowData" (sortChange)="handleSort($event)" [showActions]="true"
+          [columns]="tableColumns"></ui-table>
+      </div> -->
+
+      <app-recent-activity></app-recent-activity>
+      <app-critical-alerts-table></app-critical-alerts-table>
+    </div>
+
+    <!-- Three Column Layout for Bottom Widgets -->
+    <!-- <div class="bottom-grid">
+      <app-quick-actions></app-quick-actions>
+      <app-evaluation-pipeline></app-evaluation-pipeline>
+      <app-recent-exam-publishing></app-recent-exam-publishing>
+    </div> -->
+  </div>
+</div>

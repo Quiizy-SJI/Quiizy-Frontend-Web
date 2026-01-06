@@ -1,0 +1,39 @@
+ <div class="page-container" [attr.data-theme]="themeService.getCurrentTheme()">
+      <!-- Sidebar Navigation -->
+      <app-sidebar role="admin" [menuItem]="'Departments'"></app-sidebar>
+      
+      <!-- Main Content Area -->
+      <div class="main-content">
+        <!-- Page Header -->
+        <app-header title="Departments" buttonText="filter"></app-header>
+        
+        <!-- Two Column Layout -->
+        <div class="content-grid">
+          <!-- Left Column: Departments Catalog -->
+          <div class="left-column">
+            <app-departments-catalog
+              [departments]="departments"
+              (departmentSelect)="onDepartmentSelect($event)">
+            </app-departments-catalog>
+            
+            <!-- Exam Statistics Section -->
+            <app-exam-statistics
+              [stats]="examStats">
+            </app-exam-statistics>
+          </div>
+          
+          <!-- Right Column: Department Detail -->
+          <div class="right-column">
+            <app-department-detail
+              [department]="selectedDepartment"
+              [teachers]="teachers">
+            </app-department-detail>
+            
+            <!-- Active Quizzes Section -->
+            <app-active-quizzes
+              [quizzes]="activeQuizzes">
+            </app-active-quizzes>
+          </div>
+        </div>
+      </div>
+    </div>

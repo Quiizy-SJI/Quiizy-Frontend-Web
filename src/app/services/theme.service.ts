@@ -32,4 +32,8 @@ export class ThemeService {
   isDark(): boolean {
     return this.theme() === 'dark';
   }
+
+  getCurrentTheme(): string {
+    return this.theme();
+  }
 }

@@ -1,0 +1,114 @@
+.quizzes-container {
+      background-color: #ffffff;
+      border-radius: 12px;
+      padding: 24px;
+      transition: background-color 0.3s ease;
+    }
+    
+    .quizzes-container[data-theme="dark"] {
+      background-color: #1a1f2e;
+    }
+    
+    .quizzes-container h3 {
+      color: #111827;
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0 0 4px 0;
+    }
+    
+    .quizzes-container[data-theme="dark"] h3 {
+      color: white;
+    }
+    
+    .subtitle {
+      color: #6b7280;
+      font-size: 13px;
+      margin: 0 0 20px 0;
+    }
+    
+    .quizzes-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    
+    .quiz-card {
+      padding: 16px;
+      background-color: #f9fafb;
+      border-radius: 8px;
+      border-left: 3px solid #6366f1;
+      transition: all 0.2s;
+    }
+    
+    .quizzes-container[data-theme="dark"] .quiz-card {
+      background-color: #252b3b;
+    }
+    
+    .quiz-card:hover {
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      transform: translateY(-2px);
+    }
+    
+    .quiz-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    
+    .quiz-header h4 {
+      color: #111827;
+      font-size: 14px;
+      font-weight: 600;
+      margin: 0;
+    }
+    
+    .quizzes-container[data-theme="dark"] .quiz-header h4 {
+      color: white;
+    }
+    
+    .time-badge {
+      background-color: #fef3c7;
+      color: #92400e;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    
+    .quiz-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .dept-tag {
+      color: #6b7280;
+      font-size: 12px;
+    }
+    
+    .participants {
+      color: #6366f1;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .view-all-btn {
+      width: 100%;
+      background-color: transparent;
+      border: 2px dashed #d1d5db;
+      color: #6b7280;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .view-all-btn:hover {
+      border-color: #6366f1;
+      color: #6366f1;
+      background-color: #eef2ff;
+    }

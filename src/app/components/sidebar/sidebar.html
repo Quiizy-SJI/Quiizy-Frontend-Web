@@ -1,0 +1,24 @@
+ <aside class="sidebar" [attr.data-theme]="themeService.getCurrentTheme()">
+      <!-- Logo/Brand -->
+      <div class="brand">
+        <h1>QUIIZY Admin</h1>
+      </div>
+      
+      <!-- Main Navigation -->
+      <nav class="nav-main">
+        <div class="nav-section-title">MAIN</div>
+        <a *ngFor="let item of mainMenuItems" (click)="handleClick(item.link)" 
+          [class.active]="item.label === menuItem"
+           class="nav-item">
+          {{ item.label }}
+        </a>
+      </nav>
+      
+      <!-- Support Section -->
+      <nav class="nav-support">
+        <div class="nav-section-title">Support</div>
+        <a *ngFor="let item of supportMenuItems" class="nav-item">
+          {{ item.label }}
+        </a>
+      </nav>
+    </aside>

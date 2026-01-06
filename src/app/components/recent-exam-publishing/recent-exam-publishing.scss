@@ -1,0 +1,56 @@
+.widget {
+      background-color: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      transition: all 0.3s ease;
+    }
+    
+    /* Dark Mode Widget */
+    .widget[data-theme="dark"] {
+      background-color: #1a1f2e;
+      border: 1px solid #374151;
+    }
+
+     .widget-title {
+      color: #111827;
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0 0 20px 0;
+      transition: color 0.3s ease;
+    }
+    
+    .widget[data-theme="dark"] .widget-title {
+      color: white;
+    }
+    
+    .exams-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .exams-table th {
+      color: #9ca3af;
+      font-size: 12px;
+      font-weight: 600;
+      text-align: left;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #374151;
+    }
+    
+    .exams-table td {
+      color: #111827;
+      font-size: 13px;
+      padding: 12px 0;
+      border-bottom: 1px solid #2d3748;
+    }
+
+    .widget[data-theme="dark"] .exams-table td{
+      color: #e5e7eb;
+    }
+
+
+    
+    .exams-table tr:last-child td {
+      border-bottom: none;
+    }

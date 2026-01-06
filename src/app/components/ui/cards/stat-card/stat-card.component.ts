@@ -4,7 +4,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { cn, colorClass } from '../../utils/class-utils';
 import type { ColorVariant } from '../../types/component.types';
 
-type TrendDirection = 'up' | 'down' | 'neutral';
+export type TrendDirection = 'up' | 'down' | 'neutral';
 
 // Default icons for each color variant
 const DEFAULT_ICONS: Record<ColorVariant, string> = {

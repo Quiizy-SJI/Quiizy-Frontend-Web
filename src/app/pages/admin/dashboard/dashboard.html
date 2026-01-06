@@ -1,0 +1,26 @@
+<div class="dashboard-container">
+      <!-- Left Sidebar Navigation -->
+      <app-sidebar role="admin" [menuItem]="'Dashboard'"></app-sidebar>
+      
+      <!-- Main Content Area -->
+      <div class="main-content">
+        <!-- Top Header -->
+        <app-header [title]="'Dashboard Overview'"></app-header>
+        
+        <!-- Stats Cards Row -->
+        <app-stats-cards></app-stats-cards>
+        
+        <!-- Two Column Layout for Activity and Exams -->
+        <div class="content-grid">
+          <app-recent-activity></app-recent-activity>
+          <app-upcoming-exams></app-upcoming-exams>
+        </div>
+        
+        <!-- Three Column Layout for Bottom Widgets -->
+        <div class="bottom-grid">
+          <app-quick-actions></app-quick-actions>
+          <app-evaluation-pipeline></app-evaluation-pipeline>
+          <app-recent-exam-publishing></app-recent-exam-publishing>
+        </div>
+      </div>
+    </div>

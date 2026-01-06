@@ -1,0 +1,44 @@
+ .widget {
+      background-color: #ffffff;
+      border-radius: 12px;
+      padding: 24px;
+      transition: background-color 0.3s ease;
+    }
+    
+    .widget[data-theme="dark"] {
+      background-color: #1a1f2e;
+    }
+    
+    .widget h3 {
+      color: #111827;
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0 0 20px 0;
+    }
+    
+    .widget[data-theme="dark"] h3 {
+      color: white;
+    }
+    
+    .distribution-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    
+    .distribution-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .bar-container {
+      height: 32px;
+      background-color: #f3f4f6;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    
+    .widget[data-theme="dark"] .bar-container {
+      background-color: #374151;
+    }

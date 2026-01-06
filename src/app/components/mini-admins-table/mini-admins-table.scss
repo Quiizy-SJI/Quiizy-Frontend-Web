@@ -1,0 +1,168 @@
+  .table-container {
+      background-color: #ffffff;
+      border-radius: 12px;
+      padding: 24px;
+      transition: background-color 0.3s ease;
+    }
+    
+    .table-container[data-theme="dark"] {
+      background-color: #1a1f2e;
+    }
+    
+    .table-header {
+      margin-bottom: 20px;
+    }
+    
+    .table-header h3 {
+      color: #111827;
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0 0 4px 0;
+    }
+    
+    .table-container[data-theme="dark"] .table-header h3 {
+      color: white;
+    }
+    
+    .subtitle {
+      color: #6b7280;
+      font-size: 13px;
+      margin: 0;
+    }
+    
+    .mini-admins-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .mini-admins-table th {
+      text-align: left;
+      padding: 12px;
+      color: #6b7280;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      border-bottom: 2px solid #e5e7eb;
+    }
+    
+    .table-container[data-theme="dark"] .mini-admins-table th {
+      border-bottom-color: #374151;
+    }
+    
+    .mini-admins-table td {
+      padding: 16px 12px;
+      font-size: 14px;
+      color: #374151;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    
+    .table-container[data-theme="dark"] .mini-admins-table td {
+      color: #e5e7eb;
+      border-bottom-color: #2d3748;
+    }
+    
+    .mini-admins-table tbody tr:hover {
+      background-color: #f9fafb;
+    }
+    
+    .table-container[data-theme="dark"] .mini-admins-table tbody tr:hover {
+      background-color: #252b3b;
+    }
+    
+    .admin-name {
+      font-weight: 600;
+      color: #111827;
+    }
+    
+    .table-container[data-theme="dark"] .admin-name {
+      color: white;
+    }
+    
+    .unassigned {
+      color: #dc2626 !important;
+      font-style: italic;
+    }
+    
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    .status-active {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+    
+    .status-pending {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+    
+    .status-invite {
+      background-color: #fee2e2;
+      color: #991b1b;
+    }
+    
+    .actions {
+      padding: 12px !important;
+    }
+    
+    .action-btn {
+      background: none;
+      border: none;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    
+    .action-btn.manage {
+      color: #6366f1;
+    }
+    
+    .action-btn.manage:hover {
+      background-color: #eef2ff;
+    }
+    
+    .action-btn.remind {
+      color: #6366f1;
+    }
+    
+    .action-btn.remind:hover {
+      background-color: #eef2ff;
+    }
+    
+    .action-btn.invite {
+      color: #6366f1;
+    }
+    
+    .action-btn.invite:hover {
+      background-color: #eef2ff;
+    }
+    
+    .access-info {
+      max-width: 200px;
+    }
+    
+    .access-details {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    
+    .access-dept {
+      color: #10b981;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .access-text {
+      color: #6b7280;
+      font-size: 12px;
+    }

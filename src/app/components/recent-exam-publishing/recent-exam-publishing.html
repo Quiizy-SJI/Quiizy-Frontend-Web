@@ -1,0 +1,20 @@
+<div class="widget" [attr.data-theme]="themeService.getCurrentTheme()">
+      <h3 class="widget-title">Recent Exam Publishing</h3>
+      
+      <table class="exams-table">
+        <thead>
+          <tr>
+            <th>Exam</th>
+            <th>Teacher</th>
+            <th>Published</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let exam of exams">
+            <td>{{ exam.name }}</td>
+            <td>{{ exam.teacher }}</td>
+            <td>{{ exam.published }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>

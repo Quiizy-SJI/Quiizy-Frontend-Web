@@ -1,0 +1,13 @@
+<div class="widget" [attr.data-theme]="themeService.getCurrentTheme()">
+    <h3 class="widget-title">Recent Activity</h3>
+      
+    <div class="activity-list">
+      <div *ngFor="let activity of activities" class="activity-item">
+        <div class="activity-indicator" [style.background-color]="activity.color"></div>
+        <div class="activity-content">
+          <div class="activity-text">{{ activity.text }}</div>
+          <div class="activity-time">{{ activity.time }}</div>
+        </div>
+      </div>
+    </div>
+</div>

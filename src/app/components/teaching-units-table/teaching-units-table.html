@@ -1,0 +1,50 @@
+<div class="table-container" [attr.data-theme]="themeService.getCurrentTheme()">
+    <!-- themeService.getCurrentTheme() -->
+      <div class="table-header">
+        <h3>Teaching Units</h3>
+        <p class="table-subtitle">
+          Showing 1-8 of {{ units.length }} entries<br>
+          <span class="note">Teacher/class assignments are completed by specialty heads.</span>
+        </p>
+      </div>
+      
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Subject Code</th>
+            <th>Teaching Unit</th>
+            <th>Department</th>
+            <th>Credits</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let unit of units">
+            <td class="code">{{ unit.code }}</td>
+            <td class="name">{{ unit.name }}</td>
+            <td>{{ unit.department }}</td>
+            <td>{{ unit.credits }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="getStatusClass(unit.status)">
+                {{ unit.status }}
+              </span>
+            </td>
+            <td class="actions">
+              <button *ngIf="unit.status === 'Ready'" 
+                      class="action-link edit"
+                      (click)="editUnit.emit(unit)">Edit</button>
+              <button *ngIf="unit.status === 'Ready'" 
+                      class="action-link view"
+                      (click)="viewUnit.emit(unit)">View</button>
+              <button *ngIf="unit.status !== 'Ready'" 
+                      class="action-link view"
+                      (click)="viewUnit.emit(unit)">View</button>
+              <button *ngIf="unit.status === 'Needs Review'" 
+                      class="action-link fix"
+                      (click)="fixExcel(unit)">Fix Excel</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>

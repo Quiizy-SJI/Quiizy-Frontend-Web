@@ -173,6 +173,10 @@ $border-radius: 12px;
 // ============================================
 // These mixins generate full color scales from base colors
 
+*{
+  font-family: 'Bahnschrift';
+}
+
 @function lighten-color($color, $percentage) {
   @return color.mix(white, $color, $percentage);
 }
@@ -1452,4 +1456,8 @@ body * {
         );
     }
   }
+}
+
+body{
+  font-family: 'Bahnschrift';
 }

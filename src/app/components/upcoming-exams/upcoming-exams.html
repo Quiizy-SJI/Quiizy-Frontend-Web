@@ -1,0 +1,18 @@
+ <div class="widget">
+      <h3 class="widget-title">Upcoming Exams</h3>
+      
+      <div class="calendar-header">Week of Nov 10 - Nov 16</div>
+      
+      <div class="calendar-weekdays">
+        <div *ngFor="let day of weekdays" class="weekday">{{ day }}</div>
+      </div>
+      
+      <div class="exams-list">
+        <div *ngFor="let exam of exams" 
+             class="exam-item"
+             [style.background-color]="exam.color">
+          <div class="exam-name">{{ exam.name }}</div>
+          <div class="exam-time">{{ exam.time }}</div>
+        </div>
+      </div>
+    </div>

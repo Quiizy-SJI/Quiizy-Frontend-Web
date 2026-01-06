@@ -1,0 +1,11 @@
+<div class="widget">
+      <h3 class="widget-title">Quick Actions</h3>
+      
+      <div class="actions-list">
+        <button *ngFor="let action of actions"
+                class="action-button"
+                [style.background-color]="action.color">
+          {{ action.label }}
+        </button>
+      </div>
+    </div>

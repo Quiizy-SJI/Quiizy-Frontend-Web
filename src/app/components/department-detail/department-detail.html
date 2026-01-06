@@ -1,0 +1,58 @@
+ <div class="detail-container" [attr.data-theme]="themeService.getCurrentTheme()">
+      <div class="detail-header">
+        <h3>Department Detail</h3>
+        <h4 class="dept-title">{{ department?.name || 'Select a department' }}</h4>
+      </div>
+      
+      <div *ngIf="department" class="detail-content">
+        <div class="info-row">
+          <span class="label">Head</span>
+          <span class="value">{{ department.head }}</span>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">Teachers</span>
+          <span class="value">{{ teachers.length }} • 6 external</span>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">Classes</span>
+          <span class="value">10 cohorts</span>
+        </div>
+        
+        <div class="alert-box">
+          Alert: Load exceeds SLA
+        </div>
+        
+        <h4 class="section-title">Department Roster</h4>
+        
+        <table class="roster-table">
+          <thead>
+            <tr>
+              <th>Teacher</th>
+              <th>Subjects</th>
+              <th>Classes</th>
+              <th>Exams</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let teacher of teachers">
+              <td class="teacher-name">{{ teacher.name }}</td>
+              <td class="subjects">{{ teacher.subjects }}</td>
+              <td>{{ teacher.classes }}</td>
+              <td>
+                <span [class]="getExamClass(teacher.examCompletion)">
+                  {{ teacher.examCompletion }}%
+                </span>
+              </td>
+              <td>
+                <span class="status-badge" [ngClass]="getTeacherStatusClass(teacher.status)">
+                  {{ teacher.status }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>

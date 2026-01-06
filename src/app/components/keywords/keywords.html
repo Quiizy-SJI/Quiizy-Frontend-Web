@@ -1,0 +1,18 @@
+  <div class="widget" [attr.data-theme]="themeService.getCurrentTheme()">
+      <div class="widget-header">
+        <h3>Top Essay Keywords</h3>
+        <p class="subtitle">Extracted from all sentiment responses</p>
+      </div>
+      
+      <div class="keywords-container">
+        <div class="word-cloud">
+          <div *ngFor="let keyword of keywords" 
+               class="keyword-item"
+               [style.font-size.px]="getKeywordSize(keyword.count)">
+            {{ keyword.text }}
+            <span class="keyword-count">({{ keyword.count }})</span>
+          </div>
+        </div>
+        <p class="chart-label">[Word cloud]</p>
+      </div>
+    </div>

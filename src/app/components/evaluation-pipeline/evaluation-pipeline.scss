@@ -1,0 +1,76 @@
+ /* Light Mode Widget */
+    .widget {
+      background-color: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      transition: all 0.3s ease;
+    }
+    
+    /* Dark Mode Widget */
+    .widget[data-theme="dark"] {
+      background-color: #1a1f2e;
+      border: 1px solid #374151;
+    }
+    
+    .widget-title {
+      color: #111827;
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0 0 20px 0;
+      transition: color 0.3s ease;
+    }
+    
+    .widget[data-theme="dark"] .widget-title {
+      color: white;
+    }
+    
+    .pipeline-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    .pipeline-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .metric-label {
+      color: #6b7280;
+      font-size: 13px;
+      transition: color 0.3s ease;
+    }
+    
+    .widget[data-theme="dark"] .metric-label {
+      color: #9ca3af;
+    }
+    
+    .metric-bar-container {
+      height: 8px;
+      background-color: #e5e7eb;
+      border-radius: 4px;
+      overflow: hidden;
+      transition: background-color 0.3s ease;
+    }
+    
+    .metric-bar-container[data-theme="dark"] {
+      background-color: #374151;
+    }
+    
+    .metric-bar {
+      height: 100%;
+      transition: width 0.3s ease;
+    }
+    
+    .metric-value {
+      color: #111827;
+      font-size: 14px;
+      font-weight: 600;
+      transition: color 0.3s ease;
+    }
+    
+    .widget[data-theme="dark"] .metric-value {
+      color: white;
+    }

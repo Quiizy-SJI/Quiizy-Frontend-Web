@@ -1,4 +1,6 @@
 import { Routes } from '@angular/router';
+import { ADMIN_ROUTES } from './pages/admin/admin.routes';
+import { MINI_ADMIN_ROUTES } from './pages/mini-admin/mini-admin.routes';
 import { deanGuard } from './core/auth/dean.guard';
 import { teacherGuard } from './core/auth/teacher.guard';
 import { roleRedirectGuard } from './core/auth/role-redirect.guard';
@@ -7,7 +9,8 @@ export const routes: Routes = [
   {
     path: '',
     canActivate: [roleRedirectGuard],
-    children: []
+    children: [],
+   
   },
   {
     path: 'login',
@@ -15,10 +18,31 @@ export const routes: Routes = [
     title: 'Login'
   },
   {
+    path: 'admin',
+    title: 'Admin Panel',
+    children: ADMIN_ROUTES
+  },
+  {
+    path: 'mini-admin',
+    title: 'Specialty Head',
+    children: MINI_ADMIN_ROUTES
+  },
+  {
     path: 'showcase',
     loadComponent: () => import('./pages/showcase/showcase.component').then(m => m.ShowcaseComponent),
     title: 'UI Component Showcase'
   },
+  // {
+  //   path: '**',
+  //   redirectTo: '/404',
+  //   pathMatch: 'full'
+
+  // },
+  // {
+  //   path: '404',
+  //   title: 'Page Not Found'
+  // }
+  
   {
     path: 'dean',
     canActivate: [deanGuard],

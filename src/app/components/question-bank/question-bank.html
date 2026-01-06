@@ -1,0 +1,25 @@
+<div class="widget" [attr.data-theme]="themeService.getCurrentTheme()">
+      <div class="widget-header">
+        <h3>Question Bank Catalog</h3>
+        <div class="status-summary">
+          <span class="status-pill active">All (128)</span>
+          <span class="status-pill">Active (95)</span>
+          <span class="status-pill">Pending (15)</span>
+        </div>
+      </div>
+      
+      <div class="banks-list">
+        <div *ngFor="let bank of banks" class="bank-item">
+          <div class="bank-header">
+            <span class="bank-code">• {{ bank.id }}</span>
+            <span class="bank-status" [ngClass]="getBankStatusClass(bank.status)">
+              {{ bank.status }}
+            </span>
+          </div>
+          <div class="bank-name">{{ bank.name }}</div>
+          <div class="bank-notes" [class.warning]="bank.status === 'Pending'">
+            {{ bank.notes }}
+          </div>
+        </div>
+      </div>
+    </div>

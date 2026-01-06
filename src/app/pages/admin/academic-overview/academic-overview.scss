@@ -1,0 +1,264 @@
+ .page-container {
+      min-height: 100vh;
+      background-color: #f3f4f6;
+      transition: background-color 0.3s ease;
+    }
+    
+    .page-container[data-theme="dark"] {
+      background-color: #0a0e1a;
+    }
+    
+     .main-content {
+      flex: 1;
+      padding: 24px;
+      margin-left: 218px;
+    }
+    
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 24px;
+      margin-top: 24px;
+    }
+    
+    .left-column,
+    .right-column {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    @media (max-width: 1400px) {
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+ .stats-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    
+    .stat-card {
+      background-color: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      transition: all 0.3s ease;
+    }
+    
+    .stats-container[data-theme="dark"] .stat-card {
+      background-color: #1a1f2e;
+      border-color: #374151;
+    }
+    
+    .stat-card:hover {
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      transform: translateY(-2px);
+    }
+    
+    .stat-card.highlight {
+      border: 2px solid #f59e0b;
+      background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%);
+    }
+    
+    .stats-container[data-theme="dark"] .stat-card.highlight {
+      background: linear-gradient(135deg, #1a1f2e 0%, #2d3748 100%);
+    }
+    
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+    
+    .stat-icon.students {
+      background-color: #dbeafe;
+    }
+    
+    .stat-icon.teachers {
+      background-color: #d1fae5;
+    }
+    
+    .stat-content {
+      flex: 1;
+    }
+    
+    .stat-label {
+      color: #6b7280;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+    
+    .stat-value {
+      color: #111827;
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    
+    .stats-container[data-theme="dark"] .stat-value {
+      color: white;
+    }
+    
+    .stat-value-large {
+      color: #111827;
+      font-size: 48px;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 12px;
+    }
+    
+    .stats-container[data-theme="dark"] .stat-value-large {
+      color: white;
+    }
+    
+    .stat-meta {
+      color: #9ca3af;
+      font-size: 12px;
+    }
+    
+    .progress-bar {
+      height: 8px;
+      background-color: #f3f4f6;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    
+    .stats-container[data-theme="dark"] .progress-bar {
+      background-color: #374151;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background-color: #f59e0b;
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+    
+    .stat-warning {
+      color: #f59e0b;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    @media (max-width: 1200px) {
+      .stats-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+ .widget {
+      background-color: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      transition: all 0.3s ease;
+    }
+    
+    .widget[data-theme="dark"] {
+      background-color: #1a1f2e;
+      border-color: #374151;
+    }
+    
+    .widget h3 {
+      color: #111827;
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0 0 20px 0;
+    }
+    
+    .widget[data-theme="dark"] h3 {
+      color: white;
+    }
+    
+    .semesters-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    
+    .semester-item {
+      display: flex;
+      gap: 12px;
+      padding: 16px;
+      background-color: #f9fafb;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+    
+    .widget[data-theme="dark"] .semester-item {
+      background-color: #252b3b;
+    }
+    
+    .semester-item:hover {
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transform: translateX(4px);
+    }
+    
+    .semester-indicator {
+      width: 4px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    
+    .semester-content {
+      flex: 1;
+    }
+    
+    .semester-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    
+    .semester-name {
+      color: #111827;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    
+    .widget[data-theme="dark"] .semester-name {
+      color: white;
+    }
+    
+    .semester-status {
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    .status-active {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+    
+    .status-scheduled {
+      background-color: #ddd6fe;
+      color: #5b21b6;
+    }
+    
+    .status-completed {
+      background-color: #e5e7eb;
+      color: #374151;
+    }
+    
+    .semester-dates {
+      color: #6b7280;
+      font-size: 13px;
+    }
