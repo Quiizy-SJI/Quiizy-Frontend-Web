@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
 import { firstValueFrom } from 'rxjs';
 
 import {
@@ -14,6 +15,7 @@ import {
   TableComponent,
   type TableColumn,
 } from '../../../components/ui';
+import type { PaginationConfig, SortEvent } from '../../../components/ui/tables/table/table.component';
 import type { AcademicYearDto } from '../../../domain/dtos/dean/dean-shared.dto';
 import { DeanApiService } from '../../../services/dean-api.service';
 
@@ -25,6 +27,7 @@ type ModalMode = 'create' | 'edit';
   imports: [
     CommonModule,
     FormsModule,
+    MatIconModule,
     CardComponent,
     TableComponent,
     ButtonComponent,
@@ -44,13 +47,26 @@ export class DeanAcademicYears {
   isLoading = false;
   errorMessage = '';
 
+  allRows: AcademicYearDto[] = [];
   rows: AcademicYearDto[] = [];
+
+  // Pagination state
+  pagination: PaginationConfig = {
+    page: 1,
+    pageSize: 10,
+    total: 0,
+    pageSizes: [5, 10, 25, 50],
+  };
+
+  // Sort state
+  sortColumn: string | null = null;
+  sortDirection: 'asc' | 'desc' | null = null;
 
   readonly columns: TableColumn[] = [
     { key: 'start', label: 'Start', sortable: true },
     { key: 'end', label: 'End', sortable: true },
-    { key: 'classesCount', label: 'Classes' },
-    { key: 'updatedAt', label: 'Updated' },
+    { key: 'classesCount', label: 'Classes', sortable: true },
+    { key: 'updatedAt', label: 'Updated', sortable: true },
     { key: 'actions', label: 'Actions', width: '220px' },
   ];
 
@@ -74,13 +90,67 @@ export class DeanAcademicYears {
     this.isLoading = true;
 
     try {
-      this.rows = await firstValueFrom(this.deanApi.listAcademicYears());
+      this.allRows = await firstValueFrom(this.deanApi.listAcademicYears());
+      this.pagination.total = this.allRows.length;
+      this.pagination.page = 1;
+      this.updateDisplayedRows();
     } catch (err: unknown) {
       this.errorMessage = err instanceof Error ? err.message : 'Failed to load academic years.';
     } finally {
       this.isLoading = false;
       this.cdr.markForCheck();
     }
+  }
+
+  private updateDisplayedRows(): void {
+    let data = [...this.allRows];
+
+    // Sort data
+    if (this.sortColumn && this.sortDirection) {
+      data = data.sort((a, b) => {
+        let aVal: any;
+        let bVal: any;
+
+        // Handle computed 'classesCount' field
+        if (this.sortColumn === 'classesCount') {
+          aVal = this.classesCount(a);
+          bVal = this.classesCount(b);
+          const comparison = aVal - bVal;
+          return this.sortDirection === 'asc' ? comparison : -comparison;
+        }
+
+        aVal = (a as any)[this.sortColumn!] ?? '';
+        bVal = (b as any)[this.sortColumn!] ?? '';
+
+        const comparison = String(aVal).localeCompare(String(bVal));
+        return this.sortDirection === 'asc' ? comparison : -comparison;
+      });
+    }
+
+    // Paginate
+    const start = (this.pagination.page - 1) * this.pagination.pageSize;
+    const end = start + this.pagination.pageSize;
+    this.rows = data.slice(start, end);
+  }
+
+  onSortChange(event: SortEvent): void {
+    this.sortColumn = event.column || null;
+    this.sortDirection = event.direction;
+    this.updateDisplayedRows();
+    this.cdr.markForCheck();
+  }
+
+  onPageChange(page: number): void {
+    this.pagination.page = page;
+    this.updateDisplayedRows();
+    this.cdr.markForCheck();
+  }
+
+  onPageSizeChange(pageSize: number): void {
+    this.pagination.pageSize = pageSize;
+    this.pagination.page = 1;
+    this.updateDisplayedRows();
+    this.cdr.markForCheck();
   }
 
   openCreate(): void {

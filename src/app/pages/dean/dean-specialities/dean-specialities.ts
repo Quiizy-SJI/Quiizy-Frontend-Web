@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
+import { MatIconModule } from '@angular/material/icon';
 import { firstValueFrom } from 'rxjs';
 
 import {
@@ -16,6 +17,7 @@ import {
   type TableColumn,
   type DropdownOption,
 } from '../../../components/ui';
+import type { PaginationConfig, SortEvent } from '../../../components/ui/tables/table/table.component';
 import type { SpecialityDto, MiniAdminDto } from '../../../domain/dtos/dean/dean-shared.dto';
 import { DeanApiService } from '../../../services/dean-api.service';
 
@@ -27,6 +29,7 @@ type ModalMode = 'create' | 'edit' | 'assign';
   imports: [
     CommonModule,
     FormsModule,
+    MatIconModule,
     CardComponent,
     TableComponent,
     ButtonComponent,
@@ -46,13 +49,26 @@ export class DeanSpecialities {
   isLoading = false;
   errorMessage = '';
 
+  allRows: SpecialityDto[] = [];
   rows: SpecialityDto[] = [];
   miniAdmins: MiniAdminDto[] = [];
 
+  // Pagination state
+  pagination: PaginationConfig = {
+    page: 1,
+    pageSize: 10,
+    total: 0,
+    pageSizes: [5, 10, 25, 50],
+  };
+
+  // Sort state
+  sortColumn: string | null = null;
+  sortDirection: 'asc' | 'desc' | null = null;
+
   readonly columns: TableColumn[] = [
-    { key: 'name', label: 'Name' },
-    { key: 'head', label: 'Head' },
-    { key: 'updatedAt', label: 'Updated' },
+    { key: 'name', label: 'Name', sortable: true },
+    { key: 'head', label: 'Head', sortable: true },
+    { key: 'updatedAt', label: 'Updated', sortable: true },
     { key: 'actions', label: 'Actions', width: '280px' },
   ];
 
@@ -77,14 +93,66 @@ export class DeanSpecialities {
     this.isLoading = true;
 
     try {
-      this.rows = await firstValueFrom(this.deanApi.listSpecialities());
+      this.allRows = await firstValueFrom(this.deanApi.listSpecialities());
       this.miniAdmins = await firstValueFrom(this.deanApi.listMiniAdmins());
+      this.pagination.total = this.allRows.length;
+      this.pagination.page = 1;
+      this.updateDisplayedRows();
     } catch (err: unknown) {
       this.errorMessage = err instanceof Error ? err.message : 'Failed to load specialities.';
     } finally {
       this.isLoading = false;
       this.cdr.markForCheck();
     }
+  }
+
+  private updateDisplayedRows(): void {
+    let data = [...this.allRows];
+
+    // Sort data
+    if (this.sortColumn && this.sortDirection) {
+      data = data.sort((a, b) => {
+        let aVal: any;
+        let bVal: any;
+
+        // Handle nested head property
+        if (this.sortColumn === 'head') {
+          aVal = a.head?.user ? `${a.head.user.name} ${a.head.user.surname}` : '';
+          bVal = b.head?.user ? `${b.head.user.name} ${b.head.user.surname}` : '';
+        } else {
+          aVal = (a as any)[this.sortColumn!] ?? '';
+          bVal = (b as any)[this.sortColumn!] ?? '';
+        }
+
+        const comparison = String(aVal).localeCompare(String(bVal));
+        return this.sortDirection === 'asc' ? comparison : -comparison;
+      });
+    }
+
+    // Paginate
+    const start = (this.pagination.page - 1) * this.pagination.pageSize;
+    const end = start + this.pagination.pageSize;
+    this.rows = data.slice(start, end);
+  }
+
+  onSortChange(event: SortEvent): void {
+    this.sortColumn = event.column || null;
+    this.sortDirection = event.direction;
+    this.updateDisplayedRows();
+    this.cdr.markForCheck();
+  }
+
+  onPageChange(page: number): void {
+    this.pagination.page = page;
+    this.updateDisplayedRows();
+    this.cdr.markForCheck();
+  }
+
+  onPageSizeChange(pageSize: number): void {
+    this.pagination.pageSize = pageSize;
+    this.pagination.page = 1;
+    this.updateDisplayedRows();
+    this.cdr.markForCheck();
   }
 
   openCreate(): void {
@@ -148,7 +216,7 @@ export class DeanSpecialities {
     this.assignLoading = true;
     try {
       const headId = this.selectedHeadId && this.selectedHeadId !== '' ? this.selectedHeadId : null;
-      await firstValueFrom(this.deanApi.assignSpecialityHead(this.editingId, headId));
+      await firstValueFrom(this.deanApi.assignSpecialityHead(this.editingId, String(headId)));
       this.closeModal();
       await this.load();
     } catch (err: unknown) {

@@ -1,55 +1,298 @@
-<div class="page">
-  <div class="page__top">
-    <div>
-      <div class="page__title">AI Analytics</div>
-      <div class="page__subtitle">Hardest questions based on student performance.</div>
+<div class="analytics">
+  <!-- Header -->
+  <header class="analytics__header">
+    <div class="analytics__title-section">
+      <h1 class="analytics__title">
+        <mat-icon>psychology</mat-icon>
+        AI Analytics
+      </h1>
+      <p class="analytics__subtitle">Intelligent insights powered by data analysis and machine learning</p>
     </div>
 
-    <div class="page__actions">
+    <div class="analytics__actions">
       <ui-select
-        label="Scope"
+        label="Academic Year"
         [options]="academicYearOptions()"
-        [(ngModel)]="selectedAcademicYearId"
-        (ngModelChange)="onFilterChanged()"
+        [ngModel]="selectedAcademicYearId()"
+        (ngModelChange)="selectedAcademicYearId.set($event); onFilterChanged()"
+        [searchable]="true"
       ></ui-select>
 
-      <ui-button variant="outline" color="neutral" (clicked)="loadAnalytics()" [loading]="isLoading">
-        Refresh
+      <ui-button variant="outline" color="primary" (clicked)="loadAnalytics()" [loading]="isLoading()">
+        <mat-icon>refresh</mat-icon>
+        Refresh Analysis
       </ui-button>
     </div>
-  </div>
+  </header>
 
-  @if (errorMessage) {
-    <ui-alert type="danger" variant="outlined">
-      {{ errorMessage }}
+  <!-- Error Alert -->
+  @if (errorMessage()) {
+    <ui-alert variant="soft" color="danger" [dismissible]="true">
+      {{ errorMessage() }}
     </ui-alert>
   }
 
-  <ui-card title="Insights" [hoverable]="false">
-    @if (isLoading) {
-      <div class="page__loading">
-        <ui-spinner size="lg"></ui-spinner>
-      </div>
-    } @else {
-      <div class="meta">
-        <div class="meta__row">
-          <span class="meta__label">Generated</span>
-          <span class="meta__value">{{ analytics?.generatedAt }}</span>
-        </div>
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="analytics__loading">
+      <ui-spinner size="lg" color="primary"></ui-spinner>
+      <p>Running AI analysis...</p>
+    </div>
+  } @else {
+    <!-- AI Insights Overview -->
+    <section class="analytics__section">
+      <div class="section-header">
+        <h2 class="section-header__title">
+          <mat-icon>auto_awesome</mat-icon>
+          AI-Generated Insights
+        </h2>
+        <ui-badge color="primary" variant="subtle">
+          {{ aiInsights().length }} insights detected
+        </ui-badge>
       </div>
 
-      <div class="section">
-        <div class="section__title">Hardest Questions</div>
-        <ui-table [columns]="columns" [data]="rows()">
-          <ng-template #cell let-row let-column="column">
-            @switch (column.key) {
-              @case ('questionId') { {{ row.questionId }} }
-              @case ('attempts') { {{ row.attempts }} }
-              @case ('avgMark') { {{ formatAvg(row) }} }
-            }
-          </ng-template>
-        </ui-table>
+      @if (aiInsights().length === 0) {
+        <ui-card variant="outlined">
+          <div class="empty-state">
+            <mat-icon>psychology</mat-icon>
+            <h3>No Insights Available</h3>
+            <p>Not enough data to generate meaningful insights. Add more quizzes and student participation to enable AI analysis.</p>
+          </div>
+        </ui-card>
+      } @else {
+        <div class="insights-grid">
+          @for (insight of aiInsights(); track insight.id) {
+            <div class="insight-card" [class]="'insight-card--' + insight.type">
+              <div class="insight-card__header">
+                <div class="insight-card__icon">
+                  <mat-icon>{{ insight.icon }}</mat-icon>
+                </div>
+                <div class="insight-card__badges">
+                  <ui-badge [color]="getInsightTypeColor(insight.type)" variant="solid">
+                    {{ insight.type }}
+                  </ui-badge>
+                  <ui-badge [color]="getImpactColor(insight.impact)" variant="subtle">
+                    {{ insight.impact }} impact
+                  </ui-badge>
+                </div>
+              </div>
+              <h3 class="insight-card__title">{{ insight.title }}</h3>
+              <p class="insight-card__description">{{ insight.description }}</p>
+              <div class="insight-card__footer">
+                <div class="confidence-meter">
+                  <span class="confidence-meter__label">AI Confidence</span>
+                  <div class="confidence-meter__bar">
+                    <div class="confidence-meter__fill" [style.width.%]="insight.confidence"></div>
+                  </div>
+                  <span class="confidence-meter__value">{{ insight.confidence }}%</span>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </section>
+
+    <!-- Performance Predictions -->
+    <section class="analytics__section">
+      <div class="section-header">
+        <h2 class="section-header__title">
+          <mat-icon>query_stats</mat-icon>
+          Performance Predictions
+        </h2>
+        <span class="section-header__subtitle">Next month forecast based on current trends</span>
       </div>
-    }
-  </ui-card>
+
+      <div class="predictions-grid">
+        @for (pred of predictions(); track pred.metric) {
+          <ui-card variant="outlined" class="prediction-card">
+            <div class="prediction-card__header">
+              <span class="prediction-card__metric">{{ pred.metric }}</span>
+              <mat-icon [class]="'trend-icon trend-icon--' + pred.trend">
+                {{ getTrendIcon(pred.trend) }}
+              </mat-icon>
+            </div>
+            <div class="prediction-card__values">
+              <div class="prediction-value prediction-value--current">
+                <span class="prediction-value__label">Current</span>
+                <span class="prediction-value__number">{{ pred.current.toFixed(1) }}%</span>
+              </div>
+              <mat-icon class="prediction-arrow">arrow_forward</mat-icon>
+              <div class="prediction-value prediction-value--predicted">
+                <span class="prediction-value__label">Predicted</span>
+                <span class="prediction-value__number" [class]="'prediction-value--' + pred.trend">
+                  {{ pred.predicted.toFixed(1) }}%
+                </span>
+              </div>
+            </div>
+            <div class="prediction-card__confidence">
+              <span>Confidence: {{ pred.confidence }}%</span>
+              <div class="mini-bar">
+                <div class="mini-bar__fill" [style.width.%]="pred.confidence"></div>
+              </div>
+            </div>
+          </ui-card>
+        }
+      </div>
+    </section>
+
+    <!-- Charts Row -->
+    <div class="analytics__charts">
+      <!-- Difficulty Distribution -->
+      <ui-card variant="outlined">
+        <div class="card-header">
+          <mat-icon>pie_chart</mat-icon>
+          <h3>Question Difficulty Distribution</h3>
+        </div>
+        @if (hardestQuestions().length > 0) {
+          <div class="chart-container">
+            <ui-chart [type]="'doughnut'" [data]="difficultyDistributionData()" [options]="doughnutOptions"></ui-chart>
+          </div>
+          <div class="difficulty-legend">
+            <div class="legend-item legend-item--hard">
+              <span class="legend-dot"></span>
+              <span>Hard ({{ hardQuestionsCount() }})</span>
+            </div>
+            <div class="legend-item legend-item--medium">
+              <span class="legend-dot"></span>
+              <span>Medium ({{ mediumQuestionsCount() }})</span>
+            </div>
+            <div class="legend-item legend-item--easy">
+              <span class="legend-dot"></span>
+              <span>Easy ({{ easyQuestionsCount() }})</span>
+            </div>
+          </div>
+        } @else {
+          <div class="empty-state empty-state--sm">
+            <mat-icon>bar_chart</mat-icon>
+            <p>No question data available</p>
+          </div>
+        }
+      </ui-card>
+
+      <!-- Insight Types -->
+      <ui-card variant="outlined">
+        <div class="card-header">
+          <mat-icon>analytics</mat-icon>
+          <h3>Insight Categories</h3>
+        </div>
+        @if (aiInsights().length > 0) {
+          <div class="chart-container">
+            <ui-chart [type]="'bar'" [data]="insightTypeDistribution()" [options]="barOptions"></ui-chart>
+          </div>
+        } @else {
+          <div class="empty-state empty-state--sm">
+            <mat-icon>insights</mat-icon>
+            <p>No insights to categorize</p>
+          </div>
+        }
+      </ui-card>
+
+      <!-- Quick Stats -->
+      <ui-card variant="outlined">
+        <div class="card-header">
+          <mat-icon>speed</mat-icon>
+          <h3>Analysis Summary</h3>
+        </div>
+        <div class="quick-stats">
+          <ui-stat-card
+            label="Total Questions Analyzed"
+            [value]="hardestQuestions().length"
+            color="primary"
+            icon="quiz"
+            format="number"
+            [compact]="true"
+          ></ui-stat-card>
+          <ui-stat-card
+            label="Active Insights"
+            [value]="aiInsights().length"
+            color="success"
+            icon="lightbulb"
+            format="number"
+            [compact]="true"
+          ></ui-stat-card>
+          <ui-stat-card
+            label="High Priority"
+            [value]="highPriorityCount()"
+            color="danger"
+            icon="priority_high"
+            format="number"
+            [compact]="true"
+          ></ui-stat-card>
+        </div>
+      </ui-card>
+    </div>
+
+    <!-- Hardest Questions Table -->
+    <section class="analytics__section">
+      <div class="section-header">
+        <h2 class="section-header__title">
+          <mat-icon>warning_amber</mat-icon>
+          Hardest Questions
+        </h2>
+        <span class="section-header__subtitle">Questions with lowest success rates</span>
+      </div>
+
+      <ui-card variant="outlined">
+        @if (hardestQuestions().length > 0) {
+          <ui-table
+            [columns]="questionsColumns"
+            [data]="displayedQuestions()"
+            [showPagination]="true"
+            [pagination]="questionsPagination"
+            [sortColumn]="questionsSortColumn"
+            [sortDirection]="questionsSortDirection"
+            (sortChange)="onQuestionsSortChange($event)"
+            (pageChange)="onQuestionsPageChange($event)"
+            (pageSizeChange)="onQuestionsPageSizeChange($event)"
+          >
+            <ng-template #cell let-row let-column="column">
+              @switch (column.key) {
+                @case ('questionId') {
+                  <span class="cell-monospace">{{ row.questionId }}</span>
+                }
+                @case ('attempts') { {{ row.attempts }} }
+                @case ('avgMark') { {{ row.avgMark }} }
+                @case ('successRate') {
+                  <div class="success-bar">
+                    <div class="success-bar__fill" [style.width.%]="row.successRate"></div>
+                    <span class="success-bar__text">{{ row.successRate.toFixed(0) }}%</span>
+                  </div>
+                }
+                @case ('difficulty') {
+                  <ui-badge [color]="getDifficultyColor(row.difficulty)" variant="subtle">
+                    {{ row.difficulty }}
+                  </ui-badge>
+                }
+              }
+            </ng-template>
+          </ui-table>
+        } @else {
+          <div class="empty-state">
+            <mat-icon>quiz</mat-icon>
+            <h3>No Question Data</h3>
+            <p>Question difficulty analysis will appear once students complete assessments.</p>
+          </div>
+        }
+      </ui-card>
+    </section>
+
+    <!-- Meta Information -->
+    <ui-card variant="outlined" class="meta-card">
+      <div class="meta-info">
+        <div class="meta-item">
+          <mat-icon>schedule</mat-icon>
+          <span>Analysis generated: {{ analytics()?.generatedAt | date:'medium' }}</span>
+        </div>
+        <div class="meta-item">
+          <mat-icon>memory</mat-icon>
+          <span>Data points analyzed: {{ (stats()?.scores?.completedAttemptsWithScore ?? 0) + (stats()?.totals?.questions ?? 0) }}</span>
+        </div>
+        <div class="meta-item">
+          <mat-icon>verified</mat-icon>
+          <span>AI Model: Statistical Pattern Analysis v1.0</span>
+        </div>
+      </div>
+    </ui-card>
+  }
 </div>

@@ -19,7 +19,17 @@
 		@if (isLoading) {
 			<div class="page__loading"><ui-spinner size="lg"></ui-spinner></div>
 		} @else {
-			<ui-table [columns]="columns" [data]="rows">
+			<ui-table
+				[columns]="columns"
+				[data]="rows"
+				[showPagination]="true"
+				[pagination]="pagination"
+				[sortColumn]="sortColumn"
+				[sortDirection]="sortDirection"
+				(sortChange)="onSortChange($event)"
+				(pageChange)="onPageChange($event)"
+				(pageSizeChange)="onPageSizeChange($event)"
+			>
 				<ng-template #cell let-row let-column="column">
 					@switch (column.key) {
 						@case ('name') { {{ row.name }} }
@@ -27,9 +37,18 @@
 						@case ('updatedAt') { {{ row.updatedAt }} }
 						@case ('actions') {
 							<div class="row-actions">
-								<ui-button size="sm" variant="ghost" color="neutral" (clicked)="openEdit(row)">Edit</ui-button>
-								<ui-button size="sm" variant="ghost" color="primary" (clicked)="openAssign(row)" style="margin-left:8px">Assign Head</ui-button>
-								<ui-button size="sm" variant="ghost" color="danger" (clicked)="delete(row)" style="margin-left:8px">Delete</ui-button>
+								<ui-button size="sm" variant="soft" color="neutral" [iconLeft]="true" (clicked)="openEdit(row)">
+									<mat-icon slot="icon-left">edit</mat-icon>
+									Edit
+								</ui-button>
+								<ui-button size="sm" variant="soft" color="primary" [iconLeft]="true" (clicked)="openAssign(row)">
+									<mat-icon slot="icon-left">person_add</mat-icon>
+									Assign Head
+								</ui-button>
+								<ui-button size="sm" variant="soft" color="danger" [iconLeft]="true" (clicked)="delete(row)">
+									<mat-icon slot="icon-left">delete</mat-icon>
+									Delete
+								</ui-button>
 							</div>
 						}
 						@default { {{ row[column.key] }} }
@@ -40,15 +59,13 @@
 	</ui-card>
 
 	<ui-modal [isOpen]="isModalOpen" [title]="modalTitle()" [showFooter]="true" (closed)="closeModal()">
-		@if (modalMode === 'create' || modalMode === 'edit') {
-			<ui-alert *ngIf="errorMessage" type="danger" variant="outlined">{{ errorMessage }}</ui-alert>
-			<label>Name</label>
-			<ui-input [(ngModel)]="formName"></ui-input>
-		} @else if (modalMode === 'assign') {
-			<ui-alert *ngIf="errorMessage" type="danger" variant="outlined">{{ errorMessage }}</ui-alert>
-			<label>Head</label>
-			<ui-select [options]="miniAdminOptions()" [(ngModel)]="selectedHeadId"></ui-select>
-		}
+		<div class="form">
+			@if (modalMode === 'create' || modalMode === 'edit') {
+				<ui-input label="Name" placeholder="e.g. Computer Science" [(ngModel)]="formName"></ui-input>
+			} @else if (modalMode === 'assign') {
+				<ui-select label="Speciality Head" [options]="miniAdminOptions()" [(ngModel)]="selectedHeadId" [searchable]="true"></ui-select>
+			}
+		</div>
 
 		<div slot="footer" class="modal-actions">
 			@if (modalMode === 'create' || modalMode === 'edit') {

@@ -1,7 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
+
+import { TeacherApiService } from '../../../services/teacher-api.service';
+import type { QuizDto } from '../../../domain/dtos/teacher/teacher-quiz.dto';
 
 @Component({
   selector: 'app-teacher-mock-tests',
@@ -27,8 +31,8 @@ import { Router } from '@angular/router';
           </div>
           <div class="stat-content">
             <h3>Active Mock Tests</h3>
-            <p class="stat-number">8</p>
-            <span class="stat-change">+2 this week</span>
+            <p class="stat-number">{{ stats.activeMocks }}</p>
+            <span class="stat-change">Total MOCK quizzes</span>
           </div>
         </div>
         <div class="stat-card">
@@ -37,8 +41,8 @@ import { Router } from '@angular/router';
           </div>
           <div class="stat-content">
             <h3>Total Attempts</h3>
-            <p class="stat-number">342</p>
-            <span class="stat-change">+45 this week</span>
+            <p class="stat-number">{{ stats.totalAttempts }}</p>
+            <span class="stat-change">Students participated</span>
           </div>
         </div>
         <div class="stat-card">
@@ -47,8 +51,8 @@ import { Router } from '@angular/router';
           </div>
           <div class="stat-content">
             <h3>Average Score</h3>
-            <p class="stat-number">76%</p>
-            <span class="stat-change">+4% improvement</span>
+            <p class="stat-number">{{ stats.averageScore | number:'1.0-0' }}%</p>
+            <span class="stat-change">Overall performance</span>
           </div>
         </div>
       </div>
@@ -69,7 +73,7 @@ import { Router } from '@angular/router';
             </div>
             <span class="status-badge active">Active</span>
           </div>
-          
+
           <div class="test-details">
             <div class="detail-row">
               <div class="detail-item">
@@ -132,7 +136,7 @@ import { Router } from '@angular/router';
             </div>
             <span class="status-badge completed">Completed</span>
           </div>
-          
+
           <div class="test-details">
             <div class="detail-row">
               <div class="detail-item">
@@ -187,7 +191,7 @@ import { Router } from '@angular/router';
             </div>
             <span class="status-badge draft">Draft</span>
           </div>
-          
+
           <div class="test-details">
             <div class="detail-row">
               <div class="detail-item">
@@ -235,7 +239,7 @@ import { Router } from '@angular/router';
             </div>
             <span class="status-badge scheduled">Scheduled</span>
           </div>
-          
+
           <div class="test-details">
             <div class="detail-row">
               <div class="detail-item">
@@ -295,7 +299,7 @@ import { Router } from '@angular/router';
       justify-content: space-between;
       align-items: flex-start;
       margin-bottom: 2rem;
-      
+
       @media (max-width: 768px) {
         flex-direction: column;
         gap: 1rem;
@@ -309,7 +313,7 @@ import { Router } from '@angular/router';
         margin-bottom: 0.5rem;
         color: var(--color-text-primary);
       }
-      
+
       p {
         color: var(--color-text-secondary);
         font-size: 1rem;
@@ -328,7 +332,7 @@ import { Router } from '@angular/router';
       font-weight: 500;
       cursor: pointer;
       transition: background 0.2s;
-      
+
       &:hover {
         background: var(--color-primary-700);
       }
@@ -349,7 +353,7 @@ import { Router } from '@angular/router';
       display: flex;
       align-items: center;
       gap: 1rem;
-      
+
       .stat-icon {
         background: var(--color-primary-50);
         border-radius: 12px;
@@ -357,7 +361,7 @@ import { Router } from '@angular/router';
         display: flex;
         align-items: center;
         justify-content: center;
-        
+
         mat-icon {
           color: var(--color-primary-600);
           font-size: 1.5rem;
@@ -365,24 +369,24 @@ import { Router } from '@angular/router';
           height: 1.5rem;
         }
       }
-      
+
       .stat-content {
         flex: 1;
-        
+
         h3 {
           font-size: 0.875rem;
           font-weight: 500;
           color: var(--color-text-secondary);
           margin-bottom: 0.25rem;
         }
-        
+
         .stat-number {
           font-size: 1.75rem;
           font-weight: 700;
           color: var(--color-text-primary);
           margin-bottom: 0.25rem;
         }
-        
+
         .stat-change {
           font-size: 0.75rem;
           color: var(--color-success-600);
@@ -394,7 +398,7 @@ import { Router } from '@angular/router';
       display: flex;
       gap: 0.5rem;
       margin-bottom: 2rem;
-      
+
       .tab {
         padding: 0.75rem 1.5rem;
         border: 1px solid var(--color-border);
@@ -403,13 +407,13 @@ import { Router } from '@angular/router';
         cursor: pointer;
         transition: all 0.2s;
         font-weight: 500;
-        
+
         &.active {
           background: var(--color-primary-600);
           color: white;
           border-color: var(--color-primary-600);
         }
-        
+
         &:hover:not(.active) {
           background: var(--color-background-subtle);
         }
@@ -428,7 +432,7 @@ import { Router } from '@angular/router';
       padding: 1.5rem;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       border-left: 4px solid;
-      
+
       &.active { border-left-color: var(--color-success-500); }
       &.completed { border-left-color: var(--color-primary-500); }
       &.draft { border-left-color: var(--color-warning-500); }
@@ -456,7 +460,7 @@ import { Router } from '@angular/router';
       border-radius: 12px;
       font-size: 0.75rem;
       font-weight: 500;
-      
+
       &.mathematics {
         background: var(--color-primary-100);
         color: var(--color-primary-700);
@@ -476,7 +480,7 @@ import { Router } from '@angular/router';
       border-radius: 12px;
       font-size: 0.75rem;
       font-weight: 500;
-      
+
       &.active {
         background: var(--color-success-100);
         color: var(--color-success-700);
@@ -511,7 +515,7 @@ import { Router } from '@angular/router';
       gap: 0.25rem;
       font-size: 0.875rem;
       color: var(--color-text-secondary);
-      
+
       mat-icon {
         font-size: 1rem;
         width: 1rem;
@@ -532,13 +536,13 @@ import { Router } from '@angular/router';
       display: flex;
       flex-direction: column;
       align-items: center;
-      
+
       .stat-label {
         font-size: 0.75rem;
         color: var(--color-text-secondary);
         margin-bottom: 0.25rem;
       }
-      
+
       .stat-value {
         font-size: 1.25rem;
         font-weight: 600;
@@ -548,29 +552,29 @@ import { Router } from '@angular/router';
 
     .progress-section {
       margin-bottom: 1rem;
-      
+
       .progress-header {
         display: flex;
         justify-content: space-between;
         margin-bottom: 0.5rem;
         font-size: 0.875rem;
-        
+
         .progress-count {
           color: var(--color-text-secondary);
         }
       }
-      
+
       .progress-bar {
         height: 8px;
         background: var(--color-background-muted);
         border-radius: 4px;
         overflow: hidden;
-        
+
         .progress-fill {
           height: 100%;
           background: var(--color-success-500);
           transition: width 0.3s;
-          
+
           &.draft {
             background: var(--color-warning-500);
           }
@@ -580,7 +584,7 @@ import { Router } from '@angular/router';
 
     .completion-stats {
       margin-bottom: 1rem;
-      
+
       .completion-info {
         display: flex;
         align-items: center;
@@ -588,26 +592,26 @@ import { Router } from '@angular/router';
         margin-bottom: 1rem;
         font-size: 0.875rem;
         color: var(--color-text-secondary);
-        
+
         mat-icon {
           color: var(--color-success-600);
         }
       }
-      
+
       .final-stats {
         display: flex;
         gap: 2rem;
-        
+
         .final-stat {
           display: flex;
           flex-direction: column;
-          
+
           .label {
             font-size: 0.75rem;
             color: var(--color-text-secondary);
             margin-bottom: 0.25rem;
           }
-          
+
           .value {
             font-size: 1.125rem;
             font-weight: 600;
@@ -619,7 +623,7 @@ import { Router } from '@angular/router';
 
     .draft-progress {
       margin-bottom: 1rem;
-      
+
       .progress-info {
         display: flex;
         align-items: center;
@@ -627,7 +631,7 @@ import { Router } from '@angular/router';
         margin-bottom: 0.5rem;
         font-size: 0.875rem;
         color: var(--color-text-secondary);
-        
+
         mat-icon {
           color: var(--color-warning-600);
         }
@@ -636,26 +640,26 @@ import { Router } from '@angular/router';
 
     .schedule-info {
       margin-bottom: 1rem;
-      
+
       .schedule-item {
         display: flex;
         align-items: center;
         gap: 0.75rem;
         margin-bottom: 0.75rem;
-        
+
         mat-icon {
           color: var(--color-info-600);
         }
-        
+
         .schedule-details {
           display: flex;
           flex-direction: column;
-          
+
           .schedule-label {
             font-size: 0.75rem;
             color: var(--color-text-secondary);
           }
-          
+
           .schedule-value {
             font-size: 0.875rem;
             font-weight: 500;
@@ -681,25 +685,25 @@ import { Router } from '@angular/router';
       font-weight: 500;
       cursor: pointer;
       transition: all 0.2s;
-      
+
       &.primary {
         background: var(--color-primary-600);
         color: white;
-        
+
         &:hover {
           background: var(--color-primary-700);
         }
       }
-      
+
       &.secondary {
         background: var(--color-background-subtle);
         color: var(--color-text-primary);
-        
+
         &:hover {
           background: var(--color-background-muted);
         }
       }
-      
+
       mat-icon {
         font-size: 1rem;
         width: 1rem;
@@ -708,23 +712,87 @@ import { Router } from '@angular/router';
     }
   `]
 })
-export class TeacherMockTests {
+export class TeacherMockTests implements OnInit {
+  private readonly router = inject(Router);
+  private readonly teacherApi = inject(TeacherApiService);
+
   activeFilter = 'all';
 
-  constructor(private router: Router) {}
+  // Mock test data from API (filtered by type = 'MOCK')
+  allMockTests: QuizDto[] = [];
+  filteredMockTests: QuizDto[] = [];
+  isLoading = true;
+
+  // Stats computed from API data
+  stats = {
+    activeMocks: 0,
+    totalAttempts: 0,
+    averageScore: 0,
+  };
+
+  ngOnInit(): void {
+    this.loadMockTests();
+  }
+
+  private async loadMockTests(): Promise<void> {
+    this.isLoading = true;
+    try {
+      const quizzes = await firstValueFrom(this.teacherApi.getMyQuizzes());
+      // Filter for MOCK type quizzes
+      this.allMockTests = quizzes.filter(q => q.type === 'MOCK');
+      this.computeStats();
+      this.applyFilter();
+    } catch (error) {
+      console.error('Error loading mock tests:', error);
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  private computeStats(): void {
+    this.stats.activeMocks = this.allMockTests.length;
+
+    let totalAttempts = 0;
+    let totalScore = 0;
+    let totalMarks = 0;
+
+    for (const mock of this.allMockTests) {
+      if (mock.studentQuizes) {
+        totalAttempts += mock.studentQuizes.length;
+        for (const sq of mock.studentQuizes) {
+          if (sq.rawScore !== null && sq.rawScore !== undefined && sq.totalMarks) {
+            totalScore += sq.rawScore;
+            totalMarks += sq.totalMarks;
+          }
+        }
+      }
+    }
+
+    this.stats.totalAttempts = totalAttempts;
+    this.stats.averageScore = totalMarks > 0 ? (totalScore / totalMarks) * 100 : 0;
+  }
+
+  private applyFilter(): void {
+    if (this.activeFilter === 'all') {
+      this.filteredMockTests = this.allMockTests;
+    } else {
+      // For now, all mocks are shown - could add status filtering later
+      this.filteredMockTests = this.allMockTests;
+    }
+  }
 
   createMockTest(): void {
-    console.log('Creating new mock test');
-    alert('Create mock test functionality would be implemented here');
+    // Navigate to create exam with type pre-selected as MOCK
+    sessionStorage.setItem('examFormStep1', JSON.stringify({ quizType: 'MOCK' }));
+    this.router.navigate(['/teacher/create-exam']);
   }
 
   setFilter(filter: string): void {
     this.activeFilter = filter;
-    console.log('Filter set to:', filter);
+    this.applyFilter();
   }
 
   viewAnalytics(testId: string): void {
-    console.log('Viewing analytics for test:', testId);
     this.router.navigate(['/teacher/statistics'], { queryParams: { test: testId } });
   }
 
@@ -749,7 +817,6 @@ export class TeacherMockTests {
   }
 
   deleteDraft(testId: string): void {
-    console.log('Deleting draft test:', testId);
     if (confirm('Are you sure you want to delete this draft test?')) {
       alert(`Draft test ${testId} deleted successfully`);
     }
@@ -763,5 +830,23 @@ export class TeacherMockTests {
   editSchedule(testId: string): void {
     console.log('Editing schedule for test:', testId);
     alert(`Edit schedule for ${testId} functionality would be implemented here`);
+  }
+
+  // Helper methods for template
+  getAttemptCount(quiz: QuizDto): number {
+    return quiz.studentQuizes?.length || 0;
+  }
+
+  getAverageScore(quiz: QuizDto): number {
+    if (!quiz.studentQuizes?.length) return 0;
+    let total = 0;
+    let count = 0;
+    for (const sq of quiz.studentQuizes) {
+      if (sq.rawScore !== null && sq.rawScore !== undefined && sq.totalMarks) {
+        total += (sq.rawScore / sq.totalMarks) * 100;
+        count++;
+      }
+    }
+    return count > 0 ? total / count : 0;
   }
 }

@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
 import { firstValueFrom } from 'rxjs';
 
 import {
@@ -15,7 +16,13 @@ import {
   type DropdownOption,
   type TableColumn,
 } from '../../../components/ui';
-import type { AcademicYearDto, ClassAcademicYearDto, SemesterDto } from '../../../domain/dtos/dean/dean-shared.dto';
+import type { PaginationConfig, SortEvent } from '../../../components/ui/tables/table/table.component';
+import type {
+  AcademicYearDto,
+  ClassAcademicYearDto,
+  SemesterDto,
+  SemesterStatus,
+} from '../../../domain/dtos/dean/dean-shared.dto';
 import type { CreateSemesterDto, UpdateSemesterDto } from '../../../domain/dtos/dean/semester.dto';
 import { DeanApiService } from '../../../services/dean-api.service';
 
@@ -25,9 +32,9 @@ type SemesterForm = {
   name: string;
   shortCode: string;
   classAcademicYearId: string;
-  startDate: string;
-  endDate: string;
-  status: string;
+  startDate: Date | string;
+  endDate: Date | string ;
+  status: SemesterStatus;
 };
 
 @Component({
@@ -36,6 +43,7 @@ type SemesterForm = {
   imports: [
     CommonModule,
     FormsModule,
+    MatIconModule,
     CardComponent,
     TableComponent,
     ButtonComponent,
@@ -56,18 +64,31 @@ export class DeanSemesters {
   errorMessage = '';
 
   academicYears: AcademicYearDto[] = [];
+  allSemesters: SemesterDto[] = [];
   semesters: SemesterDto[] = [];
 
   selectedAcademicYearId: string | null = null;
 
+  // Pagination state
+  pagination: PaginationConfig = {
+    page: 1,
+    pageSize: 10,
+    total: 0,
+    pageSizes: [5, 10, 25, 50],
+  };
+
+  // Sort state
+  sortColumn: string | null = null;
+  sortDirection: 'asc' | 'desc' | null = null;
+
   readonly columns: TableColumn[] = [
-    { key: 'name', label: 'Name' },
-    { key: 'shortCode', label: 'Code' },
-    { key: 'status', label: 'Status' },
+    { key: 'name', label: 'Name', sortable: true },
+    { key: 'shortCode', label: 'Code', sortable: true },
+    { key: 'status', label: 'Status', sortable: true },
     { key: 'class', label: 'Class' },
     { key: 'academicYear', label: 'Academic Year' },
     { key: 'dates', label: 'Dates' },
-    { key: 'updatedAt', label: 'Updated' },
+    { key: 'updatedAt', label: 'Updated', sortable: true },
     { key: 'actions', label: 'Actions', width: '240px' },
   ];
 
@@ -87,11 +108,35 @@ export class DeanSemesters {
 
   saveLoading = false;
 
-  readonly statusOptions: DropdownOption<string>[] = [
+  readonly statusOptions: DropdownOption<SemesterStatus>[] = [
     { value: 'SCHEDULED', label: 'Scheduled' },
-    { value: 'ONGOING', label: 'Ongoing' },
-    { value: 'COMPLETED', label: 'Completed' },
+    { value: 'ACTIVE', label: 'Active' },
+    { value: 'ACTION_NEEDED', label: 'Action needed' },
+    { value: 'ARCHIVED', label: 'Archived' },
   ];
+
+  private toDateInputValue(value?: string | null): string {
+    if (!value) return '';
+    // Backend serializes DATE columns as ISO strings; normalize to YYYY-MM-DD for the UI.
+    return value.length >= 10 ? value.slice(0, 10) : value;
+  }
+
+  /**
+   * Convert Date | string to ISO date string (YYYY-MM-DD) for backend.
+   * Returns undefined if input is empty/falsy.
+   */
+  private toIsoDateString(value: Date | string | null | undefined): string | undefined {
+    if (!value) return undefined;
+    if (value instanceof Date) {
+      // Convert Date to ISO string (YYYY-MM-DD)
+      return value.toISOString().slice(0, 10);
+    }
+    // If it's already a string, ensure it's in YYYY-MM-DD format
+    const trimmed = value.trim();
+    if (!trimmed) return undefined;
+    // If string has time component (e.g. from datetime), extract just the date
+    return trimmed.length >= 10 ? trimmed.slice(0, 10) : trimmed;
+  }
 
   async ngOnInit(): Promise<void> {
     await this.loadAcademicYears();
@@ -137,13 +182,55 @@ export class DeanSemesters {
 
     try {
       const academicYearId = this.selectedAcademicYearId || undefined;
-      this.semesters = await firstValueFrom(this.deanApi.listSemesters(academicYearId));
+      this.allSemesters = await firstValueFrom(this.deanApi.listSemesters(academicYearId));
+      this.pagination.total = this.allSemesters.length;
+      this.pagination.page = 1;
+      this.updateDisplayedRows();
     } catch (err: unknown) {
       this.errorMessage = err instanceof Error ? err.message : 'Failed to load semesters.';
     } finally {
       this.isLoading = false;
       this.cdr.markForCheck();
     }
+  }
+
+  private updateDisplayedRows(): void {
+    let data = [...this.allSemesters];
+
+    // Sort data
+    if (this.sortColumn && this.sortDirection) {
+      data = data.sort((a, b) => {
+        const aVal = (a as any)[this.sortColumn!] ?? '';
+        const bVal = (b as any)[this.sortColumn!] ?? '';
+        const comparison = String(aVal).localeCompare(String(bVal));
+        return this.sortDirection === 'asc' ? comparison : -comparison;
+      });
+    }
+
+    // Paginate
+    const start = (this.pagination.page - 1) * this.pagination.pageSize;
+    const end = start + this.pagination.pageSize;
+    this.semesters = data.slice(start, end);
+  }
+
+  onSortChange(event: SortEvent): void {
+    this.sortColumn = event.column || null;
+    this.sortDirection = event.direction;
+    this.updateDisplayedRows();
+    this.cdr.markForCheck();
+  }
+
+  onPageChange(page: number): void {
+    this.pagination.page = page;
+    this.updateDisplayedRows();
+    this.cdr.markForCheck();
+  }
+
+  onPageSizeChange(pageSize: number): void {
+    this.pagination.pageSize = pageSize;
+    this.pagination.page = 1;
+    this.updateDisplayedRows();
+    this.cdr.markForCheck();
   }
 
   async onFilterChanged(): Promise<void> {
@@ -176,8 +263,8 @@ export class DeanSemesters {
       name: row.name ?? '',
       shortCode: row.shortCode ?? '',
       classAcademicYearId: row.classAcademicYear?.id ?? '',
-      startDate: row.startDate ?? '',
-      endDate: row.endDate ?? '',
+      startDate: this.toDateInputValue(row.startDate),
+      endDate: this.toDateInputValue(row.endDate),
       status: row.status ?? 'SCHEDULED',
     };
 
@@ -218,8 +305,8 @@ export class DeanSemesters {
           shortCode: this.form.shortCode.trim(),
           classAcademicYearId: this.form.classAcademicYearId,
           status: this.form.status,
-          startDate: this.form.startDate ? this.form.startDate : undefined,
-          endDate: this.form.endDate ? this.form.endDate : undefined,
+          startDate: this.toIsoDateString(this.form.startDate),
+          endDate: this.toIsoDateString(this.form.endDate),
         };
         await firstValueFrom(this.deanApi.createSemester(dto));
       } else if (this.editingId) {
@@ -227,8 +314,8 @@ export class DeanSemesters {
           name: this.form.name.trim(),
           shortCode: this.form.shortCode.trim(),
           status: this.form.status,
-          startDate: this.form.startDate ? this.form.startDate : undefined,
-          endDate: this.form.endDate ? this.form.endDate : undefined,
+          startDate: this.toIsoDateString(this.form.startDate),
+          endDate: this.toIsoDateString(this.form.endDate),
         };
         await firstValueFrom(this.deanApi.updateSemester(this.editingId, dto));
       }
@@ -264,8 +351,8 @@ export class DeanSemesters {
   }
 
   formatDates(row: SemesterDto): string {
-    const start = row.startDate ? row.startDate : '';
-    const end = row.endDate ? row.endDate : '';
+    const start = this.toDateInputValue(row.startDate);
+    const end = this.toDateInputValue(row.endDate);
     if (!start && !end) return '';
     if (start && end) return `${start} → ${end}`;
     return start || end;

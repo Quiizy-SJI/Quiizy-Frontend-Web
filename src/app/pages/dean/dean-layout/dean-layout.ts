@@ -35,8 +35,9 @@ export class DeanLayout implements OnInit {
     { id: 'semesters', label: 'Semesters' },
     { id: 'exam-types', label: 'Exam Types' },
     { id: 'teaching-units', label: 'Teaching Units' },
-    { id: 'mini-admins', label: 'Mini Admins' },
+    { id: 'mini-admins', label: 'Speciality Head' },
     { id: 'ai-analytics', label: 'AI Analytics' },
+    { id: 'sentiment-analysis', label: 'Sentiment Analysis' },
   ];
 
   activeTab: TabItem['id'] = 'dashboard';
@@ -64,8 +65,9 @@ export class DeanLayout implements OnInit {
     { id: 'specialities', label: 'Specialities', route: '/dean/specialities', icon: 'badge' },
     { id: 'exam-types', label: 'Exam Types', route: '/dean/exam-types', icon: 'assignment' },
     { id: 'teaching-units', label: 'Teaching Units', route: '/dean/teaching-units', icon: 'menu_book' },
-    { id: 'mini-admins', label: 'Mini Admins', route: '/dean/mini-admins', icon: 'groups' },
+    { id: 'mini-admins', label: 'Speciality Head', route: '/dean/mini-admins', icon: 'groups' },
     { id: 'ai-analytics', label: 'AI Analytics', route: '/dean/ai-analytics', icon: 'insights' },
+    { id: 'sentiment-analysis', label: 'Sentiment Analysis', route: '/dean/sentiment-analysis', icon: 'psychology' },
   ];
 
   get currentTitle(): string {
@@ -100,6 +102,7 @@ export class DeanLayout implements OnInit {
     else if (url.includes('/dean/teaching-units')) this.activeTab = 'teaching-units';
     else if (url.includes('/dean/mini-admins')) this.activeTab = 'mini-admins';
     else if (url.includes('/dean/ai-analytics')) this.activeTab = 'ai-analytics';
+    else if (url.includes('/dean/sentiment-analysis')) this.activeTab = 'sentiment-analysis';
     else this.activeTab = 'dashboard';
   }
 
@@ -129,6 +132,9 @@ export class DeanLayout implements OnInit {
       case 'ai-analytics':
         void this.router.navigateByUrl('/dean/ai-analytics');
         break;
+      case 'sentiment-analysis':
+        void this.router.navigateByUrl('/dean/sentiment-analysis');
+        break;
     }
   }
 
@@ -152,7 +158,9 @@ export class DeanLayout implements OnInit {
         error: (err: unknown) => {
           this.errorMessage = err instanceof Error ? err.message : 'Logout failed.';
           this.cdr.markForCheck();
+          this.router.navigateByUrl('/login');
         },
+
       });
   }
 

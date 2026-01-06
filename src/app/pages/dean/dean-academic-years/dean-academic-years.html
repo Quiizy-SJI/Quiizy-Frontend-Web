@@ -27,7 +27,19 @@
         <ui-spinner size="lg"></ui-spinner>
       </div>
     } @else {
-      <ui-table [columns]="columns" [data]="rows" [showHeader]="false" [loading]="false">
+      <ui-table
+        [columns]="columns"
+        [data]="rows"
+        [showHeader]="false"
+        [loading]="false"
+        [showPagination]="true"
+        [pagination]="pagination"
+        [sortColumn]="sortColumn"
+        [sortDirection]="sortDirection"
+        (sortChange)="onSortChange($event)"
+        (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)"
+      >
         <ng-template #cell let-row let-column="column">
           @switch (column.key) {
             @case ('start') {
@@ -44,20 +56,12 @@
             }
             @case ('actions') {
               <div class="row-actions">
-                <ui-button
-                  size="sm"
-                  variant="ghost"
-                  color="neutral"
-                  (clicked)="openEdit(row)"
-                >
+                <ui-button size="sm" variant="soft" color="neutral" [iconLeft]="true" (clicked)="openEdit(row)">
+                  <mat-icon slot="icon-left">edit</mat-icon>
                   Edit
                 </ui-button>
-                <ui-button
-                  size="sm"
-                  variant="ghost"
-                  color="danger"
-                  (clicked)="delete(row)"
-                >
+                <ui-button size="sm" variant="soft" color="danger" [iconLeft]="true" (clicked)="delete(row)">
+                  <mat-icon slot="icon-left">delete</mat-icon>
                   Delete
                 </ui-button>
               </div>

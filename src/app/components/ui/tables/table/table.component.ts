@@ -1,7 +1,10 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, TemplateRef, ContentChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
 import { cn, sizeClass } from '../../utils/class-utils';
 import type { Size, TableColumn } from '../../types/component.types';
+import { InputComponent } from '../../forms/input/input.component';
 
 export interface SortEvent {
   column: string;
@@ -18,9 +21,27 @@ export interface PaginationConfig {
 @Component({
   selector: 'ui-table',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule, MatIconModule, InputComponent],
   template: `
     <div [class]="wrapperClasses">
+      <!-- Search Input -->
+      @if (searchable) {
+        <div class="table-search">
+          <ui-input
+            type="search"
+            [placeholder]="searchPlaceholder"
+            [(ngModel)]="searchQuery"
+            (valueChange)="onSearchChange()"
+            [clearable]="true"
+            (cleared)="clearSearch()"
+            [iconLeft]="true"
+            size="sm"
+          >
+            <mat-icon slot="icon-left">search</mat-icon>
+          </ui-input>
+        </div>
+      }
+
       <!-- Table Header Actions -->
       @if (showHeader) {
         <div class="table-header">
@@ -86,7 +107,7 @@ export interface PaginationConfig {
 
           <!-- Table Body -->
           <tbody class="table__body">
-            @if (data.length === 0 && !loading) {
+            @if (filteredData.length === 0 && !loading) {
               <tr>
                 <td [attr.colspan]="totalColumns" class="table__empty">
                   <ng-content select="[slot=empty]"></ng-content>
@@ -95,13 +116,13 @@ export interface PaginationConfig {
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
                       </svg>
-                      <span>{{ emptyMessage }}</span>
+                      <span>{{ searchQuery ? noResultsMessage : emptyMessage }}</span>
                     </div>
                   }
                 </td>
               </tr>
             } @else {
-              @for (row of data; track trackByFn(row); let i = $index) {
+              @for (row of filteredData; track trackByFn(row); let i = $index) {
                 <tr
                   class="table__row"
                   [class.table__row--selected]="isSelected(row)"
@@ -230,16 +251,21 @@ export class TableComponent<T = any> {
   @Input() compact = false;
   @Input() trackByKey = 'id';
   @Input() customClass?: string;
+  @Input() sortColumn: string | null = null;
+  @Input() sortDirection: 'asc' | 'desc' | null = null;
+  @Input() searchable = true;
+  @Input() searchPlaceholder = 'Search...';
+  @Input() noResultsMessage = 'No matching results found';
 
   @Output() sortChange = new EventEmitter<SortEvent>();
   @Output() selectionChange = new EventEmitter<T[]>();
   @Output() rowClick = new EventEmitter<{ row: T; index: number }>();
   @Output() pageChange = new EventEmitter<number>();
   @Output() pageSizeChange = new EventEmitter<number>();
+  @Output() searchChange = new EventEmitter<string>();
 
-  sortColumn: string | null = null;
-  sortDirection: 'asc' | 'desc' | null = null;
   selectedRows = new Set<T>();
+  searchQuery = '';
 
   get wrapperClasses(): string {
     return cn(
@@ -275,6 +301,12 @@ export class TableComponent<T = any> {
 
   get someSelected(): boolean {
     return this.selectedRows.size > 0;
+  }
+
+  get filteredData(): T[] {
+    if (!this.searchQuery.trim()) return this.data;
+    const query = this.searchQuery.toLowerCase().trim();
+    return this.data.filter(row => this.rowMatchesSearch(row, query));
   }
 
   get totalPages(): number {
@@ -342,19 +374,22 @@ export class TableComponent<T = any> {
   }
 
   toggleSort(columnKey: string): void {
+    let newColumn: string | null = columnKey;
+    let newDirection: 'asc' | 'desc' | null = 'asc';
+
     if (this.sortColumn === columnKey) {
-      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : this.sortDirection === 'desc' ? null : 'asc';
-      if (!this.sortDirection) {
-        this.sortColumn = null;
+      // Cycle through: asc -> desc -> null
+      if (this.sortDirection === 'asc') {
+        newDirection = 'desc';
+      } else if (this.sortDirection === 'desc') {
+        newDirection = null;
+        newColumn = null;
       }
-    } else {
-      this.sortColumn = columnKey;
-      this.sortDirection = 'asc';
     }
 
     this.sortChange.emit({
-      column: this.sortColumn ?? '',
-      direction: this.sortDirection
+      column: newColumn ?? '',
+      direction: newDirection
     });
   }
 
@@ -395,5 +430,49 @@ export class TableComponent<T = any> {
   onPageSizeChange(event: Event): void {
     const target = event.target as HTMLSelectElement;
     this.pageSizeChange.emit(+target.value);
+  }
+
+  onSearchChange(): void {
+    this.searchChange.emit(this.searchQuery);
+  }
+
+  clearSearch(): void {
+    this.searchQuery = '';
+    this.searchChange.emit('');
+  }
+
+  private rowMatchesSearch(row: T, query: string): boolean {
+    // Search through all column keys
+    for (const column of this.columns) {
+      const value = this.getCellValue(row, this.getColumnKey(column));
+      if (value !== null && value !== undefined) {
+        const stringValue = String(value).toLowerCase();
+        if (stringValue.includes(query)) {
+          return true;
+        }
+      }
+    }
+    // Also search through all object properties for nested values
+    return this.deepSearchObject(row, query);
+  }
+
+  private deepSearchObject(obj: any, query: string, visited = new WeakSet()): boolean {
+    if (obj === null || obj === undefined) return false;
+    if (typeof obj !== 'object') {
+      return String(obj).toLowerCase().includes(query);
+    }
+    if (visited.has(obj)) return false;
+    visited.add(obj);
+
+    for (const key of Object.keys(obj)) {
+      const value = obj[key];
+      if (value === null || value === undefined) continue;
+      if (typeof value === 'object') {
+        if (this.deepSearchObject(value, query, visited)) return true;
+      } else {
+        if (String(value).toLowerCase().includes(query)) return true;
+      }
+    }
+    return false;
   }
 }

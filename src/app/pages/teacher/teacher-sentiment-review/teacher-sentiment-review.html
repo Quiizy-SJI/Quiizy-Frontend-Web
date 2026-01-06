@@ -1,0 +1,255 @@
+<div class="sentiment-review">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>
+        <mat-icon>psychology</mat-icon>
+        Sentiment Analysis
+      </h1>
+      <p>Analyze student emotions and engagement in open-ended question responses using AI.</p>
+    </div>
+  </div>
+
+  <!-- Error Alert -->
+  @if (errorMessage()) {
+    <ui-alert color="danger" class="error-alert">
+      <mat-icon>error_outline</mat-icon>
+      {{ errorMessage() }}
+    </ui-alert>
+  }
+
+  <!-- Loading State -->
+  @if (isLoadingQuizzes()) {
+    <div class="loading-state">
+      <ui-spinner size="lg" />
+      <p>Loading quizzes...</p>
+    </div>
+  } @else {
+    <!-- Quiz Selection -->
+    <ui-card class="selection-card">
+      <div class="selection-header">
+        <h2>Select a Quiz to Analyze</h2>
+        <p>Choose a completed quiz with an open-ended question</p>
+      </div>
+
+      @if (quizOptions().length === 0) {
+        <div class="empty-state">
+          <mat-icon>quiz</mat-icon>
+          <h3>No quizzes available</h3>
+          <p>You don't have any quizzes with open-ended questions yet.</p>
+        </div>
+      } @else {
+        <div class="quiz-selector">
+          <ui-select
+            label="Quiz"
+            placeholder="Select a quiz..."
+            [options]="quizSelectOptions()"
+            [ngModel]="selectedQuizId()"
+            (ngModelChange)="onQuizSelected($event)"
+            [searchable]="true"
+          ></ui-select>
+
+          @if (selectedQuiz(); as quiz) {
+            <div class="quiz-details">
+              <div class="detail-row">
+                <span class="label">Question:</span>
+                <span class="value">{{ quiz.openEndedQuestion?.question }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">Students:</span>
+                <span class="value">{{ quiz.submittedCount }} / {{ quiz.studentCount }} submitted</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">Status:</span>
+                @if (quiz.isFinished) {
+                  <ui-badge color="success">Completed</ui-badge>
+                } @else {
+                  <ui-badge color="warning">In Progress</ui-badge>
+                }
+              </div>
+            </div>
+
+            <div class="analyze-actions">
+              <ui-button
+                [disabled]="!canAnalyze()"
+                (click)="runAnalysis()"
+              >
+                @if (isAnalyzing()) {
+                  <ui-spinner size="sm" />
+                  <span>Analyzing...</span>
+                } @else {
+                  <mat-icon>auto_awesome</mat-icon>
+                  <span>Run AI Analysis</span>
+                }
+              </ui-button>
+
+              @if (!quiz.isFinished) {
+                <p class="hint">Quiz must be completed before analysis</p>
+              }
+            </div>
+          }
+        </div>
+      }
+      </ui-card>
+    @if (result(); as res) {
+      <div class="results-section">
+        <!-- Overall Sentiment Card -->
+        <ui-card class="sentiment-overview" [ngClass]="sentimentColor()">
+          <div class="overview-header">
+            <div class="sentiment-icon-wrapper" [ngClass]="sentimentColor()">
+              <mat-icon>{{ sentimentIcon() }}</mat-icon>
+            </div>
+            <div class="overview-content">
+              <h2>{{ res.overallSentiment }} Sentiment</h2>
+              <p class="summary">{{ res.summary }}</p>
+            </div>
+          </div>
+
+          <div class="metrics-grid">
+            <div class="metric">
+              <span class="metric-value">{{ confidencePercent() }}%</span>
+              <span class="metric-label">Confidence</span>
+            </div>
+            <div class="metric">
+              <span class="metric-value">{{ answersAnalyzed().provided }}</span>
+              <span class="metric-label">Responses Analyzed</span>
+            </div>
+            <div class="metric">
+              <span class="metric-value">{{ answersAnalyzed().empty }}</span>
+              <span class="metric-label">Empty Responses</span>
+            </div>
+            @if (res.sentimentScore !== undefined) {
+              <div class="metric">
+                <span class="metric-value">{{ res.sentimentScore | number:'1.2-2' }}</span>
+                <span class="metric-label">Score (-1 to 1)</span>
+              </div>
+            }
+          </div>
+        </ui-card>
+
+        <!-- Emotions & Themes Grid -->
+        <div class="analysis-grid">
+          <!-- Emotions Card -->
+          @if (topEmotions().length > 0) {
+            <ui-card class="emotions-card">
+              <h3>
+                <mat-icon>mood</mat-icon>
+                Detected Emotions
+              </h3>
+              <div class="emotions-list">
+                @for (emotion of topEmotions(); track emotion.label; let i = $index) {
+                  <div class="emotion-item">
+                    <div class="emotion-header">
+                      <span class="emotion-label">{{ emotion.label }}</span>
+                      <span class="emotion-score">{{ emotion.score * 100 | number:'1.0-0' }}%</span>
+                    </div>
+                    <div class="emotion-bar-track">
+                      <div
+                        class="emotion-bar-fill"
+                        [style.width]="getEmotionBarWidth(emotion.score)"
+                        [style.backgroundColor]="getEmotionColor(i)"
+                      ></div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </ui-card>
+          }
+
+          <!-- Themes Card -->
+          @if (themes().length > 0) {
+            <ui-card class="themes-card">
+              <h3>
+                <mat-icon>tag</mat-icon>
+                Key Themes
+              </h3>
+              <div class="themes-list">
+                @for (theme of themes(); track theme.theme) {
+                  <div class="theme-item">
+                    <div class="theme-header">
+                      <span class="theme-name">{{ theme.theme }}</span>
+                      <ui-badge color="neutral">{{ theme.frequency }} mentions</ui-badge>
+                    </div>
+                    @if (theme.examples && theme.examples.length > 0) {
+                      <ul class="theme-examples">
+                        @for (example of theme.examples; track example) {
+                          <li>"{{ example }}"</li>
+                        }
+                      </ul>
+                    }
+                  </div>
+                }
+              </div>
+            </ui-card>
+          }
+        </div>
+
+        <!-- Insights & Concerns -->
+        <div class="insights-grid">
+          <!-- Actionable Insights -->
+          @if (insights().length > 0) {
+            <ui-card class="insights-card">
+              <h3>
+                <mat-icon>lightbulb</mat-icon>
+                Actionable Insights
+              </h3>
+              <ul class="insights-list">
+                @for (insight of insights(); track insight) {
+                  <li>
+                    <mat-icon>arrow_right</mat-icon>
+                    {{ insight }}
+                  </li>
+                }
+              </ul>
+            </ui-card>
+          }
+
+          <!-- Concerns -->
+          @if (concerns().length > 0) {
+            <ui-card class="concerns-card">
+              <h3>
+                <mat-icon>warning_amber</mat-icon>
+                Student Concerns
+              </h3>
+              <ul class="concerns-list">
+                @for (concern of concerns(); track concern) {
+                  <li>
+                    <mat-icon>report_problem</mat-icon>
+                    {{ concern }}
+                  </li>
+                }
+              </ul>
+            </ui-card>
+          }
+        </div>
+
+        <!-- Analysis Meta Info -->
+        <div class="analysis-meta">
+          <span>
+            <mat-icon>smart_toy</mat-icon>
+            Analyzed by: {{ analysisResult()?.model }}
+          </span>
+          <span>
+            <mat-icon>schedule</mat-icon>
+            {{ analysisResult()?.analyzedAt | date:'medium' }}
+          </span>
+        </div>
+      </div>
+    }
+
+    <!-- Failed Analysis State -->
+    @if (analysisResult()?.status === 'FAILED') {
+      <ui-card class="failed-card">
+        <div class="failed-content">
+          <mat-icon>error_outline</mat-icon>
+          <h3>Analysis Failed</h3>
+          <p>{{ analysisResult()?.error ?? 'An unknown error occurred during analysis.' }}</p>
+          <ui-button variant="outline" (click)="runAnalysis()">
+            <mat-icon>refresh</mat-icon>
+            Retry Analysis
+          </ui-button>
+        </div>
+      </ui-card>
+    }
+  }
+</div>

@@ -1,7 +1,7 @@
 <div class="page">
   <div class="page__top">
     <div>
-      <div class="page__title">Mini Admin Accounts</div>
+      <div class="page__title">Speciality Head Accounts</div>
       <div class="page__subtitle">Create and manage speciality head accounts.</div>
     </div>
 
@@ -10,7 +10,7 @@
         Refresh
       </ui-button>
       <ui-button variant="solid" color="primary" (clicked)="openCreate()">
-        New Mini Admin
+        New Speciality Head
       </ui-button>
     </div>
   </div>
@@ -21,13 +21,23 @@
     </ui-alert>
   }
 
-  <ui-card title="Mini Admins" [hoverable]="false">
+  <ui-card title="Speciality Head" [hoverable]="false">
     @if (isLoading) {
       <div class="page__loading">
         <ui-spinner size="lg"></ui-spinner>
       </div>
     } @else {
-      <ui-table [columns]="columns" [data]="rows">
+      <ui-table
+        [columns]="columns"
+        [data]="rows"
+        [showPagination]="true"
+        [pagination]="pagination"
+        [sortColumn]="sortColumn"
+        [sortDirection]="sortDirection"
+        (sortChange)="onSortChange($event)"
+        (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)"
+      >
         <ng-template #cell let-row let-column="column">
           @switch (column.key) {
             @case ('name') { {{ row.user?.name }} }
@@ -38,8 +48,14 @@
             @case ('updatedAt') { {{ row.updatedAt }} }
             @case ('actions') {
               <div class="row-actions">
-                <ui-button size="sm" variant="ghost" color="neutral" (clicked)="openEdit(row)">Edit</ui-button>
-                <ui-button size="sm" variant="ghost" color="danger" (clicked)="delete(row)">Delete</ui-button>
+                <ui-button size="sm" variant="soft" color="neutral" [iconLeft]="true" (clicked)="openEdit(row)">
+                  <mat-icon slot="icon-left">edit</mat-icon>
+                  Edit
+                </ui-button>
+                <ui-button size="sm" variant="soft" color="danger" [iconLeft]="true" (clicked)="delete(row)">
+                  <mat-icon slot="icon-left">delete</mat-icon>
+                  Delete
+                </ui-button>
               </div>
             }
           }
@@ -71,6 +87,13 @@
         placeholder="Leave blank to keep current"
         [(ngModel)]="form.password"
       ></ui-input>
+
+      <ui-select
+        label="Speciality"
+        [options]="specialityOptions()"
+        [(ngModel)]="form.specialityId"
+        [searchable]="true"
+      ></ui-select>
     </div>
 
     <div slot="footer" class="modal-actions">

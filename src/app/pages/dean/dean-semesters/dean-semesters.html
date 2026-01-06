@@ -11,6 +11,7 @@
         [options]="academicYearOptions()"
         [(ngModel)]="selectedAcademicYearId"
         (ngModelChange)="onFilterChanged()"
+        [searchable]="true"
       ></ui-select>
 
       <ui-button variant="outline" color="neutral" (clicked)="loadSemesters()" [loading]="isLoading">
@@ -34,7 +35,17 @@
         <ui-spinner size="lg"></ui-spinner>
       </div>
     } @else {
-      <ui-table [columns]="columns" [data]="semesters">
+      <ui-table
+        [columns]="columns"
+        [data]="semesters"
+        [showPagination]="true"
+        [pagination]="pagination"
+        [sortColumn]="sortColumn"
+        [sortDirection]="sortDirection"
+        (sortChange)="onSortChange($event)"
+        (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)"
+      >
         <ng-template #cell let-row let-column="column">
           @switch (column.key) {
             @case ('name') { {{ row.name }} }
@@ -46,8 +57,14 @@
             @case ('updatedAt') { {{ row.updatedAt }} }
             @case ('actions') {
               <div class="row-actions">
-                <ui-button size="sm" variant="soft" color="neutral" (clicked)="openEdit(row)">Edit</ui-button>
-                <ui-button size="sm" variant="soft" color="danger" (clicked)="delete(row)">Delete</ui-button>
+                <ui-button size="sm" variant="soft" color="neutral" [iconLeft]="true" (clicked)="openEdit(row)">
+                  <mat-icon slot="icon-left">edit</mat-icon>
+                  Edit
+                </ui-button>
+                <ui-button size="sm" variant="soft" color="danger" [iconLeft]="true" (clicked)="delete(row)">
+                  <mat-icon slot="icon-left">delete</mat-icon>
+                  Delete
+                </ui-button>
               </div>
             }
           }
@@ -71,17 +88,19 @@
         [options]="classAcademicYearOptions()"
         [(ngModel)]="form.classAcademicYearId"
         [disabled]="modalMode === 'edit'"
+        [searchable]="true"
       ></ui-select>
 
       <ui-select
         label="Status"
         [options]="statusOptions"
         [(ngModel)]="form.status"
+        [searchable]="true"
       ></ui-select>
 
       <div class="grid-2">
-        <ui-input label="Start Date" placeholder="YYYY-MM-DD" [(ngModel)]="form.startDate"></ui-input>
-        <ui-input label="End Date" placeholder="YYYY-MM-DD" [(ngModel)]="form.endDate"></ui-input>
+        <ui-input label="Start Date" type="date" [(ngModel)]="form.startDate"></ui-input>
+        <ui-input label="End Date" type="date" [(ngModel)]="form.endDate"></ui-input>
       </div>
     </div>
 

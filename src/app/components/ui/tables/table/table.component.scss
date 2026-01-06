@@ -13,6 +13,20 @@
 }
 
 // ==========================================
+// TABLE SEARCH
+// ==========================================
+.table-search {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--surface-base);
+
+  ui-input,
+  .input-wrapper {
+    max-width: 400px;
+  }
+}
+
+// ==========================================
 // TABLE HEADER
 // ==========================================
 .table-header {

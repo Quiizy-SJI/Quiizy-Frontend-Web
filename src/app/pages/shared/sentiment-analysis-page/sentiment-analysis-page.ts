@@ -1,9 +1,10 @@
-import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, signal, computed, inject, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
 
+import { SentimentAnalysisService } from '../../../services/sentiment-analysis.service';
 import { TeacherApiService } from '../../../services/teacher-api.service';
 import type { QuizDto, QuizQuestionViewModel } from '../../../domain/dtos/teacher/teacher-quiz.dto';
 import { findOpenEndedQuestion } from '../../../domain/dtos/teacher/teacher-quiz.dto';
@@ -35,8 +36,21 @@ interface QuizOption {
   submittedCount: number;
 }
 
+/**
+ * Shared Sentiment Analysis Page Component
+ *
+ * This component can be used across multiple role-based layouts (Teacher, Dean, Speciality Head).
+ * It provides AI-powered sentiment analysis of student responses to open-ended questions.
+ *
+ * Usage:
+ * ```html
+ * <app-sentiment-analysis-page [role]="'teacher'" />
+ * <app-sentiment-analysis-page [role]="'dean'" />
+ * <app-sentiment-analysis-page [role]="'speciality-head'" />
+ * ```
+ */
 @Component({
-  selector: 'app-teacher-sentiment-review',
+  selector: 'app-sentiment-analysis-page',
   standalone: true,
   imports: [
     CommonModule,
@@ -49,22 +63,42 @@ interface QuizOption {
     AlertComponent,
     SelectComponent,
   ],
-  templateUrl: './teacher-sentiment-review.html',
-  styleUrls: ['./teacher-sentiment-review.scss'],
+  templateUrl: './sentiment-analysis-page.html',
+  styleUrls: ['./sentiment-analysis-page.scss'],
 })
-export class TeacherSentimentReview implements OnInit {
+export class SentimentAnalysisPage implements OnInit {
+  private readonly sentimentService = inject(SentimentAnalysisService);
   private readonly teacherApi = inject(TeacherApiService);
+
+  /**
+   * The role context for this page. Affects available features and data access.
+   */
+  readonly role = input<'teacher' | 'dean' | 'speciality-head'>('teacher');
+
+  /**
+   * Optional title override. Defaults to "Sentiment Analysis".
+   */
+  readonly pageTitle = input<string>('Sentiment Analysis');
+
+  /**
+   * Optional subtitle override.
+   */
+  readonly pageSubtitle = input<string>(
+    'Analyze student emotions and engagement in open-ended question responses using AI.'
+  );
 
   // ============================================
   // State Signals
   // ============================================
   readonly isLoadingQuizzes = signal(true);
   readonly isAnalyzing = signal(false);
+  readonly isLoadingExisting = signal(false);
   readonly errorMessage = signal<string | null>(null);
 
   readonly quizOptions = signal<QuizOption[]>([]);
   readonly selectedQuizId = signal<string | null>(null);
   readonly analysisResult = signal<SentimentAnalysisResponseDto | null>(null);
+  readonly existingAnalyses = signal<SentimentAnalysisResponseDto[]>([]);
 
   // ============================================
   // Computed Properties
@@ -166,6 +200,13 @@ export class TeacherSentimentReview implements OnInit {
     };
   });
 
+  readonly hasExistingAnalysis = computed(() => this.existingAnalyses().length > 0);
+
+  readonly latestExistingAnalysis = computed(() => {
+    const analyses = this.existingAnalyses();
+    return analyses.length > 0 ? analyses[0] : null;
+  });
+
   ngOnInit(): void {
     this.loadQuizzes();
   }
@@ -178,11 +219,13 @@ export class TeacherSentimentReview implements OnInit {
     this.errorMessage.set(null);
 
     try {
+      // TODO: For dean/speciality-head roles, use a different API that returns all quizzes
+      // For now, using the teacher API which works for all roles with proper backend permissions
       const quizzes = await firstValueFrom(this.teacherApi.getMyQuizzes());
       const now = new Date();
 
       // Filter and map quizzes with open-ended questions
-      // Questions are accessed through CourseQuiz → CourseQuizQuestion
+      // Questions are accessed through CourseQuiz → CourseQuizQuestion → Question
       const options: QuizOption[] = quizzes
         .map((quiz) => {
           const openEnded = findOpenEndedQuestion(quiz) ?? null;
@@ -219,13 +262,44 @@ export class TeacherSentimentReview implements OnInit {
     }
   }
 
+  private async loadExistingAnalyses(quizId: string, questionId: string): Promise<void> {
+    this.isLoadingExisting.set(true);
+
+    try {
+      const analyses = await firstValueFrom(
+        this.sentimentService.getByQuiz(quizId, questionId)
+      );
+      this.existingAnalyses.set(analyses);
+
+      // If there's an existing completed analysis, show it
+      const completed = analyses.find((a) => a.status === 'COMPLETED');
+      if (completed) {
+        this.analysisResult.set(completed);
+      }
+    } catch (error) {
+      console.error('Error loading existing analyses:', error);
+      // Don't show error - just means no existing analyses
+      this.existingAnalyses.set([]);
+    } finally {
+      this.isLoadingExisting.set(false);
+    }
+  }
+
   // ============================================
   // Actions
   // ============================================
   onQuizSelected(quizId: string): void {
     this.selectedQuizId.set(quizId);
     this.analysisResult.set(null);
+    this.existingAnalyses.set([]);
     this.errorMessage.set(null);
+
+    // Load existing analyses for this quiz/question
+    // Use questionId from the flattened view model
+    const quiz = this.quizOptions().find((q) => q.quizId === quizId);
+    if (quiz?.openEndedQuestion) {
+      this.loadExistingAnalyses(quizId, quiz.openEndedQuestion.questionId);
+    }
   }
 
   async runAnalysis(): Promise<void> {
@@ -236,15 +310,17 @@ export class TeacherSentimentReview implements OnInit {
     this.errorMessage.set(null);
 
     try {
-      // Use questionId from the flattened view model
       const result = await firstValueFrom(
-        this.teacherApi.analyzeSentiment({
+        this.sentimentService.analyze({
           quizId: quiz.quizId,
           questionId: quiz.openEndedQuestion.questionId,
         })
       );
 
       this.analysisResult.set(result);
+
+      // Add to existing analyses list
+      this.existingAnalyses.update((list) => [result, ...list]);
 
       if (result.status === 'FAILED') {
         this.errorMessage.set(result.error ?? 'Analysis failed. Please try again.');
@@ -261,6 +337,10 @@ export class TeacherSentimentReview implements OnInit {
     }
   }
 
+  viewExistingAnalysis(analysis: SentimentAnalysisResponseDto): void {
+    this.analysisResult.set(analysis);
+  }
+
   // ============================================
   // Helpers
   // ============================================
@@ -274,6 +354,17 @@ export class TeacherSentimentReview implements OnInit {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
+    });
+  }
+
+  formatDateTime(dateStr: string | null | undefined): string {
+    if (!dateStr) return 'N/A';
+    return new Date(dateStr).toLocaleString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
     });
   }
 
