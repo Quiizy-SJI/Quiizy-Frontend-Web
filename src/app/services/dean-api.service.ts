@@ -2,6 +2,13 @@ import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
 import { ApiClientService } from '../core/http/api-client.service';
+import {
+  toString,
+  toStringRequired,
+  toBoolean,
+  toDateString,
+  removeUndefined,
+} from '../core/utils/payload-sanitizer';
 import type {
   AcademicYearDto,
   SemesterDto,
@@ -35,11 +42,20 @@ export class DeanApiService {
   }
 
   createAcademicYear(dto: CreateAcademicYearDto): Observable<AcademicYearDto> {
-    return this.api.post<AcademicYearDto>('/dean/academic-years', dto);
+    const payload: Record<string, unknown> = {
+      start: toStringRequired(dto.start),
+      end: toStringRequired(dto.end),
+      cloneClassesFromLatest: toBoolean(dto.cloneClassesFromLatest),
+    };
+    return this.api.post<AcademicYearDto>('/dean/academic-years', removeUndefined(payload));
   }
 
   updateAcademicYear(id: string, dto: UpdateAcademicYearDto): Observable<AcademicYearDto | null> {
-    return this.api.patch<AcademicYearDto | null>(`/dean/academic-years/${id}`, dto);
+    const payload: Record<string, unknown> = {
+      start: toString(dto.start),
+      end: toString(dto.end),
+    };
+    return this.api.patch<AcademicYearDto | null>(`/dean/academic-years/${id}`, removeUndefined(payload));
   }
 
   deleteAcademicYear(id: string): Observable<{ deleted: boolean }> {
@@ -48,17 +64,31 @@ export class DeanApiService {
 
   // Semesters
   listSemesters(academicYearId?: string): Observable<SemesterDto[]> {
-    return this.api.get<SemesterDto[]>('/dean/semesters', {
-      params: academicYearId ? { academicYearId } : undefined,
-    });
+    const params = academicYearId ? { academicYearId: String(academicYearId) } : undefined;
+    return this.api.get<SemesterDto[]>('/dean/semesters', { params });
   }
 
   createSemester(dto: CreateSemesterDto): Observable<SemesterDto> {
-    return this.api.post<SemesterDto>('/dean/semesters', dto);
+    const payload: Record<string, unknown> = {
+      name: toStringRequired(dto.name),
+      shortCode: toStringRequired(dto.shortCode),
+      classAcademicYearId: toStringRequired(dto.classAcademicYearId),
+      startDate: toDateString(dto.startDate),
+      endDate: toDateString(dto.endDate),
+      status: dto.status ? String(dto.status) : undefined,
+    };
+    return this.api.post<SemesterDto>('/dean/semesters', removeUndefined(payload));
   }
 
   updateSemester(id: string, dto: UpdateSemesterDto): Observable<SemesterDto | null> {
-    return this.api.patch<SemesterDto | null>(`/dean/semesters/${id}`, dto);
+    const payload: Record<string, unknown> = {
+      name: toString(dto.name),
+      shortCode: toString(dto.shortCode),
+      startDate: toDateString(dto.startDate),
+      endDate: toDateString(dto.endDate),
+      status: dto.status ? String(dto.status) : undefined,
+    };
+    return this.api.patch<SemesterDto | null>(`/dean/semesters/${id}`, removeUndefined(payload));
   }
 
   deleteSemester(id: string): Observable<{ deleted: boolean }> {
@@ -71,11 +101,21 @@ export class DeanApiService {
   }
 
   createExamType(dto: CreateExamTypeDto): Observable<ExamTypeDto> {
-    return this.api.post<ExamTypeDto>('/dean/exam-types', dto);
+    const payload: Record<string, unknown> = {
+      name: toStringRequired(dto.name),
+      description: toString(dto.description),
+      active: toBoolean(dto.active),
+    };
+    return this.api.post<ExamTypeDto>('/dean/exam-types', removeUndefined(payload));
   }
 
   updateExamType(id: string, dto: UpdateExamTypeDto): Observable<ExamTypeDto | null> {
-    return this.api.patch<ExamTypeDto | null>(`/dean/exam-types/${id}`, dto);
+    const payload: Record<string, unknown> = {
+      name: toString(dto.name),
+      description: toString(dto.description),
+      active: toBoolean(dto.active),
+    };
+    return this.api.patch<ExamTypeDto | null>(`/dean/exam-types/${id}`, removeUndefined(payload));
   }
 
   deleteExamType(id: string): Observable<{ deleted: boolean }> {
@@ -88,11 +128,17 @@ export class DeanApiService {
   }
 
   createTeachingUnit(dto: CreateTeachingUnitDto): Observable<TeachingUnitDto> {
-    return this.api.post<TeachingUnitDto>('/dean/teaching-units', dto);
+    const payload: Record<string, unknown> = {
+      name: toStringRequired(dto.name),
+    };
+    return this.api.post<TeachingUnitDto>('/dean/teaching-units', payload);
   }
 
   updateTeachingUnit(id: string, dto: UpdateTeachingUnitDto): Observable<TeachingUnitDto | null> {
-    return this.api.patch<TeachingUnitDto | null>(`/dean/teaching-units/${id}`, dto);
+    const payload: Record<string, unknown> = {
+      name: toString(dto.name),
+    };
+    return this.api.patch<TeachingUnitDto | null>(`/dean/teaching-units/${id}`, removeUndefined(payload));
   }
 
   deleteTeachingUnit(id: string): Observable<{ deleted: boolean }> {
@@ -110,11 +156,17 @@ export class DeanApiService {
   }
 
   createSpeciality(dto: CreateSpecialityDto): Observable<SpecialityDto> {
-    return this.api.post<SpecialityDto>('/dean/specialities', dto);
+    const payload: Record<string, unknown> = {
+      name: toStringRequired(dto.name),
+    };
+    return this.api.post<SpecialityDto>('/dean/specialities', payload);
   }
 
   updateSpeciality(id: string, dto: UpdateSpecialityDto): Observable<SpecialityDto | null> {
-    return this.api.patch<SpecialityDto | null>(`/dean/specialities/${id}`, dto);
+    const payload: Record<string, unknown> = {
+      name: toString(dto.name),
+    };
+    return this.api.patch<SpecialityDto | null>(`/dean/specialities/${id}`, removeUndefined(payload));
   }
 
   deleteSpeciality(id: string): Observable<{ deleted: boolean }> {
@@ -122,19 +174,36 @@ export class DeanApiService {
   }
 
   assignSpecialityHead(id: string, headId?: string | null): Observable<SpecialityDto | null> {
-    // Backend expects: { headId: string } to assign, or { } / { headId: undefined } to unassign
+    // Backend expects: { headId: string } to assign, or {} to unassign
     // @IsOptional() @IsString() means null is not valid, only undefined or a string
-    const body = headId ? { headId } : {};
-    console.log("Update head ", body);
+    const sanitizedHeadId = toString(headId);
+    const body = sanitizedHeadId ? { headId: sanitizedHeadId } : {};
     return this.api.patch<SpecialityDto | null>(`/dean/specialities/${id}/head`, body);
   }
 
   createMiniAdmin(dto: CreateMiniAdminDto): Observable<MiniAdminDto> {
-    return this.api.post<MiniAdminDto>('/dean/mini-admins', dto);
+    const payload: Record<string, unknown> = {
+      name: toStringRequired(dto.name),
+      surname: toStringRequired(dto.surname),
+      email: toStringRequired(dto.email),
+      login: toStringRequired(dto.login),
+      password: toStringRequired(dto.password),
+      specialityId: toString(dto.specialityId),
+    };
+    return this.api.post<MiniAdminDto>('/dean/mini-admins', removeUndefined(payload));
   }
 
   updateMiniAdmin(id: string, dto: UpdateMiniAdminDto): Observable<MiniAdminDto | null> {
-    return this.api.patch<MiniAdminDto | null>(`/dean/mini-admins/${id}`, dto);
+    const payload: Record<string, unknown> = {
+      name: toString(dto.name),
+      surname: toString(dto.surname),
+      email: toString(dto.email),
+      login: toString(dto.login),
+      password: toString(dto.password),
+      // For specialityId, null means "unassign", undefined means "don't change"
+      specialityId: dto.specialityId === null ? null : toString(dto.specialityId),
+    };
+    return this.api.patch<MiniAdminDto | null>(`/dean/mini-admins/${id}`, removeUndefined(payload));
   }
 
   deleteMiniAdmin(id: string): Observable<{ deleted: boolean }> {
@@ -143,22 +212,18 @@ export class DeanApiService {
 
   // AI analytics
   getAiAnalytics(academicYearId?: string): Observable<DeanAiAnalyticsDto> {
-    academicYearId = academicYearId ? String(academicYearId) : undefined;
-    return this.api.get<DeanAiAnalyticsDto>('/dean/ai-analytics', {
-      params: academicYearId ? { academicYearId } : undefined,
-    });
+    const params = academicYearId ? { academicYearId: String(academicYearId) } : undefined;
+    return this.api.get<DeanAiAnalyticsDto>('/dean/ai-analytics', { params });
   }
 
   // Stats
   getStats(academicYearId?: string): Observable<DeanDashboardStatsDto> {
-    return this.api.get<DeanDashboardStatsDto>('/dean/stats', {
-      params: academicYearId ? { academicYearId } : undefined,
-    });
+    const params = academicYearId ? { academicYearId: String(academicYearId) } : undefined;
+    return this.api.get<DeanDashboardStatsDto>('/dean/stats', { params });
   }
 
   publishStats(academicYearId?: string): Observable<{ published: boolean }> {
-    return this.api.post<{ published: boolean }>('/dean/stats/publish', {}, {
-      params: academicYearId ? { academicYearId } : undefined,
-    });
+    const params = academicYearId ? { academicYearId: String(academicYearId) } : undefined;
+    return this.api.post<{ published: boolean }>('/dean/stats/publish', {}, { params });
   }
 }

@@ -33,6 +33,7 @@ import type {
   DemographicBreakdown,
 } from '../domain/dtos/statistics/statistics.dto';
 import type { QuizDto, CourseDto } from '../domain/dtos/teacher/teacher-quiz.dto';
+import { getQuizQuestionCount } from '../domain/dtos/teacher/teacher-quiz.dto';
 
 /**
  * Comprehensive Statistics Service
@@ -270,7 +271,8 @@ export class StatisticsService {
    */
   buildTeacherKpis(courses: CourseDto[], quizzes: QuizDto[]): KpiCard[] {
     const totalStudents = this.countUniqueStudents(quizzes);
-    const totalQuestions = quizzes.reduce((sum, q) => sum + (q.questions?.length || 0), 0);
+    // Questions are accessed through CourseQuiz → CourseQuizQuestion
+    const totalQuestions = quizzes.reduce((sum, q) => sum + getQuizQuestionCount(q), 0);
     const avgScore = this.computeAverageScore(quizzes);
     const completionRate = this.computeCompletionRate(quizzes);
 
