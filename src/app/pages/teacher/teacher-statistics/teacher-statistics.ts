@@ -1,6 +1,9 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+import { StatCardComponent } from '../../../components/ui/cards/stat-card/stat-card.component';
+import { ChartHostComponent } from '../../../components/charts/chart-host/chart-host.component';
+import { TableComponent } from '../../../components/ui/tables/table/table.component';
 import { firstValueFrom } from 'rxjs';
 
 import { TeacherApiService } from '../../../services/teacher-api.service';
@@ -10,58 +13,19 @@ import { getQuizQuestionCount } from '../../../domain/dtos/teacher/teacher-quiz.
 @Component({
   selector: 'app-teacher-statistics',
   standalone: true,
-  imports: [CommonModule, MatIconModule],
+  imports: [CommonModule, MatIconModule, StatCardComponent, ChartHostComponent, TableComponent],
   template: `
     <div class="statistics">
       <div class="page-header">
         <h1>Statistics & Analytics</h1>
-        <p>Comprehensive insights into student performance and exam analytics.</p>
+        <p>Overview of recent quizzes and student performance.</p>
       </div>
 
       <div class="stats-overview">
-        <div class="overview-card">
-          <div class="card-icon">
-            <mat-icon>groups</mat-icon>
-          </div>
-          <div class="card-content">
-            <h3>Total Students</h3>
-            <p class="main-stat">{{ stats.totalStudents }}</p>
-            <span class="trend neutral">Across all quizzes</span>
-          </div>
-        </div>
-
-        <div class="overview-card">
-          <div class="card-icon">
-            <mat-icon>assignment</mat-icon>
-          </div>
-          <div class="card-content">
-            <h3>Exams Conducted</h3>
-            <p class="main-stat">{{ stats.totalExams }}</p>
-            <span class="trend neutral">Total created</span>
-          </div>
-        </div>
-
-        <div class="overview-card">
-          <div class="card-icon">
-            <mat-icon>trending_up</mat-icon>
-          </div>
-          <div class="card-content">
-            <h3>Average Score</h3>
-            <p class="main-stat">{{ stats.averageScore | number:'1.1-1' }}%</p>
-            <span class="trend neutral">Overall performance</span>
-          </div>
-        </div>
-
-        <div class="overview-card">
-          <div class="card-icon">
-            <mat-icon>schedule</mat-icon>
-          </div>
-          <div class="card-content">
-            <h3>Avg Duration</h3>
-            <p class="main-stat">{{ stats.avgDuration }} min</p>
-            <span class="trend neutral">Exam duration</span>
-          </div>
-        </div>
+        <ui-stat-card label="Total Students" [value]="stats.totalStudents" color="primary" format="number"></ui-stat-card>
+        <ui-stat-card label="Exams Conducted" [value]="stats.totalExams" color="accent" format="number"></ui-stat-card>
+        <ui-stat-card label="Average Score" [value]="stats.averageScore" color="success" [showProgress]="true" [progress]="stats.averageScore" format="percent"></ui-stat-card>
+        <ui-stat-card label="Avg Duration (min)" [value]="stats.avgDuration" color="info" format="number"></ui-stat-card>
       </div>
 
       <div class="analytics-grid">
@@ -69,17 +33,8 @@ import { getQuizQuestionCount } from '../../../domain/dtos/teacher/teacher-quiz.
           <div class="chart-card">
             <div class="chart-header">
               <h3>Performance Trends</h3>
-              <select class="time-filter">
-                <option>Last 30 days</option>
-                <option>Last 3 months</option>
-                <option>Last 6 months</option>
-                <option>This year</option>
-              </select>
             </div>
-            <div class="chart-placeholder">
-              <mat-icon>show_chart</mat-icon>
-              <p>Performance trend chart would be displayed here</p>
-            </div>
+            <ui-chart [type]="'line'" [data]="trendChartData" [options]="trendChartOptions" [disableAnimations]="false"></ui-chart>
           </div>
 
           <div class="chart-card">
@@ -90,194 +45,14 @@ import { getQuizQuestionCount } from '../../../domain/dtos/teacher/teacher-quiz.
                 Export
               </button>
             </div>
-            <div class="score-distribution">
-              <div class="score-range">
-                <span class="range-label">90-100%</span>
-                <div class="range-bar">
-                  <div class="range-fill excellent" style="width: 25%"></div>
-                </div>
-                <span class="range-count">62 students</span>
-              </div>
-              <div class="score-range">
-                <span class="range-label">80-89%</span>
-                <div class="range-bar">
-                  <div class="range-fill good" style="width: 35%"></div>
-                </div>
-                <span class="range-count">87 students</span>
-              </div>
-              <div class="score-range">
-                <span class="range-label">70-79%</span>
-                <div class="range-bar">
-                  <div class="range-fill average" style="width: 28%"></div>
-                </div>
-                <span class="range-count">69 students</span>
-              </div>
-              <div class="score-range">
-                <span class="range-label">60-69%</span>
-                <div class="range-bar">
-                  <div class="range-fill below" style="width: 12%"></div>
-                </div>
-                <span class="range-count">30 students</span>
-              </div>
-            </div>
+            <ui-chart [type]="'pie'" [data]="distributionChartData" [options]="distributionChartOptions" [disableAnimations]="false"></ui-chart>
           </div>
         </div>
 
         <div class="insights-section">
-          <div class="insights-card">
-            <h3>Key Insights</h3>
-            <div class="insights-list">
-              <div class="insight-item">
-                <div class="insight-icon positive">
-                  <mat-icon>trending_up</mat-icon>
-                </div>
-                <div class="insight-content">
-                  <h4>Improved Performance</h4>
-                  <p>Mathematics scores increased by 15% after implementing practice tests.</p>
-                </div>
-              </div>
-
-              <div class="insight-item">
-                <div class="insight-icon warning">
-                  <mat-icon>warning</mat-icon>
-                </div>
-                <div class="insight-content">
-                  <h4>Attention Needed</h4>
-                  <p>Physics concepts show consistent low scores across multiple exams.</p>
-                </div>
-              </div>
-
-              <div class="insight-item">
-                <div class="insight-icon info">
-                  <mat-icon>lightbulb</mat-icon>
-                </div>
-                <div class="insight-content">
-                  <h4>Recommendation</h4>
-                  <p>Consider shorter exam durations to improve completion rates.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
           <div class="top-performers-card">
             <h3>Top Performers</h3>
-            <div class="performers-list">
-              <div class="performer-item">
-                <div class="performer-rank">1</div>
-                <div class="performer-info">
-                  <span class="performer-name">Sarah Johnson</span>
-                  <span class="performer-score">94.5%</span>
-                </div>
-              </div>
-              <div class="performer-item">
-                <div class="performer-rank">2</div>
-                <div class="performer-info">
-                  <span class="performer-name">Michael Chen</span>
-                  <span class="performer-score">92.8%</span>
-                </div>
-              </div>
-              <div class="performer-item">
-                <div class="performer-rank">3</div>
-                <div class="performer-info">
-                  <span class="performer-name">Emma Davis</span>
-                  <span class="performer-score">91.2%</span>
-                </div>
-              </div>
-              <div class="performer-item">
-                <div class="performer-rank">4</div>
-                <div class="performer-info">
-                  <span class="performer-name">James Wilson</span>
-                  <span class="performer-score">89.7%</span>
-                </div>
-              </div>
-              <div class="performer-item">
-                <div class="performer-rank">5</div>
-                <div class="performer-info">
-                  <span class="performer-name">Lisa Anderson</span>
-                  <span class="performer-score">88.9%</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="detailed-analytics">
-        <div class="analytics-card">
-          <div class="card-header">
-            <h3>Subject Performance Breakdown</h3>
-            <div class="header-actions">
-              <select class="subject-filter">
-                <option>All Subjects</option>
-                <option>Mathematics</option>
-                <option>Physics</option>
-                <option>Chemistry</option>
-              </select>
-            </div>
-          </div>
-          <div class="subject-stats">
-            <div class="subject-stat">
-              <div class="subject-info">
-                <span class="subject-name">Mathematics</span>
-                <span class="subject-exams">15 exams</span>
-              </div>
-              <div class="subject-metrics">
-                <div class="metric">
-                  <span class="metric-label">Avg Score</span>
-                  <span class="metric-value">82.3%</span>
-                </div>
-                <div class="metric">
-                  <span class="metric-label">Completion</span>
-                  <span class="metric-value">94%</span>
-                </div>
-                <div class="metric">
-                  <span class="metric-label">Difficulty</span>
-                  <span class="metric-value difficulty-medium">Medium</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="subject-stat">
-              <div class="subject-info">
-                <span class="subject-name">Physics</span>
-                <span class="subject-exams">12 exams</span>
-              </div>
-              <div class="subject-metrics">
-                <div class="metric">
-                  <span class="metric-label">Avg Score</span>
-                  <span class="metric-value">74.8%</span>
-                </div>
-                <div class="metric">
-                  <span class="metric-label">Completion</span>
-                  <span class="metric-value">89%</span>
-                </div>
-                <div class="metric">
-                  <span class="metric-label">Difficulty</span>
-                  <span class="metric-value difficulty-hard">Hard</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="subject-stat">
-              <div class="subject-info">
-                <span class="subject-name">Chemistry</span>
-                <span class="subject-exams">18 exams</span>
-              </div>
-              <div class="subject-metrics">
-                <div class="metric">
-                  <span class="metric-label">Avg Score</span>
-                  <span class="metric-value">78.9%</span>
-                </div>
-                <div class="metric">
-                  <span class="metric-label">Completion</span>
-                  <span class="metric-value">91%</span>
-                </div>
-                <div class="metric">
-                  <span class="metric-label">Difficulty</span>
-                  <span class="metric-value difficulty-medium">Medium</span>
-                </div>
-              </div>
-            </div>
+            <ui-table [columns]="topPerformerColumns" [data]="topPerformers" [showHeader]="true" [showPagination]="false" [rowClickable]="false"></ui-table>
           </div>
         </div>
       </div>
@@ -386,6 +161,9 @@ import { getQuizQuestionCount } from '../../../domain/dtos/teacher/teacher-quiz.
       border-radius: 12px;
       padding: 1.5rem;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      min-height: 320px;
     }
 
     .chart-header {
@@ -399,6 +177,14 @@ import { getQuizQuestionCount } from '../../../domain/dtos/teacher/teacher-quiz.
         font-weight: 600;
         color: var(--color-text-primary);
       }
+    }
+
+    /* Ensure ui-chart fills available card space */
+    .chart-card ui-chart,
+    .chart-card ui-chart .chart-host {
+      height: 100%;
+      min-height: 240px;
+      display: block;
     }
 
     .time-filter, .subject-filter {
@@ -722,6 +508,22 @@ export class TeacherStatistics implements OnInit {
     failing: { count: 0, percentage: 0 },   // <60
   };
 
+  // Chart data placeholders
+  trendChartData: any = { labels: [], datasets: [] };
+  trendChartOptions: any = {};
+
+  distributionChartData: any = { labels: [], datasets: [] };
+  distributionChartOptions: any = {};
+
+  // Top performers table
+  topPerformers: Array<{ rank: number; name: string; score: number; exams: number }> = [];
+  topPerformerColumns = [
+    { key: 'rank', label: 'Rank' },
+    { key: 'name', label: 'Student' },
+    { key: 'score', label: 'Avg Score' },
+    { key: 'exams', label: 'Exams' },
+  ];
+
   ngOnInit(): void {
     this.loadStatistics();
   }
@@ -793,6 +595,96 @@ export class TeacherStatistics implements OnInit {
       this.scoreDistribution.below.percentage = (this.scoreDistribution.below.count / scoredStudents) * 100;
       this.scoreDistribution.failing.percentage = (this.scoreDistribution.failing.count / scoredStudents) * 100;
     }
+
+    // Build chart data: trend per quiz (average score per quiz)
+    const trendLabels: string[] = [];
+    const trendValues: number[] = [];
+    for (const q of this.quizzes) {
+      trendLabels.push(`${q.type}${q.date ? ' - ' + new Date(q.date).toLocaleDateString() : ''}`);
+      let qTotal = 0;
+      let qMarks = 0;
+      if (q.studentQuizes) {
+        for (const sq of q.studentQuizes) {
+          if (sq.rawScore !== undefined && sq.rawScore !== null && sq.totalMarks) {
+            qTotal += sq.rawScore;
+            qMarks += sq.totalMarks;
+          }
+        }
+      }
+      trendValues.push(qMarks > 0 ? (qTotal / qMarks) * 100 : 0);
+    }
+
+    this.trendChartData = {
+      labels: trendLabels,
+      datasets: [
+        {
+          label: 'Average Score (%)',
+          data: trendValues,
+          borderColor: '#3b82f6',
+          backgroundColor: 'rgba(59,130,246,0.2)',
+          tension: 0.2,
+        },
+      ],
+    };
+
+    this.trendChartOptions = {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, max: 100 } },
+    };
+
+    // Distribution pie
+    this.distributionChartData = {
+      labels: ['90-100', '80-89', '70-79', '60-69', '<60'],
+      datasets: [
+        {
+          data: [
+            this.scoreDistribution.excellent.count,
+            this.scoreDistribution.good.count,
+            this.scoreDistribution.average.count,
+            this.scoreDistribution.below.count,
+            this.scoreDistribution.failing.count,
+          ],
+          backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#f97316', '#ef4444'],
+        },
+      ],
+    };
+
+    this.distributionChartOptions = {
+      responsive: true,
+      plugins: { legend: { position: 'bottom' } },
+    };
+
+    // Compute top performers
+    this.computeTopPerformers();
+  }
+
+  private computeTopPerformers(): void {
+    const map = new Map<string, { name: string; totalRaw: number; totalMarks: number; exams: number }>();
+
+    for (const q of this.quizzes) {
+      if (!q.studentQuizes) continue;
+      for (const sq of q.studentQuizes) {
+        const id = sq.student?.id || (sq.student?.user?.id ?? `${q.id}-${Math.random()}`);
+        const name = sq.student ? `${sq.student.user?.name || ''} ${sq.student.user?.surname || ''}`.trim() : 'Unknown';
+        if (!map.has(id)) map.set(id, { name, totalRaw: 0, totalMarks: 0, exams: 0 });
+        const entry = map.get(id)!;
+        if (sq.rawScore !== undefined && sq.rawScore !== null && sq.totalMarks) {
+          entry.totalRaw += sq.rawScore;
+          entry.totalMarks += sq.totalMarks;
+          entry.exams += 1;
+        }
+      }
+    }
+
+    const arr = Array.from(map.entries()).map(([_, v]) => ({
+      name: v.name || 'Unknown',
+      score: v.totalMarks > 0 ? Math.round((v.totalRaw / v.totalMarks) * 1000) / 10 : 0,
+      exams: v.exams,
+    }));
+
+    arr.sort((a, b) => b.score - a.score);
+    this.topPerformers = arr.slice(0, 10).map((p, i) => ({ rank: i + 1, name: p.name, score: p.score, exams: p.exams }));
   }
 
   exportData(): void {

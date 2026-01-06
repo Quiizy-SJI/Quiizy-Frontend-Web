@@ -500,6 +500,16 @@ export class TeacherCreateExam implements OnInit {
       lectures: Number(this.quizForm.lectures),
       date: String(this.quizForm.date),
       durationMinutes: Number(this.quizForm.durationMinutes),
+      // Preserve teaching unit id from selected course so later steps can default correctly
+      teachingUnitId: (() => {
+        const selected = this.courses().find(c => c.id === String(this.quizForm.courseId));
+        return selected?.teachingUnit?.id ?? '';
+      })(),
+      // Also save the teaching unit name for reliable summary display
+      teachingUnitName: (() => {
+        const selected = this.courses().find(c => c.id === String(this.quizForm.courseId));
+        return selected?.teachingUnit?.name ?? '';
+      })(),
     };
     sessionStorage.setItem('examFormStep1', JSON.stringify(formData));
     this.router.navigate(['/teacher/create-exam/step2']);

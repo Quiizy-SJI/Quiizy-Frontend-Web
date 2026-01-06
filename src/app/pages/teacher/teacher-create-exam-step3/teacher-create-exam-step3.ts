@@ -39,6 +39,8 @@ interface Step1Data {
   durationMinutes: number;
   /** Teaching unit ID from the selected course (for question bank categorization) */
   teachingUnitId?: string;
+  /** Teaching unit name saved from step 1 for reliable display */
+  teachingUnitName?: string;
 }
 
 /** Step 2 form data */
@@ -631,7 +633,7 @@ export class TeacherCreateExamStep3 implements OnInit {
     if (!courseId) return 'Not selected';
     const course = this.courses().find(c => c.id === courseId);
     if (!course) return 'Unknown Course';
-    const tuName = course.teachingUnit?.name ?? '';
+    const tuName = course.teachingUnit?.name ?? this.step1Data()?.teachingUnitName ?? '';
     const className = course.classAcademicYear?.class?.name ?? '';
     return className ? `${tuName} — ${className}` : tuName;
   });
@@ -767,8 +769,20 @@ export class TeacherCreateExamStep3 implements OnInit {
 
     try {
       // Get teaching unit ID from the selected course
-      const course = this.courses().find(c => c.id === s1.courseId);
-      const teachingUnitId = course?.teachingUnit?.id ?? s1.teachingUnitId ?? '';
+      let course = this.courses().find(c => c.id === s1.courseId);
+      let teachingUnitId = course?.teachingUnit?.id ?? s1.teachingUnitId ?? '';
+
+      // If missing, try refreshing courses from the API and re-derive teachingUnitId.
+      if (!teachingUnitId) {
+        try {
+          const fresh = await firstValueFrom(this.teacherApi.getMyCourses());
+          this.courses.set(fresh);
+          course = fresh.find(c => c.id === s1.courseId) ?? course;
+          teachingUnitId = course?.teachingUnit?.id ?? s1.teachingUnitId ?? '';
+        } catch (err) {
+          console.warn('Failed to refresh courses while publishing quiz:', err);
+        }
+      }
 
       if (!teachingUnitId) {
         alert('Course must have a teaching unit for question categorization.');

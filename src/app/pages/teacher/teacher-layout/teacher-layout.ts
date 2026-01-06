@@ -34,7 +34,6 @@ export class TeacherLayout implements OnInit {
     { id: 'exam-manager', label: 'Exam Manager' },
     { id: 'sentiment-review', label: 'Sentiment Analysis' },
     { id: 'question-bank', label: 'Question Bank' },
-    { id: 'mock-tests', label: 'Mock Tests' },
     { id: 'statistics', label: 'Statistics' },
     { id: 'create-exam', label: 'Create Exam' },
   ];
@@ -62,7 +61,6 @@ export class TeacherLayout implements OnInit {
     { id: 'exam-manager', label: 'Exam Manager', route: '/teacher/exam-manager', icon: 'assignment' },
     { id: 'sentiment-review', label: 'Sentiment Analysis', route: '/teacher/sentiment-review', icon: 'psychology' },
     { id: 'question-bank', label: 'Question Bank', route: '/teacher/question-bank', icon: 'quiz' },
-    { id: 'mock-tests', label: 'Mock Tests', route: '/teacher/mock-tests', icon: 'science' },
     { id: 'statistics', label: 'Statistics', route: '/teacher/statistics', icon: 'analytics' },
     { id: 'create-exam', label: 'Create Exam', route: '/teacher/create-exam', icon: 'add_circle' },
   ];
@@ -96,7 +94,6 @@ export class TeacherLayout implements OnInit {
     if (url.includes('/teacher/exam-manager')) this.activeTab = 'exam-manager';
     else if (url.includes('/teacher/sentiment-review')) this.activeTab = 'sentiment-review';
     else if (url.includes('/teacher/question-bank')) this.activeTab = 'question-bank';
-    else if (url.includes('/teacher/mock-tests')) this.activeTab = 'mock-tests';
     else if (url.includes('/teacher/statistics')) this.activeTab = 'statistics';
     else if (url.includes('/teacher/create-exam')) this.activeTab = 'create-exam';
     else this.activeTab = 'dashboard';
@@ -118,9 +115,6 @@ export class TeacherLayout implements OnInit {
         break;
       case 'question-bank':
         void this.router.navigateByUrl('/teacher/question-bank');
-        break;
-      case 'mock-tests':
-        void this.router.navigateByUrl('/teacher/mock-tests');
         break;
       case 'statistics':
         void this.router.navigateByUrl('/teacher/statistics');

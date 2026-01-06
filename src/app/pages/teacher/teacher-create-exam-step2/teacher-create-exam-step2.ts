@@ -998,6 +998,29 @@ export class TeacherCreateExamStep2 implements OnInit {
   async ngOnInit(): Promise<void> {
     this.loadSavedQuestions();
     await this.loadTeachingUnits();
+
+    // If the user selected a course in step 1, prefer its teachingUnitId for the question bank
+    try {
+      const step1Raw = sessionStorage.getItem('examFormStep1');
+      if (step1Raw) {
+        const s1 = JSON.parse(step1Raw || '{}');
+        if (s1 && s1.teachingUnitId) {
+          this.selectedTeachingUnitId = String(s1.teachingUnitId);
+        }
+      }
+    } catch (err) {
+      // ignore parse errors
+    }
+
+    // Default to first teaching unit if none selected
+    if (!this.selectedTeachingUnitId && this.teachingUnits().length > 0) {
+      this.selectedTeachingUnitId = this.teachingUnits()[0].id;
+    }
+
+    // Load past questions for the selected teaching unit (if any)
+    if (this.selectedTeachingUnitId) {
+      await this.loadPastQuestions();
+    }
   }
 
   private loadSavedQuestions(): void {
