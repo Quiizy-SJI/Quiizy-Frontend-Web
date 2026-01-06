@@ -1,4 +1,4 @@
-import { Component, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, ChangeDetectorRef, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -35,7 +35,7 @@ import { firstValueFrom } from 'rxjs';
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
-export class Login {
+export class Login implements OnInit, OnDestroy {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
@@ -66,6 +66,47 @@ export class Login {
 
   // Current year for copyright
   currentYear = new Date().getFullYear();
+
+  // Image and text cycling
+  private cyclingInterval?: number;
+  private currentSlideIndex = 0;
+  private readonly totalSlides = 5;
+
+  ngOnInit(): void {
+    this.startImageCycling();
+  }
+
+  ngOnDestroy(): void {
+    if (this.cyclingInterval) {
+      clearInterval(this.cyclingInterval);
+    }
+  }
+
+  private startImageCycling(): void {
+    // Start cycling after 4 seconds, then every 4 seconds
+    this.cyclingInterval = window.setInterval(() => {
+      this.cycleToNextSlide();
+    }, 4000);
+  }
+
+  private cycleToNextSlide(): void {
+    // Remove active class from current slides
+    const currentImageSlide = document.querySelector(`.login-page__slide[data-slide="${this.currentSlideIndex}"]`);
+    const currentTextSlide = document.querySelector(`.login-page__text-slide[data-text="${this.currentSlideIndex}"]`);
+    
+    if (currentImageSlide) currentImageSlide.classList.remove('active');
+    if (currentTextSlide) currentTextSlide.classList.remove('active');
+
+    // Move to next slide
+    this.currentSlideIndex = (this.currentSlideIndex + 1) % this.totalSlides;
+
+    // Add active class to new slides
+    const nextImageSlide = document.querySelector(`.login-page__slide[data-slide="${this.currentSlideIndex}"]`);
+    const nextTextSlide = document.querySelector(`.login-page__text-slide[data-text="${this.currentSlideIndex}"]`);
+    
+    if (nextImageSlide) nextImageSlide.classList.add('active');
+    if (nextTextSlide) nextTextSlide.classList.add('active');
+  }
 
   // Dynamic labels based on role
   get identifierLabel(): string {
