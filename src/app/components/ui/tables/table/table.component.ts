@@ -230,6 +230,8 @@ export class TableComponent<T = any> {
   @Input() compact = false;
   @Input() trackByKey = 'id';
   @Input() customClass?: string;
+  @Input() sortColumn: string | null = null;
+  @Input() sortDirection: 'asc' | 'desc' | null = null;
 
   @Output() sortChange = new EventEmitter<SortEvent>();
   @Output() selectionChange = new EventEmitter<T[]>();
@@ -237,8 +239,6 @@ export class TableComponent<T = any> {
   @Output() pageChange = new EventEmitter<number>();
   @Output() pageSizeChange = new EventEmitter<number>();
 
-  sortColumn: string | null = null;
-  sortDirection: 'asc' | 'desc' | null = null;
   selectedRows = new Set<T>();
 
   get wrapperClasses(): string {
@@ -342,19 +342,22 @@ export class TableComponent<T = any> {
   }
 
   toggleSort(columnKey: string): void {
+    let newColumn: string | null = columnKey;
+    let newDirection: 'asc' | 'desc' | null = 'asc';
+
     if (this.sortColumn === columnKey) {
-      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : this.sortDirection === 'desc' ? null : 'asc';
-      if (!this.sortDirection) {
-        this.sortColumn = null;
+      // Cycle through: asc -> desc -> null
+      if (this.sortDirection === 'asc') {
+        newDirection = 'desc';
+      } else if (this.sortDirection === 'desc') {
+        newDirection = null;
+        newColumn = null;
       }
-    } else {
-      this.sortColumn = columnKey;
-      this.sortDirection = 'asc';
     }
 
     this.sortChange.emit({
-      column: this.sortColumn ?? '',
-      direction: this.sortDirection
+      column: newColumn ?? '',
+      direction: newDirection
     });
   }
 
