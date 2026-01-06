@@ -1,207 +1,170 @@
 <section class="login-page">
-  <!-- Background Image Overlay -->
-  <div class="login-page__background">
-    <div class="login-page__overlay"></div>
-  </div>
+  <!-- Blurred Background -->
+  <div class="login-page__background"></div>
 
-  <!-- Main Content Container -->
+  <!-- Main Container -->
   <div class="login-page__container">
-    <!-- Left Side - Branding -->
-    <div class="login-page__branding">
-      <!-- University Logos Section -->
-      <div class="login-page__logos">
-        <div class="login-page__logo-group">
-          <div class="login-page__logo login-page__logo--main">
-            <img
-              src="assets/images/logos/iusj-logo.png"
-              alt="IUSJC - Institut Universitaire Saint Jean du Cameroun"
-            />
-          </div>
-          <div class="login-page__schools-logos">
-            <div class="login-page__logo login-page__logo--school" title="Saint Jean Ingénieur">
-              <img
-                src="https://institutsaintjean.org/wp-content/uploads/2025/11/LOGO-UNIVERSITE-SAINT-JEAN_INGENIEUR_2.png"
-                alt="Saint Jean Ingénieur - Engineering School"
-              />
-            </div>
-            <div class="login-page__logo login-page__logo--school" title="Saint Jean Management">
-              <img
-                src="https://saintjeanmanagement.org/wp-content/uploads/2025/01/Logo-Institut-USJ-MANAGEMENT-1-458x179.png"
-                alt="Saint Jean Management - Business School"
-              />
-            </div>
-            <div class="login-page__logo login-page__logo--school" title="PrépaVogt">
-              <img
-                src="https://prepavogt.org/wp-content/uploads/2022/12/LOGO-PREPAVOGT.png"
-                alt="PrépaVogt - Classes Préparatoires Intégrées"
-              />
-            </div>
-            <div class="login-page__logo login-page__logo--school" title="Prépa Saint Jean Douala">
-              <img
-                src="https://prepasaintjean.org/images/Logo.png"
-                alt="Prépa Saint Jean - Douala"
-              />
-            </div>
-          </div>
+    <!-- Left Card - Image/Branding -->
+    <div class="login-page__image-card">
+      <!-- Quizzy Logo (top-left) -->
+      <div class="login-page__quizzy-brand">
+        <div class="login-page__logo-circle">
+          <span class="login-page__logo-text">Q</span>
+        </div>
+        <span class="login-page__brand-text">QUIZZY</span>
+      </div>
+
+      <!-- Cycling Images -->
+      <div class="login-page__image-slider">
+        <div class="login-page__slide active" data-slide="0">
+          <img src="https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=800&h=600&fit=crop" alt="Students taking quiz" />
+        </div>
+        <div class="login-page__slide" data-slide="1">
+          <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800&h=600&fit=crop" alt="Classroom examination" />
+        </div>
+        <div class="login-page__slide" data-slide="2">
+          <img src="https://images.unsplash.com/photo-1509062522246-3755977927d7?w=800&h=600&fit=crop" alt="Students studying together" />
+        </div>
+        <div class="login-page__slide" data-slide="3">
+          <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=600&fit=crop" alt="Group quiz session" />
+        </div>
+        <div class="login-page__slide" data-slide="4">
+          <img src="https://images.unsplash.com/photo-1581726690015-c9861fa5057f?w=800&h=600&fit=crop" alt="Digital learning platform" />
         </div>
       </div>
 
-      <!-- Welcome Text -->
-      <div class="login-page__welcome">
-        <h1 class="login-page__title">Welcome to Quizzy</h1>
-        <p class="login-page__subtitle">
-          The intelligent examination platform for academic excellence. Streamlined assessments for
-          students, teachers, and administrators.
-        </p>
-      </div>
-
-      <!-- Feature Highlights -->
-      <div class="login-page__features">
-        <div class="login-page__feature">
-          <mat-icon class="login-page__feature-icon">quiz</mat-icon>
-          <span class="login-page__feature-text">Smart Question Banks</span>
-        </div>
-        <div class="login-page__feature">
-          <mat-icon class="login-page__feature-icon">analytics</mat-icon>
-          <span class="login-page__feature-text">Real-time Analytics</span>
-        </div>
-        <div class="login-page__feature">
-          <mat-icon class="login-page__feature-icon">psychology</mat-icon>
-          <span class="login-page__feature-text">AI-Powered Insights</span>
+      <!-- Dynamic Overlay Content -->
+      <div class="login-page__overlay-content">
+        <!-- Dynamic Hero Text -->
+        <div class="login-page__text-slider">
+          <div class="login-page__text-slide active" data-text="0">
+            <h2 class="login-page__hero-title">Smart Quiz Management</h2>
+          </div>
+          <div class="login-page__text-slide" data-text="1">
+            <h2 class="login-page__hero-title">Seamless Digital Examinations</h2>
+          </div>
+          <div class="login-page__text-slide" data-text="2">
+            <h2 class="login-page__hero-title">Collaborative Learning Excellence</h2>
+          </div>
+          <div class="login-page__text-slide" data-text="3">
+            <h2 class="login-page__hero-title">Interactive Knowledge Hub</h2>
+          </div>
+          <div class="login-page__text-slide" data-text="4">
+            <h2 class="login-page__hero-title">Advanced Analytics & Insights</h2>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Right Side - Login Form -->
-    <div class="login-page__form-section">
-      <ui-card variant="elevated" class="login-page__card">
-        <!-- Theme Toggle -->
-        <div class="login-page__theme-toggle">
-          <ui-theme-toggle />
-        </div>
+    <!-- Right Card - Login Form -->
+    <div class="login-page__form-card">
+      <!-- Theme Toggle -->
+      <div class="login-page__theme-toggle">
+        <ui-theme-toggle />
+      </div>
 
-        <!-- Form Header -->
-        <div class="login-page__form-header">
-          <h2 class="login-page__form-title">Sign In</h2>
-          <p class="login-page__form-subtitle">Access your Quizzy account</p>
-        </div>
+      <!-- Form Header -->
+      <div class="login-page__form-header">
+        <h2 class="login-page__form-title">Welcome Back to Quizzy</h2>
+        <p class="login-page__form-subtitle">Login to access your Quizzy dashboard</p>
+      </div>
 
-        <!-- Login Form -->
-        <form class="login-page__form" (ngSubmit)="onSubmit()" #loginForm="ngForm">
-          <!-- Error Alert -->
-          @if (errorMessage) {
-          <ui-alert
-            variant="soft"
-            color="danger"
-            [title]="'Authentication Failed'"
-            [dismissible]="true"
-            (dismissed)="errorMessage = ''"
+      <!-- Login Form -->
+      <form class="login-page__form" (ngSubmit)="onSubmit()" #loginForm="ngForm">
+        <!-- Error Alert -->
+        @if (errorMessage) {
+        <ui-alert
+          variant="soft"
+          color="danger"
+          [title]="'Authentication Failed'"
+          [dismissible]="true"
+          (dismissed)="errorMessage = ''"
+        >
+          {{ errorMessage }}
+        </ui-alert>
+        }
+
+        <!-- Role Selection -->
+        <div class="login-page__field">
+          <label class="login-page__label">Select Role</label>
+          <ui-select
+            placeholder="Teacher"
+            [options]="roleOptions"
+            [(ngModel)]="loginRequest.role"
+            name="role"
+            [required]="true"
+            [validationState]="roleError ? 'invalid' : 'default'"
+            [errorMessage]="roleError"
+            [iconLeft]="true"
           >
-            {{ errorMessage }}
-          </ui-alert>
-          }
+            <mat-icon slot="icon-left">person_outline</mat-icon>
+          </ui-select>
+        </div>
 
-          <!-- Role Selection -->
-          <div class="login-page__field">
-            <ui-select
-              label="Sign in as"
-              placeholder="Select your role"
-              [options]="roleOptions"
-              [(ngModel)]="loginRequest.role"
-              name="role"
-              [required]="true"
-              [validationState]="roleError ? 'invalid' : 'default'"
-              [errorMessage]="roleError"
-              [iconLeft]="true"
-            >
-              <mat-icon slot="icon-left">person_outline</mat-icon>
-            </ui-select>
-          </div>
+        <!-- Email Address -->
+        <div class="login-page__field">
+          <label class="login-page__label">Email Address</label>
+          <ui-input
+            placeholder="Enter your email"
+            type="email"
+            [(ngModel)]="loginRequest.identifier"
+            name="identifier"
+            [required]="true"
+            [validationState]="identifierError ? 'invalid' : 'default'"
+            [errorMessage]="identifierError"
+            autocomplete="username"
+            [iconLeft]="true"
+          >
+            <mat-icon slot="icon-left">email</mat-icon>
+          </ui-input>
+        </div>
 
-          <!-- Identifier (Email/Matricule) -->
-          <div class="login-page__field">
-            <ui-input
-              [label]="identifierLabel"
-              [placeholder]="identifierPlaceholder"
-              type="text"
-              [(ngModel)]="loginRequest.identifier"
-              name="identifier"
-              [required]="true"
-              [validationState]="identifierError ? 'invalid' : 'default'"
-              [errorMessage]="identifierError"
-              autocomplete="username"
-              [iconLeft]="true"
-            >
-              <mat-icon slot="icon-left">badge</mat-icon>
-            </ui-input>
-          </div>
+        <!-- Password -->
+        <div class="login-page__field">
+          <label class="login-page__label">Password</label>
+          <ui-input
+            placeholder="Enter your password"
+            type="password"
+            [(ngModel)]="loginRequest.password"
+            name="password"
+            [required]="true"
+            [showPasswordToggle]="true"
+            [validationState]="passwordError ? 'invalid' : 'default'"
+            [errorMessage]="passwordError"
+            autocomplete="current-password"
+            [iconLeft]="true"
+          >
+            <mat-icon slot="icon-left">lock_outline</mat-icon>
+          </ui-input>
+        </div>
 
-          <!-- Password -->
-          <div class="login-page__field">
-            <ui-input
-              label="Password"
-              placeholder="Enter your password"
-              type="password"
-              [(ngModel)]="loginRequest.password"
-              name="password"
-              [required]="true"
-              [showPasswordToggle]="true"
-              [validationState]="passwordError ? 'invalid' : 'default'"
-              [errorMessage]="passwordError"
-              autocomplete="current-password"
-              [iconLeft]="true"
-            >
-              <mat-icon slot="icon-left">lock_outline</mat-icon>
-            </ui-input>
-          </div>
+        <!-- Forgot Password Link -->
+        <div class="login-page__forgot-password">
+          <a href="mailto:support@quizzy.edu" class="login-page__forgot-link">Forgot Password?</a>
+        </div>
 
-          <!-- Remember Me -->
-          <div class="login-page__options">
-            <ui-checkbox
-              label="Remember me"
-              [(ngModel)]="loginRequest.rememberMe"
-              name="rememberMe"
-              color="primary"
-            >
-            </ui-checkbox>
-          </div>
+        <!-- Submit Button -->
+        <div class="login-page__submit">
+          <ui-button
+            type="submit"
+            variant="solid"
+            color="primary"
+            size="lg"
+            [fullWidth]="true"
+            [loading]="isLoading"
+            [disabled]="isLoading"
+          >
+            {{ isLoading ? 'Signing in...' : 'Login' }}
+          </ui-button>
+        </div>
 
-          <!-- Submit Button -->
-          <div class="login-page__submit">
-            <ui-button
-              type="submit"
-              variant="solid"
-              color="primary"
-              size="lg"
-              [fullWidth]="true"
-              [loading]="isLoading"
-              [disabled]="isLoading"
-              [iconLeft]="!isLoading"
-            >
-              @if (!isLoading) {
-              <mat-icon slot="icon-left">login</mat-icon>
-              }
-              {{ isLoading ? 'Signing in...' : 'Sign In' }}
-            </ui-button>
-          </div>
-        </form>
-
-        <!-- Help Link -->
-        <div class="login-page__help">
-          <p class="login-page__help-text">
-            Having trouble signing in?
-            <a href="mailto:support@quizzy.edu" class="login-page__help-link">Contact Support</a>
+        <!-- Sign Up Link -->
+        <div class="login-page__signup">
+          <p class="login-page__signup-text">
+            Don't have an account? <a href="#" class="login-page__signup-link">Sign Up</a>
           </p>
         </div>
-      </ui-card>
-
-      <!-- Footer -->
-      <div class="login-page__footer">
-        <p class="login-page__copyright">
-          © {{ currentYear }} Quizzy - Saint Jean Group of Universities
-        </p>
-        <p class="login-page__version">Version 1.0.0</p>
-      </div>
+      </form>
     </div>
   </div>
 </section>
