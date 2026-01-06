@@ -7,10 +7,11 @@ import { firstValueFrom } from 'rxjs';
 import { TeacherApiService } from '../../../services/teacher-api.service';
 import type {
   CreateTeacherQuizDto,
-  CreateQuestionDto,
+  CreateAndAddQuestionDto,
   QuizType,
   QuestionType,
   CourseDto,
+  DifficultyLevel,
 } from '../../../domain/dtos/teacher/teacher-quiz.dto';
 import {
   CardComponent,
@@ -36,6 +37,8 @@ interface Step1Data {
   lectures: number;
   date: string;
   durationMinutes: number;
+  /** Teaching unit ID from the selected course (for question bank categorization) */
+  teachingUnitId?: string;
 }
 
 /** Step 2 form data */
@@ -763,18 +766,32 @@ export class TeacherCreateExamStep3 implements OnInit {
     this.isPublishing.set(true);
 
     try {
-      // Build payload with explicit type conversions
+      // Get teaching unit ID from the selected course
+      const course = this.courses().find(c => c.id === s1.courseId);
+      const teachingUnitId = course?.teachingUnit?.id ?? s1.teachingUnitId ?? '';
+
+      if (!teachingUnitId) {
+        alert('Course must have a teaching unit for question categorization.');
+        this.isPublishing.set(false);
+        return;
+      }
+
+      // Build payload using newQuestions (creates questions in bank and adds to quiz)
+      // All questions go to the same teaching unit as the course
       const dto: CreateTeacherQuizDto = {
         courseId: String(s1.courseId),
         type: String(s1.type) as QuizType,
         lectures: Number(s1.lectures),
         date: String(s1.date),
         durationMinutes: Number(s1.durationMinutes),
-        questions: s2.questions.map(q => {
+        newQuestions: s2.questions.map((q): CreateAndAddQuestionDto => {
           const isOpenEnded = q.type === 'OPEN_ENDED';
           return {
             question: String(q.question).trim(),
             type: String(q.type) as QuestionType,
+            // Default to LEVEL_3 (medium difficulty) for now
+            difficultyLevel: 'LEVEL_3' as DifficultyLevel,
+            teachingUnitId: teachingUnitId,
             // Only include proposedAnswers and correctAnswer for non-OPEN_ENDED questions
             ...(isOpenEnded ? {} : {
               proposedAnswers: q.proposedAnswers
@@ -785,6 +802,8 @@ export class TeacherCreateExamStep3 implements OnInit {
             markAllocation: Number(q.markAllocation),
           };
         }),
+        // Publish immediately after creation
+        publishImmediately: true,
       };
 
       // Debug: Log the payload

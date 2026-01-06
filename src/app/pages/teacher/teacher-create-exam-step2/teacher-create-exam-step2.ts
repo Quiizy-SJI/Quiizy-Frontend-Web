@@ -8,7 +8,7 @@ import { firstValueFrom } from 'rxjs';
 import { TeacherApiService } from '../../../services/teacher-api.service';
 import type {
   QuestionType,
-  PastQuestionDto,
+  QuestionBankItemDto,
   CreateQuestionDto,
 } from '../../../domain/dtos/teacher/teacher-quiz.dto';
 import type { TeachingUnitDto } from '../../../domain/dtos/dean/dean-shared.dto';
@@ -397,7 +397,7 @@ interface QuestionFormData {
                       <ui-badge [color]="getTypeColor(q.type)" size="sm">
                         {{ getTypeLabel(q.type) }}
                       </ui-badge>
-                      <span class="import-source">{{ q.courseName }} • {{ q.quizType }}</span>
+                      <span class="import-source">{{ q.difficultyLevel || 'Unknown' }} • Used {{ q.usageCount || 0 }} times</span>
                     </div>
                   </div>
                 </label>
@@ -959,10 +959,10 @@ export class TeacherCreateExamStep2 implements OnInit {
   editingIndex = signal(-1);
   isLoadingQuestions = signal(false);
 
-  // Teaching units for import
+  // Teaching units for import (question bank)
   teachingUnits = signal<TeachingUnitDto[]>([]);
   selectedTeachingUnitId = '';
-  pastQuestions = signal<PastQuestionDto[]>([]);
+  pastQuestions = signal<QuestionBankItemDto[]>([]);
   selectedImportIds = signal<string[]>([]);
 
   // Current question being edited
@@ -1261,7 +1261,8 @@ export class TeacherCreateExamStep2 implements OnInit {
       type: q.type,
       proposedAnswers: q.proposedAnswers ?? [],
       correctAnswer: q.correctAnswer ?? '',
-      markAllocation: q.markAllocation,
+      // Default mark allocation since question bank items don't have it
+      markAllocation: 1,
     }));
 
     this.questions.update(list => [...list, ...newQuestions]);

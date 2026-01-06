@@ -7,9 +7,10 @@ import { firstValueFrom } from 'rxjs';
 import { TeacherApiService } from '../../../services/teacher-api.service';
 import type {
   CreateTeacherQuizDto,
-  CreateQuestionDto,
+  CreateAndAddQuestionDto,
   QuizType,
   QuestionType,
+  DifficultyLevel,
 } from '../../../domain/dtos/teacher/teacher-quiz.dto';
 
 @Component({
@@ -719,11 +720,18 @@ export class TeacherCreateExamStep4 implements OnInit {
   }
 
   private buildCreateQuizDto(): CreateTeacherQuizDto {
-    const questions: CreateQuestionDto[] =
+    // Get teaching unit ID from step1 data (stored when course was selected)
+    const teachingUnitId = this.step1Data?.teachingUnitId || '';
+
+    // Build new questions with required fields for question bank
+    const newQuestions: CreateAndAddQuestionDto[] =
       this.step2Data?.questions?.map((q: any) => ({
         question: q.text || q.question,
         type: q.type as QuestionType,
-        markAllocation: q.points || 1,
+        // Default to LEVEL_3 (medium difficulty) for now
+        difficultyLevel: 'LEVEL_3' as DifficultyLevel,
+        teachingUnitId: teachingUnitId,
+        markAllocation: q.points || q.markAllocation || 1,
         proposedAnswers: q.options || q.proposedAnswers || [],
         correctAnswer: q.correctAnswer || '',
       })) || [];
@@ -740,7 +748,9 @@ export class TeacherCreateExamStep4 implements OnInit {
       lectures: 1, // Default to 1 lecture
       date: dateStr,
       durationMinutes: this.examSummary.duration,
-      questions,
+      newQuestions,
+      // Publish immediately after creation
+      publishImmediately: true,
     };
   }
 

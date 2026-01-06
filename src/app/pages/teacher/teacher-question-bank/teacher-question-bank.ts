@@ -1,8 +1,18 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
+
+import { TeacherApiService } from '../../../services/teacher-api.service';
+import type {
+  QuestionDto,
+  QuestionType,
+  TeachingUnitQuestionsDto,
+  QuestionBankItemDto,
+} from '../../../domain/dtos/teacher/teacher-quiz.dto';
+import type { TeachingUnitDto } from '../../../domain/dtos/dean/dean-shared.dto';
 
 interface QuestionFolder {
   id: string;
@@ -52,9 +62,9 @@ interface Question {
         <div class="folders-sidebar">
           <h3>Folders</h3>
           <div class="folders-list">
-            <div 
-              class="folder-item" 
-              *ngFor="let folder of folders" 
+            <div
+              class="folder-item"
+              *ngFor="let folder of folders"
               [class.active]="folder.isActive"
               (click)="selectFolder(folder)"
             >
@@ -76,24 +86,24 @@ interface Question {
                 <option value="Web Dev">Web Dev</option>
                 <option value="All subjects">All subjects</option>
               </select>
-              
+
               <select class="filter-select" [(ngModel)]="selectedDifficulty" (change)="applyFilters()">
                 <option value="">Difficulty</option>
                 <option value="Easy">Easy</option>
                 <option value="Medium">Medium</option>
                 <option value="Hard">Hard</option>
               </select>
-              
+
               <select class="filter-select" [(ngModel)]="selectedType" (change)="applyFilters()">
                 <option value="">Type</option>
                 <option value="MCQ">MCQ only</option>
                 <option value="Essay">Essay</option>
                 <option value="Multi-answer">Multi-answer</option>
               </select>
-              
-              <input 
-                type="text" 
-                placeholder="Search..." 
+
+              <input
+                type="text"
+                placeholder="Search..."
                 class="search-input"
                 [(ngModel)]="searchTerm"
                 (input)="applyFilters()"
@@ -170,12 +180,12 @@ interface Question {
               <mat-icon>close</mat-icon>
             </button>
           </div>
-          
+
           <div class="modal-body">
             <div class="form-group">
               <label>Question Text *</label>
-              <textarea 
-                [(ngModel)]="newQuestion.text" 
+              <textarea
+                [(ngModel)]="newQuestion.text"
                 placeholder="Enter your question here..."
                 class="form-textarea"
                 rows="3"
@@ -222,22 +232,22 @@ interface Question {
               <label>Answer Options *</label>
               <div class="options-list">
                 <div class="option-input" *ngFor="let option of newQuestion.options; let i = index">
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     *ngIf="newQuestion.answerType === 'multiple'"
                     [checked]="isOptionCorrect(i)"
                     (change)="toggleCorrectOption(i, $event)"
                   >
-                  <input 
-                    type="radio" 
+                  <input
+                    type="radio"
                     *ngIf="newQuestion.answerType === 'single'"
                     [name]="'correct-answer'"
                     [checked]="isOptionCorrect(i)"
                     (change)="setCorrectOption(i)"
                   >
-                  <input 
-                    type="text" 
-                    [(ngModel)]="option.text" 
+                  <input
+                    type="text"
+                    [(ngModel)]="option.text"
                     [placeholder]="'Option ' + (i + 1)"
                     class="form-input"
                   >
@@ -271,13 +281,13 @@ interface Question {
               <mat-icon>close</mat-icon>
             </button>
           </div>
-          
+
           <div class="modal-body">
             <div class="upload-area" (click)="triggerFileInput()">
-              <input 
-                type="file" 
-                #fileInput 
-                accept=".xlsx,.xls,.csv" 
+              <input
+                type="file"
+                #fileInput
+                accept=".xlsx,.xls,.csv"
                 (change)="handleFileSelect($event)"
                 style="display: none"
               >
@@ -286,7 +296,7 @@ interface Question {
               <p>Supported formats: .xlsx, .xls, .csv</p>
               <p class="file-info" *ngIf="selectedFile">Selected: {{selectedFile.name}}</p>
             </div>
-            
+
             <div class="import-instructions">
               <h4>Excel Format Requirements:</h4>
               <ul>
@@ -323,7 +333,7 @@ interface Question {
       justify-content: space-between;
       align-items: flex-start;
       margin-bottom: 2rem;
-      
+
       @media (max-width: 768px) {
         flex-direction: column;
         gap: 1rem;
@@ -337,7 +347,7 @@ interface Question {
         margin-bottom: 0.5rem;
         color: var(--color-text-primary);
       }
-      
+
       p {
         color: var(--color-text-secondary);
         font-size: 1rem;
@@ -353,7 +363,7 @@ interface Question {
       display: grid;
       grid-template-columns: 250px 1fr;
       gap: 2rem;
-      
+
       @media (max-width: 1024px) {
         grid-template-columns: 1fr;
       }
@@ -365,7 +375,7 @@ interface Question {
       padding: 1.5rem;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       height: fit-content;
-      
+
       h3 {
         font-size: 1.125rem;
         font-weight: 600;
@@ -388,21 +398,21 @@ interface Question {
       border-radius: 8px;
       cursor: pointer;
       transition: all 0.2s;
-      
+
       &:hover {
         background: var(--color-background-subtle);
       }
-      
+
       &.active {
         background: var(--color-primary-100);
         color: var(--color-primary-700);
         font-weight: 500;
       }
-      
+
       .folder-name {
         flex: 1;
       }
-      
+
       .folder-count {
         font-size: 0.875rem;
         color: var(--color-text-secondary);
@@ -463,11 +473,11 @@ interface Question {
       padding: 1rem;
       border-bottom: 1px solid var(--color-border);
       align-items: center;
-      
+
       &:last-child {
         border-bottom: none;
       }
-      
+
       &:hover {
         background: var(--color-background-subtle);
       }
@@ -481,7 +491,7 @@ interface Question {
         color: var(--color-text-primary);
         line-height: 1.4;
       }
-      
+
       .question-meta {
         font-size: 0.75rem;
         color: var(--color-text-secondary);
@@ -493,22 +503,22 @@ interface Question {
       border-radius: 4px;
       font-size: 0.75rem;
       font-weight: 500;
-      
+
       &.ai-systems {
         background: var(--color-primary-100);
         color: var(--color-primary-700);
       }
-      
+
       &.networks {
         background: var(--color-success-100);
         color: var(--color-success-700);
       }
-      
+
       &.web-dev {
         background: var(--color-warning-100);
         color: var(--color-warning-700);
       }
-      
+
       &.all-subjects {
         background: var(--color-background-muted);
         color: var(--color-text-secondary);
@@ -520,17 +530,17 @@ interface Question {
       border-radius: 4px;
       font-size: 0.75rem;
       font-weight: 500;
-      
+
       &.easy {
         background: var(--color-success-100);
         color: var(--color-success-700);
       }
-      
+
       &.medium {
         background: var(--color-warning-100);
         color: var(--color-warning-700);
       }
-      
+
       &.hard {
         background: var(--color-error-100);
         color: var(--color-error-700);
@@ -545,19 +555,19 @@ interface Question {
       font-size: 0.75rem;
       cursor: pointer;
       transition: all 0.2s;
-      
+
       &.edit {
         color: var(--color-primary-600);
         border-color: var(--color-primary-200);
-        
+
         &:hover {
           background: var(--color-primary-50);
         }
       }
-      
+
       &.view {
         color: var(--color-text-secondary);
-        
+
         &:hover {
           background: var(--color-background-subtle);
         }
@@ -591,11 +601,11 @@ interface Question {
       cursor: pointer;
       transition: all 0.2s;
       font-size: 0.875rem;
-      
+
       &:hover:not(:disabled) {
         background: var(--color-background-subtle);
       }
-      
+
       &:disabled {
         opacity: 0.5;
         cursor: not-allowed;
@@ -613,37 +623,37 @@ interface Question {
       cursor: pointer;
       transition: all 0.2s;
       text-decoration: none;
-      
+
       &.primary {
         background: var(--color-primary-600);
         color: white;
-        
+
         &:hover:not(:disabled) {
           background: var(--color-primary-700);
         }
-        
+
         &:disabled {
           background: var(--color-background-muted);
           color: var(--color-text-secondary);
           cursor: not-allowed;
         }
       }
-      
+
       &.secondary {
         background: var(--color-background-subtle);
         color: var(--color-text-primary);
         border: 1px solid var(--color-border);
-        
+
         &:hover {
           background: var(--color-background-muted);
         }
       }
-      
+
       &.small {
         padding: 0.5rem 1rem;
         font-size: 0.875rem;
       }
-      
+
       mat-icon {
         font-size: 1.25rem;
         width: 1.25rem;
@@ -681,20 +691,20 @@ interface Question {
       align-items: center;
       padding: 1.5rem;
       border-bottom: 1px solid var(--color-border);
-      
+
       h3 {
         font-size: 1.25rem;
         font-weight: 600;
         color: var(--color-text-primary);
       }
-      
+
       .close-btn {
         padding: 0.5rem;
         background: transparent;
         border: none;
         border-radius: 6px;
         cursor: pointer;
-        
+
         &:hover {
           background: var(--color-background-subtle);
         }
@@ -715,7 +725,7 @@ interface Question {
 
     .form-group {
       margin-bottom: 1.5rem;
-      
+
       label {
         display: block;
         font-size: 0.875rem;
@@ -732,7 +742,7 @@ interface Question {
       border-radius: 6px;
       font-size: 0.875rem;
       transition: border-color 0.2s;
-      
+
       &:focus {
         outline: none;
         border-color: var(--color-primary-500);
@@ -754,7 +764,7 @@ interface Question {
       align-items: center;
       gap: 0.5rem;
       cursor: pointer;
-      
+
       input[type="radio"] {
         margin: 0;
       }
@@ -771,15 +781,15 @@ interface Question {
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      
+
       input[type="radio"], input[type="checkbox"] {
         margin: 0;
       }
-      
+
       input[type="text"] {
         flex: 1;
       }
-      
+
       .remove-option {
         padding: 0.25rem;
         background: transparent;
@@ -787,11 +797,11 @@ interface Question {
         color: var(--color-error-600);
         cursor: pointer;
         border-radius: 4px;
-        
+
         &:hover {
           background: var(--color-error-50);
         }
-        
+
         mat-icon {
           font-size: 1rem;
           width: 1rem;
@@ -808,12 +818,12 @@ interface Question {
       cursor: pointer;
       transition: all 0.2s;
       margin-bottom: 1.5rem;
-      
+
       &:hover {
         border-color: var(--color-primary-500);
         background: var(--color-primary-50);
       }
-      
+
       mat-icon {
         font-size: 3rem;
         width: 3rem;
@@ -821,19 +831,19 @@ interface Question {
         color: var(--color-text-secondary);
         margin-bottom: 1rem;
       }
-      
+
       h4 {
         font-size: 1.125rem;
         font-weight: 500;
         margin-bottom: 0.5rem;
         color: var(--color-text-primary);
       }
-      
+
       p {
         color: var(--color-text-secondary);
         margin-bottom: 0.25rem;
       }
-      
+
       .file-info {
         color: var(--color-primary-600);
         font-weight: 500;
@@ -847,11 +857,11 @@ interface Question {
         margin-bottom: 0.75rem;
         color: var(--color-text-primary);
       }
-      
+
       ul {
         margin: 0;
         padding-left: 1.25rem;
-        
+
         li {
           margin-bottom: 0.5rem;
           font-size: 0.875rem;
@@ -861,70 +871,30 @@ interface Question {
     }
   `]
 })
-export class TeacherQuestionBank {
-  // Data properties
+export class TeacherQuestionBank implements OnInit {
+  private readonly teacherApi = inject(TeacherApiService);
+  private readonly router = inject(Router);
+  private readonly cdr = inject(ChangeDetectorRef);
+
+  // Loading states
+  isLoading = false;
+  errorMessage = '';
+
+  // Teaching units from API (folders)
+  teachingUnits: TeachingUnitDto[] = [];
+
+  // Questions from selected teaching unit (from question bank API)
+  allQuestions: QuestionBankItemDto[] = [];
+
+  // Legacy folder structure (dynamically built from teaching units)
   folders: QuestionFolder[] = [
-    { id: 'all', name: 'All Questions', count: 180, isActive: true },
-    { id: 'ai-systems', name: 'AI Systems', count: 42 },
-    { id: 'networks', name: 'Networks', count: 38 },
-    { id: 'web-dev', name: 'Web Dev', count: 26 },
-    { id: 'ethics', name: 'Ethics', count: 18 },
-    { id: 'operating-systems', name: 'Operating Systems', count: 32 },
-    { id: 'security', name: 'Security', count: 24 },
-    { id: 'sentiment-prompts', name: 'Sentiment Prompts', count: 6 }
+    { id: 'all', name: 'All Questions', count: 0, isActive: true }
   ];
 
-  questions: Question[] = [
-    {
-      id: '1',
-      text: 'What is the primary purpose of a neural network?',
-      type: 'MCQ',
-      subject: 'AI Systems',
-      difficulty: 'Easy',
-      options: ['Pattern recognition', 'Data storage', 'File compression', 'Network routing'],
-      correctAnswer: 0,
-      usedCount: 3,
-      lastEdit: 'Nov 20',
-      folderId: 'ai-systems'
-    },
-    {
-      id: '2',
-      text: 'Which layer handles IP addressing in OSI?',
-      type: 'MCQ',
-      subject: 'Networks',
-      difficulty: 'Medium',
-      options: ['Physical', 'Data Link', 'Network', 'Transport'],
-      correctAnswer: 2,
-      usedCount: 5,
-      lastEdit: 'Nov 18',
-      folderId: 'networks'
-    },
-    {
-      id: '3',
-      text: 'Select all valid HTTP methods:',
-      type: 'Multi-answer',
-      subject: 'Web Dev',
-      difficulty: 'Hard',
-      options: ['GET', 'POST', 'DELETE', 'FETCH', 'PUT', 'PATCH'],
-      correctAnswer: [0, 1, 2, 4, 5],
-      usedCount: 2,
-      lastEdit: 'Nov 15',
-      folderId: 'web-dev'
-    },
-    {
-      id: '4',
-      text: '[Sentiment] Describe your stress level...',
-      type: 'Essay',
-      subject: 'All subjects',
-      difficulty: 'Easy',
-      usedCount: 0,
-      lastEdit: 'System',
-      folderId: 'sentiment-prompts'
-    }
-  ];
-
+  // Questions mapped to legacy format for UI compatibility
+  questions: Question[] = [];
   filteredQuestions: Question[] = [];
-  
+
   // Filter properties
   selectedSubject = '';
   selectedDifficulty = '';
@@ -956,8 +926,115 @@ export class TeacherQuestionBank {
     ]
   };
 
-  constructor(private router: Router) {
+  constructor() {}
+
+  async ngOnInit(): Promise<void> {
+    await this.loadTeachingUnits();
     this.applyFilters();
+  }
+
+  async loadTeachingUnits(): Promise<void> {
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    try {
+      this.teachingUnits = await firstValueFrom(this.teacherApi.getMyTeachingUnits());
+      this.buildFolders();
+    } catch (err: unknown) {
+      this.errorMessage = err instanceof Error ? err.message : 'Failed to load teaching units.';
+    } finally {
+      this.isLoading = false;
+      this.cdr.markForCheck();
+    }
+  }
+
+  buildFolders(): void {
+    this.folders = [
+      { id: 'all', name: 'All Questions', count: 0, isActive: true },
+      ...this.teachingUnits.map(tu => ({
+        id: tu.id,
+        name: tu.name,
+        count: 0, // Will be updated when questions are loaded
+      })),
+    ];
+  }
+
+  async loadQuestionsForTeachingUnit(teachingUnitId: string): Promise<void> {
+    if (!teachingUnitId || teachingUnitId === 'all') {
+      this.allQuestions = [];
+      this.mapQuestionsToLegacy();
+      return;
+    }
+
+    this.isLoading = true;
+    try {
+      const result = await firstValueFrom(
+        this.teacherApi.getTeachingUnitPastQuestions(teachingUnitId)
+      );
+      this.allQuestions = result.questions;
+      this.mapQuestionsToLegacy();
+    } catch (err: unknown) {
+      console.error('Failed to load past questions:', err);
+    } finally {
+      this.isLoading = false;
+      this.cdr.markForCheck();
+    }
+  }
+
+  mapQuestionsToLegacy(): void {
+    // Map QuestionBankItemDto to the legacy Question interface for UI compatibility
+    // Question bank items have difficultyLevel and usage tracking
+    this.questions = this.allQuestions.map((q, idx) => ({
+      id: q.questionId,
+      text: q.question,
+      type: this.mapQuestionType(q.type),
+      subject: this.getActiveTeachingUnitName(),
+      difficulty: this.mapDifficultyLevel(q.difficultyLevel),
+      options: q.proposedAnswers ?? [],
+      correctAnswer: q.proposedAnswers?.indexOf(q.correctAnswer ?? '') ?? 0,
+      usedCount: q.usageCount ?? 1,
+      lastEdit: q.createdAt ? new Date(q.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'N/A',
+      folderId: this.activeFolder,
+    }));
+    this.applyFilters();
+  }
+
+  /**
+   * Map backend difficulty level to UI difficulty.
+   */
+  mapDifficultyLevel(level: string | undefined): 'Easy' | 'Medium' | 'Hard' {
+    switch (level) {
+      case 'LEVEL_1':
+      case 'LEVEL_2':
+        return 'Easy';
+      case 'LEVEL_3':
+        return 'Medium';
+      case 'LEVEL_4':
+      case 'LEVEL_5':
+        return 'Hard';
+      default:
+        return 'Medium';
+    }
+  }
+
+  mapQuestionType(type: QuestionType): 'MCQ' | 'Essay' | 'Multi-answer' {
+    switch (type) {
+      case 'SINGLE_CHOICE':
+      case 'TRUE_FALSE':
+        return 'MCQ';
+      case 'MULTIPLE_CHOICE':
+        return 'Multi-answer';
+      case 'OPEN_ENDED':
+        return 'Essay';
+      default:
+        return 'MCQ';
+    }
+  }
+
+  getActiveTeachingUnitName(): string {
+    if (this.activeFolder === 'all') return 'All subjects';
+    const tu = this.teachingUnits.find(t => t.id === this.activeFolder);
+    return tu?.name ?? 'Unknown';
   }
 
   get paginationStart(): number {
@@ -976,7 +1053,7 @@ export class TeacherQuestionBank {
     this.folders.forEach(f => f.isActive = false);
     folder.isActive = true;
     this.activeFolder = folder.id;
-    this.applyFilters();
+    this.loadQuestionsForTeachingUnit(folder.id);
   }
 
   applyFilters(): void {
@@ -1008,7 +1085,7 @@ export class TeacherQuestionBank {
 
     // Filter by search term
     if (this.searchTerm) {
-      filtered = filtered.filter(q => 
+      filtered = filtered.filter(q =>
         q.text.toLowerCase().includes(this.searchTerm.toLowerCase())
       );
     }
@@ -1055,10 +1132,10 @@ export class TeacherQuestionBank {
 
   isNewQuestionValid(): boolean {
     if (!this.newQuestion.text.trim() || !this.newQuestion.subject) return false;
-    
+
     const validOptions = this.newQuestion.options.filter((opt: any) => opt.text.trim());
     const hasCorrectAnswer = this.newQuestion.options.some((opt: any) => opt.isCorrect);
-    
+
     return validOptions.length >= 2 && hasCorrectAnswer;
   }
 
