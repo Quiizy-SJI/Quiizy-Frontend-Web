@@ -17,6 +17,7 @@ import type {
   SpecialityDto,
   MiniAdminDto,
 } from '../domain/dtos/dean/dean-shared.dto';
+import type { QuizDto } from '../domain/dtos/teacher/teacher-quiz.dto';
 import type {
   CreateAcademicYearDto,
   UpdateAcademicYearDto,
@@ -214,6 +215,18 @@ export class DeanApiService {
   getAiAnalytics(academicYearId?: string): Observable<DeanAiAnalyticsDto> {
     const params = academicYearId ? { academicYearId: String(academicYearId) } : undefined;
     return this.api.get<DeanAiAnalyticsDto>('/dean/ai-analytics', { params });
+  }
+
+  /**
+   * List quizzes visible to the dean across the institution.
+   * Backend may expose an institution-scoped endpoint for deans.
+   * Route: GET /quizzes
+   */
+  listQuizzes(): Observable<QuizDto[]> {
+    // Backend does not expose `/dean/quizzes` currently; use generic `/quizzes`
+    // which returns all quizzes (admin-scoped). Adjust if a dean-scoped
+    // endpoint is added in the future.
+    return this.api.get<QuizDto[]>('/quizzes');
   }
 
   // Stats
