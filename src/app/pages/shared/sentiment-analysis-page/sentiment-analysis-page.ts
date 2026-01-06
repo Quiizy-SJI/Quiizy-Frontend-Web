@@ -6,6 +6,8 @@ import { firstValueFrom } from 'rxjs';
 
 import { SentimentAnalysisService } from '../../../services/sentiment-analysis.service';
 import { TeacherApiService } from '../../../services/teacher-api.service';
+import { DeanApiService } from '../../../services/dean-api.service';
+import { Router } from '@angular/router';
 import type { QuizDto, QuizQuestionViewModel } from '../../../domain/dtos/teacher/teacher-quiz.dto';
 import { findOpenEndedQuestion } from '../../../domain/dtos/teacher/teacher-quiz.dto';
 import type {
@@ -69,6 +71,8 @@ interface QuizOption {
 export class SentimentAnalysisPage implements OnInit {
   private readonly sentimentService = inject(SentimentAnalysisService);
   private readonly teacherApi = inject(TeacherApiService);
+  private readonly deanApi = inject(DeanApiService);
+  private readonly router = inject(Router);
 
   /**
    * The role context for this page. Affects available features and data access.
@@ -219,9 +223,13 @@ export class SentimentAnalysisPage implements OnInit {
     this.errorMessage.set(null);
 
     try {
-      // TODO: For dean/speciality-head roles, use a different API that returns all quizzes
-      // For now, using the teacher API which works for all roles with proper backend permissions
-      const quizzes = await firstValueFrom(this.teacherApi.getMyQuizzes());
+      // Determine effective role: prefer explicit input, but allow route-based detection
+      const isDeanRole = this.role() === 'dean' || this.router.url.includes('/dean');
+
+      // For dean and speciality-head, use dean API which can list institution-scoped quizzes.
+      const quizzes = isDeanRole
+        ? await firstValueFrom(this.deanApi.listQuizzes())
+        : await firstValueFrom(this.teacherApi.getMyQuizzes());
       const now = new Date();
 
       // Filter and map quizzes with open-ended questions
