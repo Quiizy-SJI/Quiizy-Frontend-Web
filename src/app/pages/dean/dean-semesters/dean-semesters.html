@@ -11,6 +11,7 @@
         [options]="academicYearOptions()"
         [(ngModel)]="selectedAcademicYearId"
         (ngModelChange)="onFilterChanged()"
+        [searchable]="true"
       ></ui-select>
 
       <ui-button variant="outline" color="neutral" (clicked)="loadSemesters()" [loading]="isLoading">
@@ -34,7 +35,17 @@
         <ui-spinner size="lg"></ui-spinner>
       </div>
     } @else {
-      <ui-table [columns]="columns" [data]="semesters">
+      <ui-table
+        [columns]="columns"
+        [data]="semesters"
+        [showPagination]="true"
+        [pagination]="pagination"
+        [sortColumn]="sortColumn"
+        [sortDirection]="sortDirection"
+        (sortChange)="onSortChange($event)"
+        (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)"
+      >
         <ng-template #cell let-row let-column="column">
           @switch (column.key) {
             @case ('name') { {{ row.name }} }
@@ -71,12 +82,14 @@
         [options]="classAcademicYearOptions()"
         [(ngModel)]="form.classAcademicYearId"
         [disabled]="modalMode === 'edit'"
+        [searchable]="true"
       ></ui-select>
 
       <ui-select
         label="Status"
         [options]="statusOptions"
         [(ngModel)]="form.status"
+        [searchable]="true"
       ></ui-select>
 
       <div class="grid-2">

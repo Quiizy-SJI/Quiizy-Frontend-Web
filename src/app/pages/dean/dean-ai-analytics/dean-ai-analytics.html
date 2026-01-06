@@ -15,6 +15,7 @@
         [options]="academicYearOptions()"
         [ngModel]="selectedAcademicYearId()"
         (ngModelChange)="selectedAcademicYearId.set($event); onFilterChanged()"
+        [searchable]="true"
       ></ui-select>
 
       <ui-button variant="outline" color="primary" (clicked)="loadAnalytics()" [loading]="isLoading()">
@@ -234,39 +235,38 @@
 
       <ui-card variant="outlined">
         @if (hardestQuestions().length > 0) {
-          <div class="questions-table">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Question ID</th>
-                  <th>Attempts</th>
-                  <th>Avg Score</th>
-                  <th>Success Rate</th>
-                  <th>Difficulty</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (question of hardestQuestions(); track question.questionId) {
-                  <tr>
-                    <td class="cell-monospace">{{ question.questionId }}</td>
-                    <td>{{ question.attempts }}</td>
-                    <td>{{ question.avgMark }}</td>
-                    <td>
-                      <div class="success-bar">
-                        <div class="success-bar__fill" [style.width.%]="question.successRate"></div>
-                        <span class="success-bar__text">{{ question.successRate.toFixed(0) }}%</span>
-                      </div>
-                    </td>
-                    <td>
-                      <ui-badge [color]="getDifficultyColor(question.difficulty)" variant="subtle">
-                        {{ question.difficulty }}
-                      </ui-badge>
-                    </td>
-                  </tr>
+          <ui-table
+            [columns]="questionsColumns"
+            [data]="displayedQuestions()"
+            [showPagination]="true"
+            [pagination]="questionsPagination"
+            [sortColumn]="questionsSortColumn"
+            [sortDirection]="questionsSortDirection"
+            (sortChange)="onQuestionsSortChange($event)"
+            (pageChange)="onQuestionsPageChange($event)"
+            (pageSizeChange)="onQuestionsPageSizeChange($event)"
+          >
+            <ng-template #cell let-row let-column="column">
+              @switch (column.key) {
+                @case ('questionId') {
+                  <span class="cell-monospace">{{ row.questionId }}</span>
                 }
-              </tbody>
-            </table>
-          </div>
+                @case ('attempts') { {{ row.attempts }} }
+                @case ('avgMark') { {{ row.avgMark }} }
+                @case ('successRate') {
+                  <div class="success-bar">
+                    <div class="success-bar__fill" [style.width.%]="row.successRate"></div>
+                    <span class="success-bar__text">{{ row.successRate.toFixed(0) }}%</span>
+                  </div>
+                }
+                @case ('difficulty') {
+                  <ui-badge [color]="getDifficultyColor(row.difficulty)" variant="subtle">
+                    {{ row.difficulty }}
+                  </ui-badge>
+                }
+              }
+            </ng-template>
+          </ui-table>
         } @else {
           <div class="empty-state">
             <mat-icon>quiz</mat-icon>

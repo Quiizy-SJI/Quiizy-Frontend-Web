@@ -15,6 +15,7 @@ import {
   type DropdownOption,
   type TableColumn,
 } from '../../../components/ui';
+import type { PaginationConfig, SortEvent } from '../../../components/ui/tables/table/table.component';
 import type {
   AcademicYearDto,
   ClassAcademicYearDto,
@@ -61,18 +62,31 @@ export class DeanSemesters {
   errorMessage = '';
 
   academicYears: AcademicYearDto[] = [];
+  allSemesters: SemesterDto[] = [];
   semesters: SemesterDto[] = [];
 
   selectedAcademicYearId: string | null = null;
 
+  // Pagination state
+  pagination: PaginationConfig = {
+    page: 1,
+    pageSize: 10,
+    total: 0,
+    pageSizes: [5, 10, 25, 50],
+  };
+
+  // Sort state
+  sortColumn: string | null = null;
+  sortDirection: 'asc' | 'desc' | null = null;
+
   readonly columns: TableColumn[] = [
-    { key: 'name', label: 'Name' },
-    { key: 'shortCode', label: 'Code' },
-    { key: 'status', label: 'Status' },
+    { key: 'name', label: 'Name', sortable: true },
+    { key: 'shortCode', label: 'Code', sortable: true },
+    { key: 'status', label: 'Status', sortable: true },
     { key: 'class', label: 'Class' },
     { key: 'academicYear', label: 'Academic Year' },
     { key: 'dates', label: 'Dates' },
-    { key: 'updatedAt', label: 'Updated' },
+    { key: 'updatedAt', label: 'Updated', sortable: true },
     { key: 'actions', label: 'Actions', width: '240px' },
   ];
 
@@ -166,13 +180,55 @@ export class DeanSemesters {
 
     try {
       const academicYearId = this.selectedAcademicYearId || undefined;
-      this.semesters = await firstValueFrom(this.deanApi.listSemesters(academicYearId));
+      this.allSemesters = await firstValueFrom(this.deanApi.listSemesters(academicYearId));
+      this.pagination.total = this.allSemesters.length;
+      this.pagination.page = 1;
+      this.updateDisplayedRows();
     } catch (err: unknown) {
       this.errorMessage = err instanceof Error ? err.message : 'Failed to load semesters.';
     } finally {
       this.isLoading = false;
       this.cdr.markForCheck();
     }
+  }
+
+  private updateDisplayedRows(): void {
+    let data = [...this.allSemesters];
+
+    // Sort data
+    if (this.sortColumn && this.sortDirection) {
+      data = data.sort((a, b) => {
+        const aVal = (a as any)[this.sortColumn!] ?? '';
+        const bVal = (b as any)[this.sortColumn!] ?? '';
+        const comparison = String(aVal).localeCompare(String(bVal));
+        return this.sortDirection === 'asc' ? comparison : -comparison;
+      });
+    }
+
+    // Paginate
+    const start = (this.pagination.page - 1) * this.pagination.pageSize;
+    const end = start + this.pagination.pageSize;
+    this.semesters = data.slice(start, end);
+  }
+
+  onSortChange(event: SortEvent): void {
+    this.sortColumn = event.column || null;
+    this.sortDirection = event.direction;
+    this.updateDisplayedRows();
+    this.cdr.markForCheck();
+  }
+
+  onPageChange(page: number): void {
+    this.pagination.page = page;
+    this.updateDisplayedRows();
+    this.cdr.markForCheck();
+  }
+
+  onPageSizeChange(pageSize: number): void {
+    this.pagination.pageSize = pageSize;
+    this.pagination.page = 1;
+    this.updateDisplayedRows();
+    this.cdr.markForCheck();
   }
 
   async onFilterChanged(): Promise<void> {

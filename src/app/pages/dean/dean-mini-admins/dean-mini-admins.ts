@@ -15,6 +15,7 @@ import {
   type DropdownOption,
   type TableColumn,
 } from '../../../components/ui';
+import type { PaginationConfig, SortEvent } from '../../../components/ui/tables/table/table.component';
 import type { MiniAdminDto, SpecialityDto } from '../../../domain/dtos/dean/dean-shared.dto';
 import type { UpdateMiniAdminDto } from '../../../domain/dtos/dean/mini-admin.dto';
 import { DeanApiService } from '../../../services/dean-api.service';
@@ -55,16 +56,29 @@ export class DeanMiniAdmins {
   isLoading = false;
   errorMessage = '';
 
+  allRows: MiniAdminDto[] = [];
   rows: MiniAdminDto[] = [];
   specialities: SpecialityDto[] = [];
 
+  // Pagination state
+  pagination: PaginationConfig = {
+    page: 1,
+    pageSize: 10,
+    total: 0,
+    pageSizes: [5, 10, 25, 50],
+  };
+
+  // Sort state
+  sortColumn: string | null = null;
+  sortDirection: 'asc' | 'desc' | null = null;
+
   readonly columns: TableColumn[] = [
-    { key: 'name', label: 'Name' },
-    { key: 'surname', label: 'Surname' },
-    { key: 'email', label: 'Email' },
-    { key: 'login', label: 'Login' },
-    { key: 'speciality', label: 'Speciality' },
-    { key: 'updatedAt', label: 'Updated' },
+    { key: 'name', label: 'Name', sortable: true },
+    { key: 'surname', label: 'Surname', sortable: true },
+    { key: 'email', label: 'Email', sortable: true },
+    { key: 'login', label: 'Login', sortable: true },
+    { key: 'speciality', label: 'Speciality', sortable: true },
+    { key: 'updatedAt', label: 'Updated', sortable: true },
     { key: 'actions', label: 'Actions', width: '240px' },
   ];
 
@@ -93,14 +107,84 @@ export class DeanMiniAdmins {
     this.isLoading = true;
 
     try {
-      this.rows = await firstValueFrom(this.deanApi.listMiniAdmins());
+      this.allRows = await firstValueFrom(this.deanApi.listMiniAdmins());
       this.specialities = await firstValueFrom(this.deanApi.listSpecialities());
+      this.pagination.total = this.allRows.length;
+      this.pagination.page = 1;
+      this.updateDisplayedRows();
     } catch (err: unknown) {
       this.errorMessage = err instanceof Error ? err.message : 'Failed to load Speciality Head.';
     } finally {
       this.isLoading = false;
       this.cdr.markForCheck();
     }
+  }
+
+  private updateDisplayedRows(): void {
+    let data = [...this.allRows];
+
+    // Sort data
+    if (this.sortColumn && this.sortDirection) {
+      data = data.sort((a, b) => {
+        let aVal: any;
+        let bVal: any;
+
+        // Handle nested user properties
+        switch (this.sortColumn) {
+          case 'name':
+            aVal = a.user?.name ?? '';
+            bVal = b.user?.name ?? '';
+            break;
+          case 'surname':
+            aVal = a.user?.surname ?? '';
+            bVal = b.user?.surname ?? '';
+            break;
+          case 'email':
+            aVal = a.user?.email ?? '';
+            bVal = b.user?.email ?? '';
+            break;
+          case 'login':
+            aVal = a.user?.login ?? '';
+            bVal = b.user?.login ?? '';
+            break;
+          case 'speciality':
+            aVal = a.speciality?.name ?? '';
+            bVal = b.speciality?.name ?? '';
+            break;
+          default:
+            aVal = (a as any)[this.sortColumn!] ?? '';
+            bVal = (b as any)[this.sortColumn!] ?? '';
+        }
+
+        const comparison = String(aVal).localeCompare(String(bVal));
+        return this.sortDirection === 'asc' ? comparison : -comparison;
+      });
+    }
+
+    // Paginate
+    const start = (this.pagination.page - 1) * this.pagination.pageSize;
+    const end = start + this.pagination.pageSize;
+    this.rows = data.slice(start, end);
+  }
+
+  onSortChange(event: SortEvent): void {
+    this.sortColumn = event.column || null;
+    this.sortDirection = event.direction;
+    this.updateDisplayedRows();
+    this.cdr.markForCheck();
+  }
+
+  onPageChange(page: number): void {
+    this.pagination.page = page;
+    this.updateDisplayedRows();
+    this.cdr.markForCheck();
+  }
+
+  onPageSizeChange(pageSize: number): void {
+    this.pagination.pageSize = pageSize;
+    this.pagination.page = 1;
+    this.updateDisplayedRows();
+    this.cdr.markForCheck();
   }
 
   openCreate(): void {

@@ -27,7 +27,17 @@
         <ui-spinner size="lg"></ui-spinner>
       </div>
     } @else {
-      <ui-table [columns]="columns" [data]="rows">
+      <ui-table
+        [columns]="columns"
+        [data]="rows"
+        [showPagination]="true"
+        [pagination]="pagination"
+        [sortColumn]="sortColumn"
+        [sortDirection]="sortDirection"
+        (sortChange)="onSortChange($event)"
+        (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)"
+      >
         <ng-template #cell let-row let-column="column">
           @switch (column.key) {
             @case ('name') { {{ row.name }} }

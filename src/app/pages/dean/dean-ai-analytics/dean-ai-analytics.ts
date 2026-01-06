@@ -12,8 +12,11 @@ import {
   SelectComponent,
   SpinnerComponent,
   StatCardComponent,
+  TableComponent,
   type DropdownOption,
+  type TableColumn,
 } from '../../../components/ui';
+import type { PaginationConfig, SortEvent } from '../../../components/ui/tables/table/table.component';
 import type { AcademicYearDto } from '../../../domain/dtos/dean/dean-shared.dto';
 import type { DeanAiAnalyticsDto } from '../../../domain/dtos/dean/ai-analytics.dto';
 import type { DeanDashboardStatsDto } from '../../../domain/dtos/dean/stats.dto';
@@ -61,6 +64,7 @@ interface PerformancePredictor {
     BadgeComponent,
     SpinnerComponent,
     StatCardComponent,
+    TableComponent,
     ChartHostComponent,
   ],
   templateUrl: './dean-ai-analytics.html',
@@ -79,6 +83,30 @@ export class DeanAiAnalytics {
 
   analytics = signal<DeanAiAnalyticsDto | null>(null);
   stats = signal<DeanDashboardStatsDto | null>(null);
+
+  // Table columns for hardest questions
+  readonly questionsColumns: TableColumn[] = [
+    { key: 'questionId', label: 'Question ID', sortable: true },
+    { key: 'attempts', label: 'Attempts', sortable: true },
+    { key: 'avgMark', label: 'Avg Score', sortable: true },
+    { key: 'successRate', label: 'Success Rate', sortable: true },
+    { key: 'difficulty', label: 'Difficulty', sortable: true },
+  ];
+
+  // Pagination state for hardest questions
+  questionsPagination: PaginationConfig = {
+    page: 1,
+    pageSize: 5,
+    total: 0,
+    pageSizes: [5, 10, 25],
+  };
+
+  // Sort state for hardest questions
+  questionsSortColumn: string | null = null;
+  questionsSortDirection: 'asc' | 'desc' | null = null;
+
+  // Displayed questions (paginated/sorted)
+  displayedQuestions = signal<HardestQuestionRow[]>([]);
 
   // Computed insights
   hardestQuestions = computed<HardestQuestionRow[]>(() => {
@@ -301,6 +329,10 @@ export class DeanAiAnalytics {
 
       this.analytics.set(analyticsData);
       this.stats.set(statsData);
+
+      // Update questions table after data is loaded
+      this.questionsPagination.page = 1;
+      this.updateDisplayedQuestions();
     } catch (err: unknown) {
       this.errorMessage.set(err instanceof Error ? err.message : 'Failed to load AI analytics.');
       this.analytics.set(null);
@@ -313,6 +345,54 @@ export class DeanAiAnalytics {
 
   async onFilterChanged(): Promise<void> {
     await this.loadAnalytics();
+  }
+
+  private updateDisplayedQuestions(): void {
+    let data = [...this.hardestQuestions()];
+
+    // Sort data
+    if (this.questionsSortColumn && this.questionsSortDirection) {
+      data = data.sort((a, b) => {
+        const aVal = (a as any)[this.questionsSortColumn!] ?? '';
+        const bVal = (b as any)[this.questionsSortColumn!] ?? '';
+
+        // Numeric comparison for number fields
+        if (typeof aVal === 'number' && typeof bVal === 'number') {
+          return this.questionsSortDirection === 'asc' ? aVal - bVal : bVal - aVal;
+        }
+
+        const comparison = String(aVal).localeCompare(String(bVal));
+        return this.questionsSortDirection === 'asc' ? comparison : -comparison;
+      });
+    }
+
+    // Update pagination total
+    this.questionsPagination.total = data.length;
+
+    // Paginate
+    const start = (this.questionsPagination.page - 1) * this.questionsPagination.pageSize;
+    const end = start + this.questionsPagination.pageSize;
+    this.displayedQuestions.set(data.slice(start, end));
+  }
+
+  onQuestionsSortChange(event: SortEvent): void {
+    this.questionsSortColumn = event.column || null;
+    this.questionsSortDirection = event.direction;
+    this.updateDisplayedQuestions();
+    this.cdr.markForCheck();
+  }
+
+  onQuestionsPageChange(page: number): void {
+    this.questionsPagination.page = page;
+    this.updateDisplayedQuestions();
+    this.cdr.markForCheck();
+  }
+
+  onQuestionsPageSizeChange(pageSize: number): void {
+    this.questionsPagination.pageSize = pageSize;
+    this.questionsPagination.page = 1;
+    this.updateDisplayedQuestions();
+    this.cdr.markForCheck();
   }
 
   // Helper methods
