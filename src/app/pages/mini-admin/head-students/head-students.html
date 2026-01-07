@@ -41,15 +41,7 @@
   }
 
   <div class="students__toolbar">
-    <ui-button
-      color="success"
-      variant="soft"
-      size="sm"
-      [disabled]="selectedRows.length === 0"
-      (clicked)="archiveSelected()"
-    >
-      Archive Selected
-    </ui-button>
+    
 
     <ui-button color="warning" variant="soft" size="sm" (clicked)="importExcel()">
       Import Excel
@@ -69,14 +61,18 @@
 
       <ui-table
         [columns]="columns"
-        [data]="filteredRows"
+        [data]="pagedRows"
         [loading]="loading"
-        [searchable]="false"
+        [searchable]="true"
         [selectable]="true"
         [rowClickable]="true"
+        [showPagination]="true"
+        [pagination]="pagination"
         trackByKey="id"
         (rowClick)="onRowClick($event.row)"
         (selectionChange)="onSelectionChange($event)"
+        (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)"
       >
         <ng-template #cell let-row let-column="column">
           @switch (column.key) {
@@ -130,10 +126,6 @@
               <div class="detail-field__value">{{ selectedRow.className }}</div>
             </div>
             <div class="detail-field">
-              <div class="detail-field__label">Carryover</div>
-              <div class="detail-field__value">{{ selectedRow.carryovers }}</div>
-            </div>
-            <div class="detail-field">
               <div class="detail-field__label">Email</div>
               <div class="detail-field__value">{{ selectedRow.email }}</div>
             </div>
@@ -152,36 +144,6 @@
     </ui-card>
   </section>
 
-  <section class="students__bottom">
-    <ui-card variant="outlined" class="panel">
-      <div class="panel__header">
-        <div class="panel__title">Activity &amp; Alerts</div>
-      </div>
-
-      <div class="activity-list">
-        @for (item of activity; track item.message) {
-          <div class="activity-item">
-            <span [class]="activityDotClass(item.tone)"></span>
-            <div class="activity-item__content">
-              <div class="activity-item__message">{{ item.message }}</div>
-              <div class="activity-item__time">{{ item.timeAgo }}</div>
-            </div>
-          </div>
-        }
-      </div>
-    </ui-card>
-
-    <ui-card variant="outlined" class="panel">
-      <div class="panel__header">
-        <div class="panel__title">Filter &amp; Export</div>
-      </div>
-
-      <div class="filter-actions">
-        <ui-button color="primary" variant="soft" size="sm">Class Filter</ui-button>
-        <ui-button color="secondary" variant="soft" size="sm" (clicked)="exportStudents()">Export students</ui-button>
-      </div>
-    </ui-card>
-  </section>
 
   <!-- Create modal -->
   <ui-modal
@@ -197,7 +159,6 @@
       <ui-input label="Email" [(ngModel)]="draftEmail" placeholder="e.g., jerry.george@example.com"></ui-input>
       <ui-input label="Login" [(ngModel)]="draftLogin" placeholder="e.g., jerry.george"></ui-input>
       <ui-input label="Password" type="password" [(ngModel)]="draftPassword" placeholder="Min 6 characters"></ui-input>
-      <ui-input label="Carry overs" type="number" [(ngModel)]="draftCarryovers" placeholder="0"></ui-input>
       <ui-select
         label="Class"
         [options]="classOptions()"
@@ -226,7 +187,6 @@
       <ui-input label="Email" [(ngModel)]="draftEmail"></ui-input>
       <ui-input label="Login" [(ngModel)]="draftLogin"></ui-input>
       <ui-input label="Password (leave blank to keep)" type="password" [(ngModel)]="draftPassword"></ui-input>
-      <ui-input label="Carry overs" type="number" [(ngModel)]="draftCarryovers"></ui-input>
       <ui-select
         label="Class"
         [options]="classOptions()"

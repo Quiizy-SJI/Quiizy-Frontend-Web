@@ -19,8 +19,9 @@ import {
 import { HeadService } from '../../../services/head.service';
 import type { AcademicYearDto, ClassAcademicYearDto, CourseDto } from '../../../domain/dtos/teacher';
 import type { MiniAdminDto } from '../../../domain/dtos/dean/dean-shared.dto';
-
-type Tone = 'primary' | 'info' | 'success' | 'warning' | 'danger' | 'neutral' | 'secondary' | 'accent';
+import { toString } from '../../../core/utils/payload-sanitizer';
+import { downloadXlsx, getCell, readExcelFile } from '../../../core/utils/excel-utils';
+import { pushHeadActivity } from '../../../core/utils/head-activity-store';
 
 type LevelLabel = string;
 
@@ -34,12 +35,6 @@ interface HeadClassRow {
   students: number; // backend not available here -> 0
   teachers: number;
   subjects: number;
-}
-
-interface ActivityItem {
-  message: string;
-  timeAgo: string;
-  tone: Tone;
 }
 
 @Component({
@@ -70,6 +65,9 @@ export class HeadClasses {
 
   rows: HeadClassRow[] = [];
   filteredRows: HeadClassRow[] = [];
+  pagedRows: HeadClassRow[] = [];
+
+  pagination = { page: 1, pageSize: 5, total: 0, pageSizes: [5, 10, 25, 50] };
 
   selectedAcademicYearId = '';
   selectedRows: HeadClassRow[] = [];
@@ -90,8 +88,6 @@ export class HeadClasses {
   draftLevel = '';
   draftAcademicYearId = '';
 
-  readonly activity: ActivityItem[] = [];
-
   readonly columns: TableColumn<HeadClassRow>[] = [
     { key: 'className', label: 'Class', sortable: true },
     { key: 'level', label: 'Level', sortable: true, width: '90px', align: 'center' },
@@ -103,17 +99,33 @@ export class HeadClasses {
   academicYearOptions(): DropdownOption<string>[] {
     const opts: DropdownOption<string>[] = [{ value: '', label: 'Select academic year' }];
     for (const ay of this.academicYears) {
-      opts.push({ value: ay.id, label: `${ay.start.split('-')[0]}–${ay.end.split('-')[0]}` });
+      opts.push({ value: String((ay as any).id ?? ''), label: `${ay.start.split('-')[0]}–${ay.end.split('-')[0]}` });
     }
     return opts;
   }
 
-  activityDotClass(tone: Tone): string {
-    return `dot dot--${tone}`;
-  }
-
   async ngOnInit(): Promise<void> {
     await this.loadAll();
+  }
+
+  onPageChange(page: number): void {
+    this.pagination.page = page;
+    this.updatePaging();
+  }
+
+  onPageSizeChange(pageSize: number): void {
+    this.pagination.pageSize = pageSize;
+    this.pagination.page = 1;
+    this.updatePaging();
+  }
+
+  private updatePaging(): void {
+    this.pagination.total = this.filteredRows.length;
+    const totalPages = Math.max(1, Math.ceil(this.pagination.total / this.pagination.pageSize));
+    if (this.pagination.page > totalPages) this.pagination.page = totalPages;
+    if (this.pagination.page < 1) this.pagination.page = 1;
+    const start = (this.pagination.page - 1) * this.pagination.pageSize;
+    this.pagedRows = this.filteredRows.slice(start, start + this.pagination.pageSize);
   }
 
   async loadAll(): Promise<void> {
@@ -138,8 +150,8 @@ export class HeadClasses {
     await this.loadForAcademicYear(this.selectedAcademicYearId);
   }
 
-  private async loadForAcademicYear(academicYearId: string): Promise<void> {
-    const year = academicYearId?.trim();
+  private async loadForAcademicYear(academicYearId: unknown): Promise<void> {
+    const year = toString(academicYearId);
     if (!year) {
       this.rows = [];
       this.filteredRows = [];
@@ -150,10 +162,21 @@ export class HeadClasses {
     this.loading = true;
     this.errorMessage = '';
     try {
-      const [courses, cays] = await Promise.all([
-        firstValueFrom(this.headApi.listCourses(year)),
-        firstValueFrom(this.headApi.listClasses(year)),
-      ]);
+      let courses: CourseDto[] = [];
+      let cays: ClassAcademicYearDto[] = [];
+
+      try {
+        [courses, cays] = await Promise.all([
+          firstValueFrom(this.headApi.listCourses(year)),
+          firstValueFrom(this.headApi.listClasses(year)),
+        ]);
+      } catch {
+        // Fallback: if backend rejects academicYearId filter, load all and filter locally.
+        [courses, cays] = await Promise.all([
+          firstValueFrom(this.headApi.listCourses(undefined)),
+          firstValueFrom(this.headApi.listClasses(undefined)),
+        ]);
+      }
 
       this.courses = courses;
       this.classAcademicYears = cays;
@@ -186,7 +209,7 @@ export class HeadClasses {
       })
       .sort((a, b) => b.score - a.score)[0]?.ay;
 
-    return best?.id ?? '';
+    return String((best as any)?.id ?? '');
   }
 
   private getUser(): MiniAdminDto {
@@ -217,7 +240,7 @@ export class HeadClasses {
         classId: classDto.id,
         className: classDto.name,
         level: String(classDto.level ?? ''),
-        academicYearId: ay.id,
+        academicYearId: String((ay as any).id ?? ''),
         academicYearLabel: `${ay.start.split('-')[0]}–${ay.end.split('-')[0]}`,
         students: 0,
         teachers: teacherCount,
@@ -249,16 +272,17 @@ export class HeadClasses {
   }
 
   applyFilters(): void {
-    const year = this.selectedAcademicYearId?.trim();
+    const year = toString(this.selectedAcademicYearId);
 
-    this.filteredRows = year
-      ? this.rows.filter(r => r.academicYearId === year)
-      : this.rows.slice();
+    this.filteredRows = year ? this.rows.filter(r => r.academicYearId === year) : this.rows.slice();
 
     // keep selection consistent
     if (this.selectedRow && !this.filteredRows.some(r => r.id === this.selectedRow?.id)) {
       this.selectedRow = this.filteredRows[0] ?? null;
     }
+
+    this.pagination.page = 1;
+    this.updatePaging();
   }
 
   onSelectionChange(rows: HeadClassRow[]): void {
@@ -326,6 +350,7 @@ export class HeadClasses {
       this.createOpen = false;
       await this.loadForAcademicYear(this.selectedAcademicYearId);
       this.infoMessage = 'Class created successfully.';
+      pushHeadActivity('Created class', 'success');
     } catch (err: unknown) {
       this.errorMessage = err instanceof Error ? err.message : 'Failed to create class.';
     } finally {
@@ -359,6 +384,7 @@ export class HeadClasses {
       this.editOpen = false;
       await this.loadForAcademicYear(this.selectedAcademicYearId);
       this.infoMessage = 'Class updated successfully.';
+      pushHeadActivity('Updated class', 'info');
     } catch (err: unknown) {
       this.errorMessage = err instanceof Error ? err.message : 'Failed to update class.';
     } finally {
@@ -377,6 +403,7 @@ export class HeadClasses {
       this.deleteOpen = false;
       await this.loadForAcademicYear(this.selectedAcademicYearId);
       this.infoMessage = 'Class removed from the academic year.';
+      pushHeadActivity('Deleted class (academic year link)', 'danger');
     } catch (err: unknown) {
       this.errorMessage = err instanceof Error ? err.message : 'Failed to delete class.';
     } finally {
@@ -397,6 +424,7 @@ export class HeadClasses {
       this.selectedRows = [];
       await this.loadForAcademicYear(this.selectedAcademicYearId);
       this.infoMessage = 'Selected classes archived.';
+      pushHeadActivity('Archived classes', 'warning');
     } catch (err: unknown) {
       this.errorMessage = err instanceof Error ? err.message : 'Failed to archive classes.';
     } finally {
@@ -404,11 +432,88 @@ export class HeadClasses {
     }
   }
 
-  importExcel(): void {
-    this.infoMessage = 'Import Excel is not wired yet.';
+  private pickExcelFile(): Promise<File | null> {
+    return new Promise(resolve => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.xlsx,.xls';
+      input.onchange = () => resolve(input.files?.[0] ?? null);
+      input.click();
+    });
+  }
+
+  async importExcel(): Promise<void> {
+    this.infoMessage = '';
+    this.errorMessage = '';
+
+    const file = await this.pickExcelFile();
+    if (!file) return;
+
+    const selectedYearId = toString(this.selectedAcademicYearId);
+    if (!selectedYearId) {
+      this.infoMessage = 'Select an academic year before importing.';
+      return;
+    }
+
+    this.loading = true;
+    try {
+      const excelRows = await readExcelFile(file);
+      let ok = 0;
+      let failed = 0;
+
+      for (const r of excelRows) {
+        const name = getCell(r, 'classname', 'class name', 'class', 'name');
+        const level = getCell(r, 'level');
+        const academicYearId = getCell(r, 'academicyearid', 'academic year id', 'academicYearId') || selectedYearId;
+
+        if (!name || !academicYearId) {
+          failed++;
+          continue;
+        }
+
+        try {
+          const createdClass = await firstValueFrom(
+            this.headApi.createClass({
+              name,
+              level: level || undefined,
+            }),
+          );
+
+          await firstValueFrom(
+            this.headApi.createClassAcademicYear({
+              classId: createdClass.id,
+              academicYearId,
+            }),
+          );
+
+          ok++;
+        } catch {
+          failed++;
+        }
+      }
+
+      await this.loadForAcademicYear(this.selectedAcademicYearId);
+      this.infoMessage = `Imported ${ok} class(es). ${failed ? `Failed: ${failed}.` : ''}`.trim();
+      pushHeadActivity(`Imported ${ok} class(es)`, failed ? 'warning' : 'success');
+    } catch (err: unknown) {
+      this.errorMessage = err instanceof Error ? err.message : 'Failed to import classes.';
+    } finally {
+      this.loading = false;
+    }
   }
 
   exportExcel(): void {
-    this.infoMessage = 'Export Excel is not wired yet.';
+    const year = toString(this.selectedAcademicYearId) || 'all';
+    const rows = (this.filteredRows.length ? this.filteredRows : this.rows).map(r => ({
+      Class: r.className,
+      Level: r.level,
+      AcademicYear: r.academicYearLabel,
+      Teachers: r.teachers,
+      Subjects: r.subjects,
+      ClassAcademicYearId: r.id,
+      ClassId: r.classId,
+    }));
+    downloadXlsx(`classes-${year}.xlsx`, rows, 'Classes');
+    pushHeadActivity('Exported classes (Excel)', 'info');
   }
 }

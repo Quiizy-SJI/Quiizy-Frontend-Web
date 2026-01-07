@@ -18,8 +18,9 @@ import {
 
 import { HeadService } from '../../../services/head.service';
 import type { AcademicYearDto, ClassAcademicYearDto } from '../../../domain/dtos/teacher';
-
-type Tone = 'primary' | 'info' | 'success' | 'warning' | 'danger' | 'neutral' | 'secondary' | 'accent';
+import { toString } from '../../../core/utils/payload-sanitizer';
+import { downloadXlsx, getCell, readExcelFile } from '../../../core/utils/excel-utils';
+import { pushHeadActivity } from '../../../core/utils/head-activity-store';
 
 interface HeadStudentRow {
   id: string;
@@ -32,14 +33,7 @@ interface HeadStudentRow {
   level: string;
   academicYearId: string;
   academicYearLabel: string;
-  carryovers: number;
   email: string;
-}
-
-interface ActivityItem {
-  message: string;
-  timeAgo: string;
-  tone: Tone;
 }
 
 @Component({
@@ -70,6 +64,9 @@ export class HeadStudents {
 
   rows: HeadStudentRow[] = [];
   filteredRows: HeadStudentRow[] = [];
+  pagedRows: HeadStudentRow[] = [];
+
+  pagination = { page: 1, pageSize: 5, total: 0, pageSizes: [5, 10, 25, 50] };
 
   selectedAcademicYearId = '';
   selectedLevel = '';
@@ -94,17 +91,13 @@ export class HeadStudents {
   draftEmail = '';
   draftLogin = '';
   draftPassword = '';
-  draftCarryovers = 0;
   draftClassAcademicYearId = '';
-
-  readonly activity: ActivityItem[] = [];
 
   readonly columns: TableColumn<HeadStudentRow>[] = [
     { key: 'matricule', label: 'Matricule', sortable: true, width: '120px' },
     { key: 'name', label: 'Name', sortable: true },
     { key: 'surname', label: 'Surname', sortable: true },
     { key: 'className', label: 'Class', sortable: true, width: '140px' },
-    { key: 'carryovers', label: 'Carry overs', sortable: true, width: '120px', align: 'center' },
     { key: 'email', label: 'Email', sortable: true },
     { key: 'actions', label: 'Actions', sortable: false, width: '180px', align: 'right' },
   ];
@@ -112,7 +105,7 @@ export class HeadStudents {
   academicYearOptions(): DropdownOption<string>[] {
     const opts: DropdownOption<string>[] = [{ value: '', label: 'Select academic year' }];
     for (const ay of this.academicYears) {
-      opts.push({ value: ay.id, label: `${ay.start.split('-')[0]}–${ay.end.split('-')[0]}` });
+      opts.push({ value: String((ay as any).id ?? ''), label: `${ay.start.split('-')[0]}–${ay.end.split('-')[0]}` });
     }
     return opts;
   }
@@ -139,12 +132,29 @@ export class HeadStudents {
     return opts;
   }
 
-  activityDotClass(tone: Tone): string {
-    return `dot dot--${tone}`;
-  }
-
   async ngOnInit(): Promise<void> {
     await this.loadAll();
+  }
+
+  onPageChange(page: number): void {
+    this.pagination.page = page;
+    this.updatePaging();
+  }
+
+  onPageSizeChange(pageSize: number): void {
+    this.pagination.pageSize = pageSize;
+    this.pagination.page = 1;
+    this.updatePaging();
+  }
+
+  private updatePaging(): void {
+    this.pagination.total = this.filteredRows.length;
+    const totalPages = Math.max(1, Math.ceil(this.pagination.total / this.pagination.pageSize));
+    if (this.pagination.page > totalPages) this.pagination.page = totalPages;
+    if (this.pagination.page < 1) this.pagination.page = 1;
+
+    const start = (this.pagination.page - 1) * this.pagination.pageSize;
+    this.pagedRows = this.filteredRows.slice(start, start + this.pagination.pageSize);
   }
 
   private pickLatestAcademicYearId(ays: AcademicYearDto[]): string {
@@ -155,7 +165,7 @@ export class HeadStudents {
       })
       .sort((a, b) => b.endTs - a.endTs);
 
-    return parsed[0]?.id ?? '';
+    return String((parsed[0] as any)?.id ?? '');
   }
 
   async loadAll(): Promise<void> {
@@ -190,12 +200,12 @@ export class HeadStudents {
     await this.loadForAcademicYear(this.selectedAcademicYearId);
   }
 
-  private async loadForAcademicYear(academicYearId: string): Promise<void> {
+  private async loadForAcademicYear(academicYearId: unknown): Promise<void> {
     this.loading = true;
     this.errorMessage = '';
 
     try {
-      const ay = academicYearId?.trim() || undefined;
+      const ay = toString(academicYearId);
 
       const [cays, students] = await Promise.all([
         firstValueFrom(this.headApi.listClasses(ay)),
@@ -224,12 +234,11 @@ export class HeadStudents {
 
       const user = s.user ?? {};
       const classYears: any[] = Array.isArray(s.classAcademicYears) ? s.classAcademicYears : [];
-      const carriedOverCourses: any[] = Array.isArray(s.carriedOverCourses) ? s.carriedOverCourses : [];
 
-      const selectedYearId = this.selectedAcademicYearId?.trim();
+      const selectedYearId = toString(this.selectedAcademicYearId);
       const bestCay =
         (selectedYearId
-          ? classYears.find(cy => cy?.academicYear?.id === selectedYearId)
+          ? classYears.find(cy => toString(cy?.academicYear?.id) === selectedYearId)
           : null) ??
         classYears[0] ??
         null;
@@ -251,7 +260,6 @@ export class HeadStudents {
         level: String(classDto?.level ?? ''),
         academicYearId: String(ay?.id ?? ''),
         academicYearLabel,
-        carryovers: carriedOverCourses.length,
       });
     }
 
@@ -259,8 +267,8 @@ export class HeadStudents {
   }
 
   applyFilters(): void {
-    const year = this.selectedAcademicYearId?.trim();
-    const level = this.selectedLevel?.trim();
+    const year = toString(this.selectedAcademicYearId);
+    const level = toString(this.selectedLevel);
 
     this.filteredRows = this.rows.filter(r => {
       if (year && r.academicYearId !== year) return false;
@@ -271,6 +279,9 @@ export class HeadStudents {
     if (this.selectedRow && !this.filteredRows.some(r => r.id === this.selectedRow?.id)) {
       this.selectedRow = this.filteredRows[0] ?? null;
     }
+
+    this.pagination.page = 1;
+    this.updatePaging();
   }
 
   onSelectionChange(rows: HeadStudentRow[]): void {
@@ -294,7 +305,6 @@ export class HeadStudents {
     this.draftEmail = '';
     this.draftLogin = '';
     this.draftPassword = '';
-    this.draftCarryovers = 0;
     this.draftClassAcademicYearId = '';
     this.createOpen = true;
   }
@@ -310,7 +320,6 @@ export class HeadStudents {
     this.draftEmail = r.email;
     this.draftLogin = r.login;
     this.draftPassword = '';
-    this.draftCarryovers = r.carryovers;
     this.draftClassAcademicYearId = r.classAcademicYearId;
     this.editOpen = true;
   }
@@ -357,7 +366,7 @@ export class HeadStudents {
       const createdRow = this.rows.find(r => r.id === created?.id) ?? null;
       if (createdRow) this.selectedRow = createdRow;
 
-      this.activity.unshift({ message: 'Added student', timeAgo: 'Just now', tone: 'success' });
+      pushHeadActivity('Added student', 'success');
     } catch (err: unknown) {
       this.errorMessage = err instanceof Error ? err.message : 'Failed to create student.';
     } finally {
@@ -397,7 +406,7 @@ export class HeadStudents {
       }
 
       this.selectedRow = this.rows.find(r => r.id === id) ?? this.selectedRow;
-      this.activity.unshift({ message: 'Edited student', timeAgo: 'Just now', tone: 'info' });
+      pushHeadActivity('Edited student', 'info');
     } catch (err: unknown) {
       this.errorMessage = err instanceof Error ? err.message : 'Failed to update student.';
     } finally {
@@ -420,7 +429,7 @@ export class HeadStudents {
         await this.loadForAcademicYear(this.selectedAcademicYearId);
       }
 
-      this.activity.unshift({ message: 'Deleted student', timeAgo: 'Just now', tone: 'danger' });
+      pushHeadActivity('Deleted student', 'danger');
     } catch (err: unknown) {
       this.errorMessage = err instanceof Error ? err.message : 'Failed to delete student.';
     } finally {
@@ -445,7 +454,7 @@ export class HeadStudents {
         await this.loadForAcademicYear(this.selectedAcademicYearId);
       }
 
-      this.activity.unshift({ message: `Archived ${count} student(s)`, timeAgo: 'Just now', tone: 'warning' });
+      pushHeadActivity(`Archived ${count} student(s)`, 'warning');
     } catch (err: unknown) {
       this.errorMessage = err instanceof Error ? err.message : 'Failed to archive students.';
     } finally {
@@ -453,15 +462,124 @@ export class HeadStudents {
     }
   }
 
-  importExcel(): void {
-    this.infoMessage = 'Import Excel is not wired yet.';
+  private pickExcelFile(): Promise<File | null> {
+    return new Promise(resolve => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.xlsx,.xls';
+      input.onchange = () => resolve(input.files?.[0] ?? null);
+      input.click();
+    });
+  }
+
+  private resolveClassAcademicYearId(row: Record<string, unknown>): string {
+    const direct = getCell(row, 'classacademicyearid', 'class academic year id', 'classAcademicYearId');
+    if (direct) return direct;
+
+    const className = getCell(row, 'class', 'classname', 'class name');
+    const ayId = getCell(row, 'academicyearid', 'academic year id', 'academicYearId');
+
+    if (!className) return '';
+
+    const match = this.classAcademicYears.find(cay => {
+      const n = String(cay.class?.name ?? '').trim();
+      if (n.toLowerCase() !== className.toLowerCase()) return false;
+      if (ayId) return String((cay.academicYear as any)?.id ?? '') === ayId;
+      return true;
+    });
+
+    return match?.id ?? '';
+  }
+
+  async importExcel(): Promise<void> {
+    this.infoMessage = '';
+    this.errorMessage = '';
+
+    const file = await this.pickExcelFile();
+    if (!file) return;
+
+    this.loading = true;
+    try {
+      const excelRows = await readExcelFile(file);
+      let ok = 0;
+      let failed = 0;
+
+      for (const r of excelRows) {
+        const matricule = getCell(r, 'matricule');
+        const name = getCell(r, 'name', 'firstname', 'first name');
+        const surname = getCell(r, 'surname', 'lastname', 'last name');
+        const email = getCell(r, 'email');
+        const login = getCell(r, 'login', 'username');
+        const password = getCell(r, 'password');
+        const classAcademicYearId = this.resolveClassAcademicYearId(r);
+
+        if (!matricule || !name || !surname || !email || !login || !password || !classAcademicYearId) {
+          failed++;
+          continue;
+        }
+
+        try {
+          await firstValueFrom(
+            this.headApi.createStudent({
+              matricule,
+              name,
+              surname,
+              email,
+              login,
+              password,
+              classAcademicYearIds: [classAcademicYearId],
+            }),
+          );
+          ok++;
+        } catch {
+          failed++;
+        }
+      }
+
+      if (this.selectedAcademicYearId) {
+        await this.loadForAcademicYear(this.selectedAcademicYearId);
+      }
+
+      this.infoMessage = `Imported ${ok} student(s). ${failed ? `Failed: ${failed}.` : ''}`.trim();
+      pushHeadActivity(`Imported ${ok} student(s)`, failed ? 'warning' : 'success');
+    } catch (err: unknown) {
+      this.errorMessage = err instanceof Error ? err.message : 'Failed to import students.';
+    } finally {
+      this.loading = false;
+    }
   }
 
   exportExcel(): void {
-    this.infoMessage = 'Export Excel is not wired yet.';
+    const year = toString(this.selectedAcademicYearId) || 'all';
+    const rows = (this.filteredRows.length ? this.filteredRows : this.rows).map(r => ({
+      Matricule: r.matricule,
+      Name: r.name,
+      Surname: r.surname,
+      Email: r.email,
+      Login: r.login,
+      Class: r.className,
+      Level: r.level,
+      AcademicYear: r.academicYearLabel,
+      ClassAcademicYearId: r.classAcademicYearId,
+      StudentId: r.id,
+    }));
+    downloadXlsx(`students-${year}.xlsx`, rows, 'Students');
+    pushHeadActivity('Exported students (Excel)', 'info');
   }
 
   exportStudents(): void {
-    this.infoMessage = 'Export students is not wired yet.';
+    const year = toString(this.selectedAcademicYearId) || 'all';
+    const rows = (this.filteredRows.length ? this.filteredRows : this.rows).map(r => ({
+      Matricule: r.matricule,
+      Name: r.name,
+      Surname: r.surname,
+      Email: r.email,
+      Login: r.login,
+      Class: r.className,
+      Level: r.level,
+      AcademicYear: r.academicYearLabel,
+    }));
+    downloadXlsx(`students-${year}.xlsx`, rows, 'Students');
+    pushHeadActivity('Exported students (Excel)', 'info');
   }
 }

@@ -19,8 +19,9 @@ import {
 import { HeadService } from '../../../services/head.service';
 import type { AcademicYearDto, ClassAcademicYearDto, CourseDto, TeacherDto } from '../../../domain/dtos/teacher';
 import type { TeachingUnitDto } from '../../../domain/dtos/dean/dean-shared.dto';
-
-type Tone = 'primary' | 'info' | 'success' | 'warning' | 'danger' | 'neutral' | 'secondary' | 'accent';
+import { toString } from '../../../core/utils/payload-sanitizer';
+import { downloadXlsx, getCell, getCellNumber, readExcelFile } from '../../../core/utils/excel-utils';
+import { pushHeadActivity } from '../../../core/utils/head-activity-store';
 
 interface HeadCourseRow {
   id: string;
@@ -34,12 +35,6 @@ interface HeadCourseRow {
   academicYearLabel: string;
   teachingUnitId?: string;
   teacherId?: string;
-}
-
-interface ActivityItem {
-  message: string;
-  timeAgo: string;
-  tone: Tone;
 }
 
 @Component({
@@ -72,6 +67,9 @@ export class HeadCourses {
 
   rows: HeadCourseRow[] = [];
   filteredRows: HeadCourseRow[] = [];
+  pagedRows: HeadCourseRow[] = [];
+
+  pagination = { page: 1, pageSize: 5, total: 0, pageSizes: [5, 10, 25, 50] };
 
   selectedAcademicYearId = '';
   selectedLevel = '';
@@ -96,8 +94,6 @@ export class HeadCourses {
   draftClassAcademicYearId = '';
   draftTeacherId = '';
 
-  readonly activity: ActivityItem[] = [];
-
   readonly columns: TableColumn<HeadCourseRow>[] = [
     { key: 'teachingUnitName', label: 'Teaching Unit', sortable: true },
     { key: 'teacherName', label: 'Teacher', sortable: true },
@@ -110,7 +106,7 @@ export class HeadCourses {
   academicYearOptions(): DropdownOption<string>[] {
     const opts: DropdownOption<string>[] = [{ value: '', label: 'Select academic year' }];
     for (const ay of this.academicYears) {
-      opts.push({ value: ay.id, label: `${ay.start.split('-')[0]}–${ay.end.split('-')[0]}` });
+      opts.push({ value: String((ay as any).id ?? ''), label: `${ay.start.split('-')[0]}–${ay.end.split('-')[0]}` });
     }
     return opts;
   }
@@ -176,15 +172,31 @@ export class HeadCourses {
       })
       .sort((a, b) => b.endTs - a.endTs);
 
-    return parsed[0]?.id ?? '';
-  }
-
-  activityDotClass(tone: Tone): string {
-    return `dot dot--${tone}`;
+    return String((parsed[0] as any)?.id ?? '');
   }
 
   async ngOnInit(): Promise<void> {
     await this.loadAll();
+  }
+
+  onPageChange(page: number): void {
+    this.pagination.page = page;
+    this.updatePaging();
+  }
+
+  onPageSizeChange(pageSize: number): void {
+    this.pagination.pageSize = pageSize;
+    this.pagination.page = 1;
+    this.updatePaging();
+  }
+
+  private updatePaging(): void {
+    this.pagination.total = this.filteredRows.length;
+    const totalPages = Math.max(1, Math.ceil(this.pagination.total / this.pagination.pageSize));
+    if (this.pagination.page > totalPages) this.pagination.page = totalPages;
+    if (this.pagination.page < 1) this.pagination.page = 1;
+    const start = (this.pagination.page - 1) * this.pagination.pageSize;
+    this.pagedRows = this.filteredRows.slice(start, start + this.pagination.pageSize);
   }
 
   async loadAll(): Promise<void> {
@@ -226,15 +238,27 @@ export class HeadCourses {
     await this.loadForAcademicYear(this.selectedAcademicYearId);
   }
 
-  private async loadForAcademicYear(academicYearId: string): Promise<void> {
+  private async loadForAcademicYear(academicYearId: unknown): Promise<void> {
     this.loading = true;
     this.errorMessage = '';
 
     try {
-      const [cays, courses] = await Promise.all([
-        firstValueFrom(this.headApi.listClasses(academicYearId)),
-        firstValueFrom(this.headApi.listCourses(academicYearId)),
-      ]);
+      const year = toString(academicYearId);
+      let cays: ClassAcademicYearDto[] = [];
+      let courses: CourseDto[] = [];
+
+      try {
+        [cays, courses] = await Promise.all([
+          firstValueFrom(this.headApi.listClasses(year)),
+          firstValueFrom(this.headApi.listCourses(year)),
+        ]);
+      } catch {
+        // Fallback: some backends ignore or reject the filter param; load all then filter client-side.
+        [cays, courses] = await Promise.all([
+          firstValueFrom(this.headApi.listClasses(undefined)),
+          firstValueFrom(this.headApi.listCourses(undefined)),
+        ]);
+      }
 
       this.classAcademicYears = cays;
       this.courses = courses;
@@ -279,7 +303,7 @@ export class HeadCourses {
         level,
         credits,
         classAcademicYearId: cay?.id ?? '',
-        academicYearId: ay?.id ?? '',
+        academicYearId: String((ay as any)?.id ?? ''),
         academicYearLabel,
         teachingUnitId: c.teachingUnit?.id,
         teacherId: c.teacher?.id,
@@ -290,8 +314,8 @@ export class HeadCourses {
   }
 
   applyFilters(): void {
-    const year = this.selectedAcademicYearId?.trim();
-    const level = this.selectedLevel?.trim();
+    const year = toString(this.selectedAcademicYearId);
+    const level = toString(this.selectedLevel);
 
     this.filteredRows = this.rows.filter(r => {
       if (year && r.academicYearId !== year) return false;
@@ -302,6 +326,9 @@ export class HeadCourses {
     if (this.selectedRow && !this.filteredRows.some(r => r.id === this.selectedRow?.id)) {
       this.selectedRow = this.filteredRows[0] ?? null;
     }
+
+    this.pagination.page = 1;
+    this.updatePaging();
   }
 
   onSelectionChange(rows: HeadCourseRow[]): void {
@@ -379,7 +406,7 @@ export class HeadCourses {
       const createdRow = this.rows.find(r => r.id === created.id) ?? null;
       if (createdRow) this.selectedRow = createdRow;
 
-      this.activity.unshift({ message: 'Created course', timeAgo: 'Just now', tone: 'success' });
+      pushHeadActivity('Created course', 'success');
     } catch (err: unknown) {
       this.errorMessage = err instanceof Error ? err.message : 'Failed to create course.';
     } finally {
@@ -418,7 +445,7 @@ export class HeadCourses {
       }
 
       this.selectedRow = this.rows.find(r => r.id === id) ?? this.selectedRow;
-      this.activity.unshift({ message: 'Updated course', timeAgo: 'Just now', tone: 'info' });
+      pushHeadActivity('Updated course', 'info');
     } catch (err: unknown) {
       this.errorMessage = err instanceof Error ? err.message : 'Failed to update course.';
     } finally {
@@ -442,7 +469,7 @@ export class HeadCourses {
         await this.loadForAcademicYear(this.selectedAcademicYearId);
       }
 
-      this.activity.unshift({ message: 'Deleted course', timeAgo: 'Just now', tone: 'danger' });
+      pushHeadActivity('Deleted course', 'danger');
     } catch (err: unknown) {
       this.errorMessage = err instanceof Error ? err.message : 'Failed to delete course.';
     } finally {
@@ -467,7 +494,7 @@ export class HeadCourses {
         await this.loadForAcademicYear(this.selectedAcademicYearId);
       }
 
-      this.activity.unshift({ message: `Archived ${count} course(s)`, timeAgo: 'Just now', tone: 'warning' });
+      pushHeadActivity(`Archived ${count} course(s)`, 'warning');
     } catch (err: unknown) {
       this.errorMessage = err instanceof Error ? err.message : 'Failed to archive courses.';
     } finally {
@@ -475,11 +502,122 @@ export class HeadCourses {
     }
   }
 
-  importExcel(): void {
-    this.infoMessage = 'Import Excel is not wired yet.';
+  private pickExcelFile(): Promise<File | null> {
+    return new Promise(resolve => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.xlsx,.xls';
+      input.onchange = () => resolve(input.files?.[0] ?? null);
+      input.click();
+    });
+  }
+
+  private resolveTeachingUnitId(row: Record<string, unknown>): string {
+    const direct = getCell(row, 'teachingunitid', 'teaching unit id', 'teachingUnitId');
+    if (direct) return direct;
+
+    const name = getCell(row, 'teachingunit', 'teaching unit', 'teachingunitname', 'teaching unit name');
+    if (!name) return '';
+    const match = this.teachingUnits.find(tu => String(tu?.name ?? '').trim().toLowerCase() === name.toLowerCase());
+    return match?.id ?? '';
+  }
+
+  private resolveClassAcademicYearId(row: Record<string, unknown>): string {
+    const direct = getCell(row, 'classacademicyearid', 'class academic year id', 'classAcademicYearId');
+    if (direct) return direct;
+
+    const className = getCell(row, 'class', 'classname', 'class name');
+    const ayId = getCell(row, 'academicyearid', 'academic year id', 'academicYearId');
+    if (!className) return '';
+
+    const match = this.classAcademicYears.find(cay => {
+      const n = String(cay.class?.name ?? '').trim();
+      if (n.toLowerCase() !== className.toLowerCase()) return false;
+      if (ayId) return String((cay.academicYear as any)?.id ?? '') === ayId;
+      return true;
+    });
+    return match?.id ?? '';
+  }
+
+  private resolveTeacherId(row: Record<string, unknown>): string {
+    const direct = getCell(row, 'teacherid', 'teacher id', 'teacherId');
+    if (direct) return direct;
+
+    const email = getCell(row, 'teacheremail', 'teacher email');
+    if (!email) return '';
+    const match = this.teachers.find(t => String(t.user?.email ?? '').trim().toLowerCase() === email.toLowerCase());
+    return match?.id ?? '';
+  }
+
+  async importExcel(): Promise<void> {
+    this.infoMessage = '';
+    this.errorMessage = '';
+
+    const file = await this.pickExcelFile();
+    if (!file) return;
+
+    this.loading = true;
+    try {
+      const excelRows = await readExcelFile(file);
+      let ok = 0;
+      let failed = 0;
+
+      for (const r of excelRows) {
+        const teachingUnitId = this.resolveTeachingUnitId(r);
+        const classAcademicYearId = this.resolveClassAcademicYearId(r);
+        const teacherId = this.resolveTeacherId(r);
+        const credits = getCellNumber(r, 'credits');
+        const level = getCell(r, 'level');
+
+        if (!teachingUnitId || !classAcademicYearId) {
+          failed++;
+          continue;
+        }
+
+        try {
+          await firstValueFrom(
+            this.headApi.createCourse({
+              level: level || this.draftLevel || 'L1',
+              credits: credits || 0,
+              classAcademicYearId,
+              teachingUnitId,
+              ...(teacherId ? { teacherId } : {}),
+            }),
+          );
+          ok++;
+        } catch {
+          failed++;
+        }
+      }
+
+      if (this.selectedAcademicYearId) {
+        await this.loadForAcademicYear(this.selectedAcademicYearId);
+      }
+
+      this.infoMessage = `Imported ${ok} course(s). ${failed ? `Failed: ${failed}.` : ''}`.trim();
+      pushHeadActivity(`Imported ${ok} course(s)`, failed ? 'warning' : 'success');
+    } catch (err: unknown) {
+      this.errorMessage = err instanceof Error ? err.message : 'Failed to import courses.';
+    } finally {
+      this.loading = false;
+    }
   }
 
   exportExcel(): void {
-    this.infoMessage = 'Export Excel is not wired yet.';
+    const year = toString(this.selectedAcademicYearId) || 'all';
+    const rows = (this.filteredRows.length ? this.filteredRows : this.rows).map(r => ({
+      TeachingUnit: r.teachingUnitName,
+      Teacher: r.teacherName,
+      Class: r.className,
+      Level: r.level,
+      Credits: r.credits,
+      AcademicYear: r.academicYearLabel,
+      TeachingUnitId: r.teachingUnitId ?? '',
+      TeacherId: r.teacherId ?? '',
+      ClassAcademicYearId: r.classAcademicYearId,
+      CourseId: r.id,
+    }));
+    downloadXlsx(`courses-${year}.xlsx`, rows, 'Courses');
+    pushHeadActivity('Exported courses (Excel)', 'info');
   }
 }

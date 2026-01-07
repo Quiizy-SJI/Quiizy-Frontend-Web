@@ -13,6 +13,12 @@
       ></ui-select>
     </header>
 
+    @if (loading) {
+        <div class="dashboard__loading">
+            <ui-spinner size="md" color="primary" label="Loading dashboard..." [showLabel]="true"></ui-spinner>
+        </div>
+    }
+
     @if (errorMessage) {
     <ui-alert type="danger" variant="outlined">
       {{ errorMessage }}
@@ -59,8 +65,13 @@
 
             <ui-table
                 [columns]="classesColumns"
-                [data]="classesData"
-                [searchable]="false"
+                [data]="pagedClassesData"
+                [loading]="loading"
+                [searchable]="true"
+                [showPagination]="true"
+                [pagination]="classesPagination"
+                (pageChange)="onClassesPageChange($event)"
+                (pageSizeChange)="onClassesPageSizeChange($event)"
             >
                 <ng-template #cell let-row let-column="column">
                     @switch (column.key) {
@@ -128,8 +139,13 @@
 
             <ui-table
                 [columns]="sentimentColumns"
-                [data]="sentimentData"
-                [searchable]="false"
+                [data]="pagedSentimentData"
+                [loading]="loading"
+                [searchable]="true"
+                [showPagination]="true"
+                [pagination]="sentimentPagination"
+                (pageChange)="onSentimentPageChange($event)"
+                (pageSizeChange)="onSentimentPageSizeChange($event)"
                 emptyMessage=""
             >
                 <ng-template #empty>

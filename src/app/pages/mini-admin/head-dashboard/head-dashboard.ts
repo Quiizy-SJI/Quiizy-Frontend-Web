@@ -2,13 +2,17 @@ import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DropdownOption, TableColumn, SelectComponent, AlertComponent } from '../../../components/ui';
-import { BadgeComponent, ButtonComponent, CardComponent, StatCardComponent, TableComponent } from "../../../components/ui";
+import { BadgeComponent, ButtonComponent, CardComponent, SpinnerComponent, StatCardComponent, TableComponent } from "../../../components/ui";
 import { AcademicYearDto, ClassAcademicYearDto, CourseDto } from '../../../domain/dtos/teacher';
 import { firstValueFrom } from 'rxjs';
 import { HeadService } from '../../../services/head.service';
 import { MiniAdminDto } from '../../../domain/dtos/dean/dean-shared.dto';
+import { toString } from '../../../core/utils/payload-sanitizer';
+import { loadHeadActivity, type ActivityItem, type ActivityTone } from '../../../core/utils/head-activity-store';
+import { SentimentAnalysisService } from '../../../services/sentiment-analysis.service';
+import type { SentimentAnalysisResponseDto } from '../../../domain/dtos/teacher/teacher-sentiment.dto';
 
-type Tone = 'primary' | 'info' | 'success' | 'warning' | 'danger' | 'neutral' | 'secondary' | 'accent';
+type Tone = ActivityTone;
 export interface HeadDashboardStats {
   classesManaged: number;
   students: number;
@@ -40,12 +44,6 @@ interface UpcomingExam {
   tone: Tone;
 }
 
-interface ActivityItem {
-  message: string;
-  timeAgo: string;
-  tone: Tone;
-}
-
 interface SentimentAlertRow {
   student: string;
   department: string;
@@ -57,16 +55,28 @@ interface SentimentAlertRow {
 @Component({
   selector: 'app-head-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, CardComponent, StatCardComponent, TableComponent, ButtonComponent, BadgeComponent, SelectComponent, AlertComponent],
+  imports: [CommonModule, FormsModule, CardComponent, StatCardComponent, TableComponent, ButtonComponent, BadgeComponent, SelectComponent, AlertComponent, SpinnerComponent],
   templateUrl: './head-dashboard.html',
   styleUrl: './head-dashboard.scss',
 })
 export class HeadDashboard {
 
     private readonly headApi = inject(HeadService);
+  private readonly sentimentApi = inject(SentimentAnalysisService);
 
   loading = false;
+  private loadingCount = 0;
   errorMessage = '';
+
+  private beginLoading(): void {
+    this.loadingCount++;
+    this.loading = true;
+  }
+
+  private endLoading(): void {
+    this.loadingCount = Math.max(0, this.loadingCount - 1);
+    this.loading = this.loadingCount > 0;
+  }
 
   readonly classesColumns: TableColumn<ManagedClassRow>[] = [
     { key: 'id', label: 'ID', sortable: true, width: '90px' },
@@ -78,13 +88,15 @@ export class HeadDashboard {
   ];
 
   classesData: ManagedClassRow[] = [];
+  pagedClassesData: ManagedClassRow[] = [];
+  classesPagination = { page: 1, pageSize: 5, total: 0, pageSizes: [5, 10, 25, 50] };
 
   readonly weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   readonly weekLabel = 'Week of Nov 10 - Nov 16';
 
   readonly upcomingExams: UpcomingExam[] = [];
 
-  readonly activity: ActivityItem[] = [];
+  activity: ActivityItem[] = [];
 
   readonly sentimentColumns: TableColumn<SentimentAlertRow>[] = [
     { key: 'student', label: 'Student', sortable: true },
@@ -95,7 +107,9 @@ export class HeadDashboard {
     { key: 'actions', label: 'Action', sortable: false, width: '120px', align: 'right' },
   ];
 
-  readonly sentimentData: SentimentAlertRow[] = [];
+  sentimentData: SentimentAlertRow[] = [];
+  pagedSentimentData: SentimentAlertRow[] = [];
+  sentimentPagination = { page: 1, pageSize: 5, total: 0, pageSizes: [5, 10, 25, 50] };
 
   moodColor(mood: SentimentAlertRow['mood']): Tone {
     if (mood === 'High') return 'danger';
@@ -107,16 +121,57 @@ export class HeadDashboard {
     return `dot dot--${tone}`;
   }
 
+  onClassesPageChange(page: number): void {
+    this.classesPagination.page = page;
+    this.updateClassesPaging();
+  }
+
+  onClassesPageSizeChange(pageSize: number): void {
+    this.classesPagination.pageSize = pageSize;
+    this.classesPagination.page = 1;
+    this.updateClassesPaging();
+  }
+
+  private updateClassesPaging(): void {
+    this.classesPagination.total = this.classesData.length;
+    const totalPages = Math.max(1, Math.ceil(this.classesPagination.total / this.classesPagination.pageSize));
+    if (this.classesPagination.page > totalPages) this.classesPagination.page = totalPages;
+    if (this.classesPagination.page < 1) this.classesPagination.page = 1;
+    const start = (this.classesPagination.page - 1) * this.classesPagination.pageSize;
+    this.pagedClassesData = this.classesData.slice(start, start + this.classesPagination.pageSize);
+  }
+
+  onSentimentPageChange(page: number): void {
+    this.sentimentPagination.page = page;
+    this.updateSentimentPaging();
+  }
+
+  onSentimentPageSizeChange(pageSize: number): void {
+    this.sentimentPagination.pageSize = pageSize;
+    this.sentimentPagination.page = 1;
+    this.updateSentimentPaging();
+  }
+
+  private updateSentimentPaging(): void {
+    this.sentimentPagination.total = this.sentimentData.length;
+    const totalPages = Math.max(1, Math.ceil(this.sentimentPagination.total / this.sentimentPagination.pageSize));
+    if (this.sentimentPagination.page > totalPages) this.sentimentPagination.page = totalPages;
+    if (this.sentimentPagination.page < 1) this.sentimentPagination.page = 1;
+    const start = (this.sentimentPagination.page - 1) * this.sentimentPagination.pageSize;
+    this.pagedSentimentData = this.sentimentData.slice(start, start + this.sentimentPagination.pageSize);
+  }
+
   academicYears: AcademicYearDto[] = [];
   classAcademicYears: ClassAcademicYearDto[] = [];
   courses: CourseDto[] = [];
+  students: any[] = [];
   selectedAcademicYearId = '';
 
 
   academicYearOptions(): DropdownOption<string>[] {
       const opts: DropdownOption<string>[] = [{ value: '', label: 'All academic years' }];
       for (const ay of this.academicYears) {
-        opts.push({ value: ay.id, label: `${ay.start.split('-')[0]}–${ay.end.split('-')[0]}` });
+        opts.push({ value: String((ay as any).id ?? ''), label: `${ay.start.split('-')[0]}–${ay.end.split('-')[0]}` });
       }
       return opts;
     }
@@ -126,7 +181,7 @@ export class HeadDashboard {
   }
 
   private async loadAll(): Promise<void> {
-    this.loading = true;
+    this.beginLoading();
     this.errorMessage = '';
 
     try {
@@ -138,33 +193,93 @@ export class HeadDashboard {
       }
 
       await this.loadForAcademicYear(this.selectedAcademicYearId);
+      await this.loadSentimentAlerts();
     } catch (err: unknown) {
       this.errorMessage = err instanceof Error ? err.message : 'Failed to load dashboard data.';
     } finally {
-      this.loading = false;
+      this.endLoading();
     }
   }
 
-  private async loadForAcademicYear(academicYearId: string): Promise<void> {
-    this.loading = true;
+  private async loadForAcademicYear(academicYearId: unknown): Promise<void> {
+    this.beginLoading();
     this.errorMessage = '';
 
     try {
-      const year = academicYearId?.trim() || undefined;
+      const year = toString(academicYearId);
 
-      const [cays, courses] = await Promise.all([
+      const [cays, courses, students] = await Promise.all([
         firstValueFrom(this.headApi.listClasses(year)),
         firstValueFrom(this.headApi.listCourses(year)),
+        firstValueFrom(this.headApi.listStudents(year)),
       ]);
 
       this.classAcademicYears = cays;
       this.courses = courses;
+      this.students = students;
 
       this.recomputeDashboard();
     } catch (err: unknown) {
       this.errorMessage = err instanceof Error ? err.message : 'Failed to load dashboard data.';
     } finally {
-      this.loading = false;
+      this.endLoading();
+    }
+  }
+
+  private mapSentimentToMood(a: SentimentAnalysisResponseDto): SentimentAlertRow['mood'] {
+    const overall = a.resultJson?.overallSentiment;
+    if (overall === 'NEGATIVE') return 'High';
+    if (overall === 'MIXED') return 'Medium';
+    return 'Low';
+  }
+
+  private async loadSentimentAlerts(): Promise<void> {
+    this.beginLoading();
+    // Best-effort: if endpoint is not allowed for HEAD role, keep empty.
+    try {
+      const analyses = await firstValueFrom(this.sentimentApi.getAll());
+
+      const critical = (analyses ?? [])
+        .filter(a => a?.status === 'COMPLETED')
+        .filter(a => {
+          const overall = a.resultJson?.overallSentiment;
+          return overall === 'NEGATIVE' || overall === 'MIXED';
+        })
+        .slice(0, 10);
+
+      this.sentimentData = critical.map(a => {
+        const exam = String(a.courseName ?? a.quiz?.title ?? a.quiz?.name ?? a.quizId ?? '—');
+        const department = String(
+          a.quiz?.classAcademicYear?.class?.speciality?.name ??
+            a.quiz?.department ??
+            this.getUser()?.speciality?.name ??
+            '—',
+        );
+
+        // We typically don't have per-student identity here; show the class/group instead.
+        const student = String(a.quiz?.classAcademicYear?.class?.name ?? a.quiz?.className ?? '—');
+
+        const flagged = a.analyzedAt
+          ? new Date(a.analyzedAt).toLocaleDateString()
+          : new Date(a.createdAt).toLocaleDateString();
+
+        return {
+          student,
+          department,
+          exam,
+          mood: this.mapSentimentToMood(a),
+          flagged,
+        };
+      });
+
+      this.sentimentPagination.page = 1;
+      this.updateSentimentPaging();
+    } catch {
+      this.sentimentData = [];
+      this.sentimentPagination.page = 1;
+      this.updateSentimentPaging();
+    } finally {
+      this.endLoading();
     }
   }
 
@@ -184,7 +299,7 @@ export class HeadDashboard {
       })
       .sort((a, b) => b.score - a.score)[0]?.ay;
 
-    return best?.id ?? '';
+    return String((best as any)?.id ?? '');
   }
 
   getUser(): MiniAdminDto{
@@ -192,11 +307,11 @@ export class HeadDashboard {
   }
 
   private recomputeDashboard(): void {
-    const selectedYear = this.selectedAcademicYearId?.trim() || undefined;
+    const selectedYear = toString(this.selectedAcademicYearId);
     const specialityName = this.getUser()?.speciality?.name;
 
     const filteredCays = this.classAcademicYears.filter(cay => {
-      if (selectedYear && cay.academicYear?.id !== selectedYear) return false;
+      if (selectedYear && toString(cay.academicYear?.id) !== selectedYear) return false;
       const classAny = cay.class as any;
       const caySpecialityName: string | undefined = classAny?.speciality?.name;
       if (specialityName && caySpecialityName && caySpecialityName !== specialityName) return false;
@@ -204,7 +319,7 @@ export class HeadDashboard {
     });
 
     const filteredCourses = this.courses.filter(c => {
-      if (selectedYear && c.classAcademicYear?.academicYear?.id !== selectedYear) return false;
+      if (selectedYear && toString(c.classAcademicYear?.academicYear?.id) !== selectedYear) return false;
 
       const classAny = c.classAcademicYear?.class as any;
       const courseSpecialityName: string | undefined = classAny?.speciality?.name;
@@ -214,6 +329,8 @@ export class HeadDashboard {
     });
 
     this.classesData = this.buildClassesOverview(filteredCays, filteredCourses);
+    this.classesPagination.page = 1;
+    this.updateClassesPaging();
 
     const teacherIds = new Set<string>();
     for (const c of filteredCourses) {
@@ -223,7 +340,7 @@ export class HeadDashboard {
 
     this.stats = {
       classesManaged: filteredCays.length,
-      students: 0,
+      students: (this.students ?? []).length,
       teachers: teacherIds.size,
       upcomingExams: this.upcomingExams.length,
     };
@@ -274,6 +391,7 @@ export class HeadDashboard {
   };
 
   ngOnInit(): void {
+    this.activity = loadHeadActivity();
     void this.loadAll();
   }
   

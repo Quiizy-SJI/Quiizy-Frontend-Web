@@ -18,8 +18,9 @@ import {
 
 import { HeadService } from '../../../services/head.service';
 import type { AcademicYearDto, ClassAcademicYearDto, CourseDto, TeacherDto } from '../../../domain/dtos/teacher';
-
-type Tone = 'primary' | 'info' | 'success' | 'warning' | 'danger' | 'neutral' | 'secondary' | 'accent';
+import { toString } from '../../../core/utils/payload-sanitizer';
+import { downloadXlsx, getCell, readExcelFile } from '../../../core/utils/excel-utils';
+import { pushHeadActivity } from '../../../core/utils/head-activity-store';
 
 interface HeadTeacherRow {
   id: string;
@@ -30,12 +31,6 @@ interface HeadTeacherRow {
   assignedClasses: number;
   levels: string; // comma separated
   academicYears: string; // comma separated
-}
-
-interface ActivityItem {
-  message: string;
-  timeAgo: string;
-  tone: Tone;
 }
 
 @Component({
@@ -67,6 +62,9 @@ export class HeadTeachers {
 
   rows: HeadTeacherRow[] = [];
   filteredRows: HeadTeacherRow[] = [];
+  pagedRows: HeadTeacherRow[] = [];
+
+  pagination = { page: 1, pageSize: 5, total: 0, pageSizes: [5, 10, 25, 50] };
 
   selectedAcademicYearId = '';
   selectedLevel = '';
@@ -91,8 +89,6 @@ export class HeadTeachers {
   draftLogin = '';
   draftPassword = '';
 
-  readonly activity: ActivityItem[] = [];
-
   readonly columns: TableColumn<HeadTeacherRow>[] = [
     { key: 'name', label: 'Name', sortable: true },
     { key: 'surname', label: 'Surname', sortable: true },
@@ -105,7 +101,7 @@ export class HeadTeachers {
   academicYearOptions(): DropdownOption<string>[] {
     const opts: DropdownOption<string>[] = [{ value: '', label: 'Select academic year' }];
     for (const ay of this.academicYears) {
-      opts.push({ value: ay.id, label: `${ay.start.split('-')[0]}–${ay.end.split('-')[0]}` });
+      opts.push({ value: String((ay as any).id ?? ''), label: `${ay.start.split('-')[0]}–${ay.end.split('-')[0]}` });
     }
     return opts;
   }
@@ -118,12 +114,28 @@ export class HeadTeachers {
     return [{ value: '', label: 'Select level' }, ...levels.map(l => ({ value: l, label: l }))];
   }
 
-  activityDotClass(tone: Tone): string {
-    return `dot dot--${tone}`;
-  }
-
   async ngOnInit(): Promise<void> {
     await this.loadAll();
+  }
+
+  onPageChange(page: number): void {
+    this.pagination.page = page;
+    this.updatePaging();
+  }
+
+  onPageSizeChange(pageSize: number): void {
+    this.pagination.pageSize = pageSize;
+    this.pagination.page = 1;
+    this.updatePaging();
+  }
+
+  private updatePaging(): void {
+    this.pagination.total = this.filteredRows.length;
+    const totalPages = Math.max(1, Math.ceil(this.pagination.total / this.pagination.pageSize));
+    if (this.pagination.page > totalPages) this.pagination.page = totalPages;
+    if (this.pagination.page < 1) this.pagination.page = 1;
+    const start = (this.pagination.page - 1) * this.pagination.pageSize;
+    this.pagedRows = this.filteredRows.slice(start, start + this.pagination.pageSize);
   }
 
   private pickLatestAcademicYearId(ays: AcademicYearDto[]): string {
@@ -133,7 +145,7 @@ export class HeadTeachers {
         return { id: ay.id, endTs: Number.isFinite(endTs) ? endTs : Number.NEGATIVE_INFINITY };
       })
       .sort((a, b) => b.endTs - a.endTs);
-    return parsed[0]?.id ?? '';
+    return String((parsed[0] as any)?.id ?? '');
   }
 
   async loadAll(): Promise<void> {
@@ -164,12 +176,12 @@ export class HeadTeachers {
     await this.loadForAcademicYear(this.selectedAcademicYearId);
   }
 
-  private async loadForAcademicYear(academicYearId: string): Promise<void> {
+  private async loadForAcademicYear(academicYearId: unknown): Promise<void> {
     this.loading = true;
     this.errorMessage = '';
 
     try {
-      const ay = academicYearId?.trim() || undefined;
+      const ay = toString(academicYearId);
       const [cays, courses, teachers] = await Promise.all([
         firstValueFrom(this.headApi.listClasses(ay)),
         firstValueFrom(this.headApi.listCourses(ay)),
@@ -245,12 +257,12 @@ export class HeadTeachers {
   }
 
   applyFilters(): void {
-    const year = this.selectedAcademicYearId?.trim();
-    const level = this.selectedLevel?.trim();
+    const year = toString(this.selectedAcademicYearId);
+    const level = toString(this.selectedLevel);
 
     const yearLabel = year
       ? (() => {
-          const ay = this.academicYears.find(a => a.id === year);
+          const ay = this.academicYears.find(a => String((a as any).id ?? '') === year);
           return ay ? `${ay.start.split('-')[0]}–${ay.end.split('-')[0]}` : '';
         })()
       : '';
@@ -265,6 +277,9 @@ export class HeadTeachers {
     if (this.selectedRow && !this.filteredRows.some(r => r.id === this.selectedRow?.id)) {
       this.selectedRow = this.filteredRows[0] ?? null;
     }
+
+    this.pagination.page = 1;
+    this.updatePaging();
   }
 
   onSelectionChange(rows: HeadTeacherRow[]): void {
@@ -337,7 +352,7 @@ export class HeadTeachers {
       const createdRow = this.rows.find(r => r.id === created?.id) ?? null;
       if (createdRow) this.selectedRow = createdRow;
 
-      this.activity.unshift({ message: 'Created teacher', timeAgo: 'Just now', tone: 'success' });
+      pushHeadActivity('Created teacher', 'success');
     } catch (err: unknown) {
       this.errorMessage = err instanceof Error ? err.message : 'Failed to create teacher.';
     } finally {
@@ -369,7 +384,7 @@ export class HeadTeachers {
       await this.loadForAcademicYear(this.selectedAcademicYearId);
       this.selectedRow = this.rows.find(r => r.id === id) ?? this.selectedRow;
 
-      this.activity.unshift({ message: 'Updated teacher', timeAgo: 'Just now', tone: 'info' });
+      pushHeadActivity('Updated teacher', 'info');
     } catch (err: unknown) {
       this.errorMessage = err instanceof Error ? err.message : 'Failed to update teacher.';
     } finally {
@@ -388,7 +403,7 @@ export class HeadTeachers {
       await firstValueFrom(this.headApi.deleteTeacher(id));
       this.deleteOpen = false;
       await this.loadForAcademicYear(this.selectedAcademicYearId);
-      this.activity.unshift({ message: 'Deleted teacher', timeAgo: 'Just now', tone: 'danger' });
+      pushHeadActivity('Deleted teacher', 'danger');
     } catch (err: unknown) {
       this.errorMessage = err instanceof Error ? err.message : 'Failed to delete teacher.';
     } finally {
@@ -409,7 +424,7 @@ export class HeadTeachers {
       await Promise.all(ids.map(id => firstValueFrom(this.headApi.deleteTeacher(id))));
       this.selectedRows = [];
       await this.loadForAcademicYear(this.selectedAcademicYearId);
-      this.activity.unshift({ message: `Archived ${count} teacher(s)`, timeAgo: 'Just now', tone: 'warning' });
+      pushHeadActivity(`Archived ${count} teacher(s)`, 'warning');
     } catch (err: unknown) {
       this.errorMessage = err instanceof Error ? err.message : 'Failed to archive teachers.';
     } finally {
@@ -417,11 +432,80 @@ export class HeadTeachers {
     }
   }
 
-  importExcel(): void {
-    this.infoMessage = 'Import Excel is not wired yet.';
+  private pickExcelFile(): Promise<File | null> {
+    return new Promise(resolve => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.xlsx,.xls';
+      input.onchange = () => resolve(input.files?.[0] ?? null);
+      input.click();
+    });
+  }
+
+  async importExcel(): Promise<void> {
+    this.infoMessage = '';
+    this.errorMessage = '';
+
+    const file = await this.pickExcelFile();
+    if (!file) return;
+
+    this.loading = true;
+    try {
+      const excelRows = await readExcelFile(file);
+      let ok = 0;
+      let failed = 0;
+
+      for (const r of excelRows) {
+        const name = getCell(r, 'name', 'firstname', 'first name');
+        const surname = getCell(r, 'surname', 'lastname', 'last name');
+        const email = getCell(r, 'email');
+        const login = getCell(r, 'login', 'username');
+        const password = getCell(r, 'password');
+
+        if (!name || !surname || !email || !login || !password) {
+          failed++;
+          continue;
+        }
+
+        try {
+          await firstValueFrom(
+            this.headApi.createTeacher({
+              name,
+              surname,
+              email,
+              login,
+              password,
+            }),
+          );
+          ok++;
+        } catch {
+          failed++;
+        }
+      }
+
+      await this.loadForAcademicYear(this.selectedAcademicYearId);
+      this.infoMessage = `Imported ${ok} teacher(s). ${failed ? `Failed: ${failed}.` : ''}`.trim();
+      pushHeadActivity(`Imported ${ok} teacher(s)`, failed ? 'warning' : 'success');
+    } catch (err: unknown) {
+      this.errorMessage = err instanceof Error ? err.message : 'Failed to import teachers.';
+    } finally {
+      this.loading = false;
+    }
   }
 
   exportExcel(): void {
-    this.infoMessage = 'Export Excel is not wired yet.';
+    const year = toString(this.selectedAcademicYearId) || 'all';
+    const rows = (this.filteredRows.length ? this.filteredRows : this.rows).map(r => ({
+      Name: r.name,
+      Surname: r.surname,
+      Email: r.email,
+      AssignedCourses: r.assignedCourses,
+      AssignedClasses: r.assignedClasses,
+      Levels: r.levels,
+      AcademicYears: r.academicYears,
+      TeacherId: r.id,
+    }));
+    downloadXlsx(`teachers-${year}.xlsx`, rows, 'Teachers');
+    pushHeadActivity('Exported teachers (Excel)', 'info');
   }
 }

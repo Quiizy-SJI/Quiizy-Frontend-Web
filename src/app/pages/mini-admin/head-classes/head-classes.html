@@ -14,8 +14,8 @@
         label="Select academic year"
         [options]="academicYearOptions()"
         [(ngModel)]="selectedAcademicYearId"
-        (ngModelChange)="onAcademicYearChanged()"
         [searchable]="true"
+        (valueChange)="onAcademicYearChanged()"
       ></ui-select>
     </div>
   </header>
@@ -33,15 +33,6 @@
   }
 
   <div class="classes__toolbar">
-    <ui-button
-      color="success"
-      variant="soft"
-      size="sm"
-      [disabled]="selectedRows.length === 0"
-      (clicked)="archiveSelected()"
-    >
-      Archive Selected
-    </ui-button>
 
     <ui-button color="warning" variant="soft" size="sm" (clicked)="importExcel()">
       Import Excel
@@ -61,14 +52,18 @@
 
       <ui-table
         [columns]="columns"
-        [data]="filteredRows"
+        [data]="pagedRows"
         [loading]="loading"
-        [searchable]="false"
+        [searchable]="true"
         [selectable]="true"
         [rowClickable]="true"
+        [showPagination]="true"
+        [pagination]="pagination"
         trackByKey="id"
         (rowClick)="onRowClick($event.row)"
         (selectionChange)="onSelectionChange($event)"
+        (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)"
       >
         <ng-template #cell let-row let-column="column">
           @switch (column.key) {
@@ -135,26 +130,6 @@
           </div>
         </div>
       }
-    </ui-card>
-  </section>
-
-  <section class="classes__bottom">
-    <ui-card variant="outlined" class="panel">
-      <div class="panel__header">
-        <div class="panel__title">Recent Activity</div>
-      </div>
-
-      <div class="activity-list">
-        @for (item of activity; track item.message) {
-          <div class="activity-item">
-            <span [class]="activityDotClass(item.tone)"></span>
-            <div class="activity-item__content">
-              <div class="activity-item__message">{{ item.message }}</div>
-              <div class="activity-item__time">{{ item.timeAgo }}</div>
-            </div>
-          </div>
-        }
-      </div>
     </ui-card>
   </section>
 

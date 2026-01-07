@@ -25,7 +25,7 @@ export class HeadService {
   }
   
   listCourses(academicYearId?: string): Observable<CourseDto[]> {
-    const params = academicYearId ? { academicYearId } : undefined;
+    const params = academicYearId ? { academicYearId: String(academicYearId) } : undefined;
     return this.api.get<CourseDto[]>('/mini-admin/courses', { params });
   }
 
@@ -57,7 +57,7 @@ export class HeadService {
   }
 
   listClasses(academicYearId?: string): Observable<ClassAcademicYearDto[]> {
-    const params = academicYearId ? { academicYearId } : undefined;
+    const params = academicYearId ? { academicYearId: String(academicYearId) } : undefined;
     return this.api.get<ClassAcademicYearDto[]>('/class-academic-years', { params });
   }
 
@@ -130,7 +130,7 @@ export class HeadService {
   }
 
   listStudents(academicYearId?: string): Observable<any[]> {
-    const params = academicYearId ? { academicYearId } : undefined;
+    const params = academicYearId ? { academicYearId: String(academicYearId) } : undefined;
     return this.api.get<any[]>('/mini-admin/students', { params });
   }
 
