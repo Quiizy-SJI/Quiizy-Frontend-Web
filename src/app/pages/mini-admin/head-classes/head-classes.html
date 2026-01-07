@@ -14,7 +14,7 @@
         label="Select academic year"
         [options]="academicYearOptions()"
         [(ngModel)]="selectedAcademicYearId"
-        (ngModelChange)="applyFilters()"
+        (ngModelChange)="onAcademicYearChanged()"
         [searchable]="true"
       ></ui-select>
     </div>

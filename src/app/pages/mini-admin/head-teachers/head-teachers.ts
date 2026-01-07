@@ -63,6 +63,7 @@ export class HeadTeachers {
   academicYears: AcademicYearDto[] = [];
   classAcademicYears: ClassAcademicYearDto[] = [];
   courses: CourseDto[] = [];
+  teachers: TeacherDto[] = [];
 
   rows: HeadTeacherRow[] = [];
   filteredRows: HeadTeacherRow[] = [];
@@ -87,11 +88,10 @@ export class HeadTeachers {
   draftName = '';
   draftSurname = '';
   draftEmail = '';
+  draftLogin = '';
+  draftPassword = '';
 
-  readonly activity: ActivityItem[] = [
-    { message: 'Assigned teachers to courses', timeAgo: 'Today', tone: 'info' },
-    { message: 'Created new teacher profile', timeAgo: 'Yesterday', tone: 'success' },
-  ];
+  readonly activity: ActivityItem[] = [];
 
   readonly columns: TableColumn<HeadTeacherRow>[] = [
     { key: 'name', label: 'Name', sortable: true },
@@ -126,27 +126,33 @@ export class HeadTeachers {
     await this.loadAll();
   }
 
+  private pickLatestAcademicYearId(ays: AcademicYearDto[]): string {
+    const parsed = ays
+      .map(ay => {
+        const endTs = Date.parse(ay.end);
+        return { id: ay.id, endTs: Number.isFinite(endTs) ? endTs : Number.NEGATIVE_INFINITY };
+      })
+      .sort((a, b) => b.endTs - a.endTs);
+    return parsed[0]?.id ?? '';
+  }
+
   async loadAll(): Promise<void> {
     this.loading = true;
     this.errorMessage = '';
 
     try {
-      const [ays, cays, courses] = await Promise.all([
+      const [ays, teachers] = await Promise.all([
         firstValueFrom(this.headApi.listAcademicYears()),
-        firstValueFrom(this.headApi.listClasses()),
-        firstValueFrom(this.headApi.listCourses()),
+        firstValueFrom(this.headApi.listTeachers()),
       ]);
 
       this.academicYears = ays;
-      this.classAcademicYears = cays;
-      this.courses = courses;
+      this.teachers = teachers;
 
-      this.rows = this.mapRowsFromCourses(courses);
-      this.applyFilters();
+      const latestId = this.pickLatestAcademicYearId(ays);
+      this.selectedAcademicYearId = latestId;
 
-      if (!this.selectedRow && this.filteredRows.length > 0) {
-        this.selectRow(this.filteredRows[0]);
-      }
+      await this.loadForAcademicYear(latestId);
     } catch (err: unknown) {
       this.errorMessage = err instanceof Error ? err.message : 'Failed to load teachers.';
     } finally {
@@ -154,58 +160,85 @@ export class HeadTeachers {
     }
   }
 
-  private mapRowsFromCourses(courses: CourseDto[]): HeadTeacherRow[] {
-    const byId = new Map<string, {
-      teacher: TeacherDto;
-      courseIds: Set<string>;
-      classIds: Set<string>;
-      levels: Set<string>;
-      academicYears: Set<string>;
-    }>();
+  async onAcademicYearChanged(): Promise<void> {
+    await this.loadForAcademicYear(this.selectedAcademicYearId);
+  }
 
-    for (const c of courses) {
-      const t = c.teacher;
-      if (!t?.id) continue;
+  private async loadForAcademicYear(academicYearId: string): Promise<void> {
+    this.loading = true;
+    this.errorMessage = '';
 
-      const rec = byId.get(t.id) ?? {
-        teacher: t,
-        courseIds: new Set<string>(),
-        classIds: new Set<string>(),
-        levels: new Set<string>(),
-        academicYears: new Set<string>(),
-      };
+    try {
+      const ay = academicYearId?.trim() || undefined;
+      const [cays, courses, teachers] = await Promise.all([
+        firstValueFrom(this.headApi.listClasses(ay)),
+        firstValueFrom(this.headApi.listCourses(ay)),
+        firstValueFrom(this.headApi.listTeachers()),
+      ]);
 
-      if (c.id) rec.courseIds.add(c.id);
+      this.classAcademicYears = cays;
+      this.courses = courses;
+      this.teachers = teachers;
 
-      const cay = c.classAcademicYear;
-      const classId = cay?.class?.id;
-      if (classId) rec.classIds.add(classId);
+      this.rows = this.mapRowsFromTeachersAndCourses(teachers, courses);
+      this.applyFilters();
 
-      const level = String(cay?.class?.level ?? c.level ?? '');
-      if (level) rec.levels.add(level);
+      this.selectedRows = [];
+      this.selectedRow = this.filteredRows[0] ?? null;
+    } catch (err: unknown) {
+      this.errorMessage = err instanceof Error ? err.message : 'Failed to load teachers.';
+    } finally {
+      this.loading = false;
+    }
+  }
 
-      const ay = cay?.academicYear;
-      if (ay?.start && ay?.end) {
-        rec.academicYears.add(`${ay.start.split('-')[0]}–${ay.end.split('-')[0]}`);
-      }
+  private mapRowsFromTeachersAndCourses(teachers: TeacherDto[], courses: CourseDto[]): HeadTeacherRow[] {
+    const courseIdsByTeacher = new Map<string, Set<string>>();
+    const classIdsByTeacher = new Map<string, Set<string>>();
+    const levelsByTeacher = new Map<string, Set<string>>();
+    const academicYearsByTeacher = new Map<string, Set<string>>();
 
-      byId.set(t.id, rec);
+    for (const c of courses ?? []) {
+      const teacherId = c.teacher?.id;
+      if (!teacherId) continue;
+
+      const courseIds = courseIdsByTeacher.get(teacherId) ?? new Set<string>();
+      if (c.id) courseIds.add(c.id);
+      courseIdsByTeacher.set(teacherId, courseIds);
+
+      const classIds = classIdsByTeacher.get(teacherId) ?? new Set<string>();
+      const classId = c.classAcademicYear?.class?.id;
+      if (classId) classIds.add(classId);
+      classIdsByTeacher.set(teacherId, classIds);
+
+      const levels = levelsByTeacher.get(teacherId) ?? new Set<string>();
+      const lvl = String(c.classAcademicYear?.class?.level ?? c.level ?? '').trim();
+      if (lvl) levels.add(lvl);
+      levelsByTeacher.set(teacherId, levels);
+
+      const years = academicYearsByTeacher.get(teacherId) ?? new Set<string>();
+      const ay = c.classAcademicYear?.academicYear;
+      if (ay?.start && ay?.end) years.add(`${ay.start.split('-')[0]}–${ay.end.split('-')[0]}`);
+      academicYearsByTeacher.set(teacherId, years);
     }
 
-    return Array.from(byId.values())
-      .map(({ teacher, courseIds, classIds, levels, academicYears }) => {
-        const name = teacher.user?.name ?? '';
-        const surname = teacher.user?.surname ?? '';
-        const email = teacher.user?.email ?? '';
+    return (teachers ?? [])
+      .filter(t => !!t?.id)
+      .map(t => {
+        const teacherId = t.id;
+        const name = t.user?.name ?? '';
+        const surname = t.user?.surname ?? '';
+        const email = t.user?.email ?? '';
+
         return {
-          id: teacher.id,
+          id: teacherId,
           name,
           surname,
           email,
-          assignedCourses: courseIds.size,
-          assignedClasses: classIds.size,
-          levels: Array.from(levels).sort().join(', '),
-          academicYears: Array.from(academicYears).sort().join(', '),
+          assignedCourses: courseIdsByTeacher.get(teacherId)?.size ?? 0,
+          assignedClasses: classIdsByTeacher.get(teacherId)?.size ?? 0,
+          levels: Array.from(levelsByTeacher.get(teacherId) ?? []).sort().join(', '),
+          academicYears: Array.from(academicYearsByTeacher.get(teacherId) ?? []).sort().join(', '),
         };
       })
       .sort((a, b) => `${a.name} ${a.surname}`.trim().localeCompare(`${b.name} ${b.surname}`.trim()));
@@ -251,6 +284,8 @@ export class HeadTeachers {
     this.draftName = '';
     this.draftSurname = '';
     this.draftEmail = '';
+    this.draftLogin = '';
+    this.draftPassword = '';
     this.createOpen = true;
   }
 
@@ -262,6 +297,9 @@ export class HeadTeachers {
     this.draftName = r.name;
     this.draftSurname = r.surname;
     this.draftEmail = r.email;
+    const t = this.teachers.find(tt => tt.id === r.id);
+    this.draftLogin = t?.user?.login ?? '';
+    this.draftPassword = '';
     this.editOpen = true;
   }
 
@@ -274,85 +312,109 @@ export class HeadTeachers {
     this.deleteOpen = true;
   }
 
-  confirmCreate(): void {
+  async confirmCreate(): Promise<void> {
     if (!this.draftName.trim() || !this.draftSurname.trim() || !this.draftEmail.trim()) return;
+    if (!this.draftLogin.trim()) return;
+    if (!this.draftPassword.trim()) return;
 
-    const newRow: HeadTeacherRow = {
-      id: `TEMP-${Date.now()}`,
-      name: this.draftName.trim(),
-      surname: this.draftSurname.trim(),
-      email: this.draftEmail.trim(),
-      assignedCourses: 0,
-      assignedClasses: 0,
-      levels: '',
-      academicYears: '',
-    };
+    this.loading = true;
+    this.errorMessage = '';
 
-    this.rows = [newRow, ...this.rows];
-    this.applyFilters();
-    this.selectRow(newRow);
+    try {
+      const created = await firstValueFrom(
+        this.headApi.createTeacher({
+          name: this.draftName.trim(),
+          surname: this.draftSurname.trim(),
+          email: this.draftEmail.trim(),
+          login: this.draftLogin.trim(),
+          password: this.draftPassword,
+        }),
+      );
 
-    this.activity.unshift({ message: `Created teacher ${newRow.name} ${newRow.surname}`, timeAgo: 'Just now', tone: 'success' });
-    this.createOpen = false;
+      this.createOpen = false;
+      await this.loadForAcademicYear(this.selectedAcademicYearId);
 
-    this.infoMessage = 'Create is UI-only (API not wired yet).';
+      const createdRow = this.rows.find(r => r.id === created?.id) ?? null;
+      if (createdRow) this.selectedRow = createdRow;
+
+      this.activity.unshift({ message: 'Created teacher', timeAgo: 'Just now', tone: 'success' });
+    } catch (err: unknown) {
+      this.errorMessage = err instanceof Error ? err.message : 'Failed to create teacher.';
+    } finally {
+      this.loading = false;
+    }
   }
 
-  confirmEdit(): void {
+  async confirmEdit(): Promise<void> {
     if (!this.selectedRow) return;
     if (!this.draftName.trim() || !this.draftSurname.trim() || !this.draftEmail.trim()) return;
+    if (!this.draftLogin.trim()) return;
 
     const id = this.selectedRow.id;
+    this.loading = true;
+    this.errorMessage = '';
 
-    this.rows = this.rows.map(r =>
-      r.id === id
-        ? {
-            ...r,
-            name: this.draftName.trim(),
-            surname: this.draftSurname.trim(),
-            email: this.draftEmail.trim(),
-          }
-        : r,
-    );
+    try {
+      await firstValueFrom(
+        this.headApi.updateTeacher(id, {
+          name: this.draftName.trim(),
+          surname: this.draftSurname.trim(),
+          email: this.draftEmail.trim(),
+          login: this.draftLogin.trim(),
+          ...(this.draftPassword.trim() ? { password: this.draftPassword } : {}),
+        }),
+      );
 
-    this.applyFilters();
-    const updated = this.rows.find(r => r.id === id) ?? null;
-    if (updated) this.selectedRow = updated;
+      this.editOpen = false;
+      await this.loadForAcademicYear(this.selectedAcademicYearId);
+      this.selectedRow = this.rows.find(r => r.id === id) ?? this.selectedRow;
 
-    this.activity.unshift({ message: `Updated teacher ${this.draftName.trim()} ${this.draftSurname.trim()}`, timeAgo: 'Just now', tone: 'info' });
-    this.editOpen = false;
-
-    this.infoMessage = 'Edit is UI-only (API not wired yet).';
+      this.activity.unshift({ message: 'Updated teacher', timeAgo: 'Just now', tone: 'info' });
+    } catch (err: unknown) {
+      this.errorMessage = err instanceof Error ? err.message : 'Failed to update teacher.';
+    } finally {
+      this.loading = false;
+    }
   }
 
-  confirmDelete(): void {
+  async confirmDelete(): Promise<void> {
     if (!this.selectedRow) return;
 
-    const name = `${this.selectedRow.name} ${this.selectedRow.surname}`;
     const id = this.selectedRow.id;
+    this.loading = true;
+    this.errorMessage = '';
 
-    this.rows = this.rows.filter(r => r.id !== id);
-    this.applyFilters();
-    this.selectedRow = this.filteredRows[0] ?? null;
-
-    this.activity.unshift({ message: `Deleted teacher ${name}`, timeAgo: 'Just now', tone: 'danger' });
-    this.deleteOpen = false;
-
-    this.infoMessage = 'Delete is UI-only (API not wired yet).';
+    try {
+      await firstValueFrom(this.headApi.deleteTeacher(id));
+      this.deleteOpen = false;
+      await this.loadForAcademicYear(this.selectedAcademicYearId);
+      this.activity.unshift({ message: 'Deleted teacher', timeAgo: 'Just now', tone: 'danger' });
+    } catch (err: unknown) {
+      this.errorMessage = err instanceof Error ? err.message : 'Failed to delete teacher.';
+    } finally {
+      this.loading = false;
+    }
   }
 
-  archiveSelected(): void {
+  async archiveSelected(): Promise<void> {
     if (this.selectedRows.length === 0) return;
 
     const count = this.selectedRows.length;
-    const ids = new Set(this.selectedRows.map(r => r.id));
+    const ids = [...new Set(this.selectedRows.map(r => r.id))];
 
-    this.rows = this.rows.filter(r => !ids.has(r.id));
-    this.applyFilters();
-    this.selectedRows = [];
+    this.loading = true;
+    this.errorMessage = '';
 
-    this.activity.unshift({ message: `Archived ${count} teacher(s)`, timeAgo: 'Just now', tone: 'warning' });
-    this.infoMessage = 'Archive is UI-only (API not wired yet).';
+    try {
+      await Promise.all(ids.map(id => firstValueFrom(this.headApi.deleteTeacher(id))));
+      this.selectedRows = [];
+      await this.loadForAcademicYear(this.selectedAcademicYearId);
+      this.activity.unshift({ message: `Archived ${count} teacher(s)`, timeAgo: 'Just now', tone: 'warning' });
+    } catch (err: unknown) {
+      this.errorMessage = err instanceof Error ? err.message : 'Failed to archive teachers.';
+    } finally {
+      this.loading = false;
+    }
   }
 
   importExcel(): void {

@@ -14,7 +14,7 @@
         label="Select academic year"
         [options]="academicYearOptions()"
         [(ngModel)]="selectedAcademicYearId"
-        (ngModelChange)="applyFilters()"
+        (ngModelChange)="onAcademicYearChanged()"
         [searchable]="true"
       ></ui-select>
 
@@ -162,7 +162,7 @@
   <!-- Create modal -->
   <ui-modal [isOpen]="createOpen" title="Create Course" [showFooter]="true" (closed)="createOpen = false">
     <div class="modal-form">
-      <ui-input label="Teaching unit" [(ngModel)]="draftTeachingUnitName" placeholder="e.g., Database Systems"></ui-input>
+      <ui-select label="Teaching unit" [options]="teachingUnitOptions()" [(ngModel)]="draftTeachingUnitId" [searchable]="true"></ui-select>
       <ui-input label="Credits" type="number" [(ngModel)]="draftCredits" placeholder="3"></ui-input>
       <ui-input label="Level" [(ngModel)]="draftLevel" placeholder="e.g., 4"></ui-input>
       <ui-select label="Class" [options]="classOptions()" [(ngModel)]="draftClassAcademicYearId" [searchable]="true"></ui-select>
@@ -178,7 +178,7 @@
   <!-- Edit modal -->
   <ui-modal [isOpen]="editOpen" title="Edit Course" [showFooter]="true" (closed)="editOpen = false">
     <div class="modal-form">
-      <ui-input label="Teaching unit" [(ngModel)]="draftTeachingUnitName"></ui-input>
+      <ui-select label="Teaching unit" [options]="teachingUnitOptions()" [(ngModel)]="draftTeachingUnitId" [searchable]="true"></ui-select>
       <ui-input label="Credits" type="number" [(ngModel)]="draftCredits"></ui-input>
       <ui-input label="Level" [(ngModel)]="draftLevel"></ui-input>
       <ui-select label="Class" [options]="classOptions()" [(ngModel)]="draftClassAcademicYearId" [searchable]="true"></ui-select>
@@ -195,7 +195,7 @@
   <ui-modal
     [isOpen]="deleteOpen"
     title="Delete Course"
-    description="This will remove the course from the list (UI only)."
+    description="This will delete the course."
     [showFooter]="true"
     (closed)="deleteOpen = false"
   >

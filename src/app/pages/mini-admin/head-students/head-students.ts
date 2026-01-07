@@ -22,10 +22,11 @@ import type { AcademicYearDto, ClassAcademicYearDto } from '../../../domain/dtos
 type Tone = 'primary' | 'info' | 'success' | 'warning' | 'danger' | 'neutral' | 'secondary' | 'accent';
 
 interface HeadStudentRow {
-  id: string; // UI-only
+  id: string;
   matricule: string;
   name: string;
   surname: string;
+  login: string;
   classAcademicYearId: string;
   className: string;
   level: string;
@@ -65,6 +66,7 @@ export class HeadStudents {
   // data
   academicYears: AcademicYearDto[] = [];
   classAcademicYears: ClassAcademicYearDto[] = [];
+  students: any[] = [];
 
   rows: HeadStudentRow[] = [];
   filteredRows: HeadStudentRow[] = [];
@@ -90,14 +92,12 @@ export class HeadStudents {
   draftName = '';
   draftSurname = '';
   draftEmail = '';
+  draftLogin = '';
+  draftPassword = '';
   draftCarryovers = 0;
   draftClassAcademicYearId = '';
 
-  readonly activity: ActivityItem[] = [
-    { message: 'Imported 42 students via Excel', timeAgo: 'Today', tone: 'info' },
-    { message: 'Archived 3 inactive students', timeAgo: 'Yesterday', tone: 'warning' },
-    { message: 'Student list export generated', timeAgo: '2 days ago', tone: 'success' },
-  ];
+  readonly activity: ActivityItem[] = [];
 
   readonly columns: TableColumn<HeadStudentRow>[] = [
     { key: 'matricule', label: 'Matricule', sortable: true, width: '120px' },
@@ -147,32 +147,115 @@ export class HeadStudents {
     await this.loadAll();
   }
 
+  private pickLatestAcademicYearId(ays: AcademicYearDto[]): string {
+    const parsed = ays
+      .map(ay => {
+        const endTs = Date.parse(ay.end);
+        return { id: ay.id, endTs: Number.isFinite(endTs) ? endTs : Number.NEGATIVE_INFINITY };
+      })
+      .sort((a, b) => b.endTs - a.endTs);
+
+    return parsed[0]?.id ?? '';
+  }
+
   async loadAll(): Promise<void> {
     this.loading = true;
     this.errorMessage = '';
 
     try {
-      const [ays, cays] = await Promise.all([
-        firstValueFrom(this.headApi.listAcademicYears()),
-        firstValueFrom(this.headApi.listClasses()),
-      ]);
-
+      const ays = await firstValueFrom(this.headApi.listAcademicYears());
       this.academicYears = ays;
-      this.classAcademicYears = cays;
 
-      // No students endpoint wired yet in the frontend.
-      // Keep UI functional by starting with an empty list (students can be added in the modal).
-      this.rows = [];
-      this.applyFilters();
+      const latestId = this.pickLatestAcademicYearId(ays);
+      this.selectedAcademicYearId = latestId;
 
-      if (!this.selectedRow && this.filteredRows.length > 0) {
-        this.selectRow(this.filteredRows[0]);
+      if (latestId) {
+        await this.loadForAcademicYear(latestId);
+      } else {
+        this.classAcademicYears = [];
+        this.students = [];
+        this.rows = [];
+        this.applyFilters();
+        this.selectedRow = null;
+        this.selectedRows = [];
       }
     } catch (err: unknown) {
       this.errorMessage = err instanceof Error ? err.message : 'Failed to load student metadata.';
     } finally {
       this.loading = false;
     }
+  }
+
+  async onAcademicYearChanged(): Promise<void> {
+    await this.loadForAcademicYear(this.selectedAcademicYearId);
+  }
+
+  private async loadForAcademicYear(academicYearId: string): Promise<void> {
+    this.loading = true;
+    this.errorMessage = '';
+
+    try {
+      const ay = academicYearId?.trim() || undefined;
+
+      const [cays, students] = await Promise.all([
+        firstValueFrom(this.headApi.listClasses(ay)),
+        firstValueFrom(this.headApi.listStudents(ay)),
+      ]);
+
+      this.classAcademicYears = cays;
+      this.students = students;
+      this.rows = this.mapRows(students);
+      this.applyFilters();
+
+      this.selectedRows = [];
+      this.selectedRow = this.filteredRows[0] ?? null;
+    } catch (err: unknown) {
+      this.errorMessage = err instanceof Error ? err.message : 'Failed to load students.';
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  private mapRows(students: any[]): HeadStudentRow[] {
+    const rows: HeadStudentRow[] = [];
+
+    for (const s of students ?? []) {
+      if (!s?.id) continue;
+
+      const user = s.user ?? {};
+      const classYears: any[] = Array.isArray(s.classAcademicYears) ? s.classAcademicYears : [];
+      const carriedOverCourses: any[] = Array.isArray(s.carriedOverCourses) ? s.carriedOverCourses : [];
+
+      const selectedYearId = this.selectedAcademicYearId?.trim();
+      const bestCay =
+        (selectedYearId
+          ? classYears.find(cy => cy?.academicYear?.id === selectedYearId)
+          : null) ??
+        classYears[0] ??
+        null;
+
+      const ay = bestCay?.academicYear;
+      const classDto = bestCay?.class;
+
+      const academicYearLabel = ay?.start && ay?.end ? `${ay.start.split('-')[0]}–${ay.end.split('-')[0]}` : '';
+
+      rows.push({
+        id: String(s.id),
+        matricule: String(s.matricule ?? ''),
+        name: String(user.name ?? ''),
+        surname: String(user.surname ?? ''),
+        login: String(user.login ?? ''),
+        email: String(user.email ?? ''),
+        classAcademicYearId: String(bestCay?.id ?? ''),
+        className: String(classDto?.name ?? '—'),
+        level: String(classDto?.level ?? ''),
+        academicYearId: String(ay?.id ?? ''),
+        academicYearLabel,
+        carryovers: carriedOverCourses.length,
+      });
+    }
+
+    return rows.sort((a, b) => a.matricule.localeCompare(b.matricule));
   }
 
   applyFilters(): void {
@@ -209,6 +292,8 @@ export class HeadStudents {
     this.draftName = '';
     this.draftSurname = '';
     this.draftEmail = '';
+    this.draftLogin = '';
+    this.draftPassword = '';
     this.draftCarryovers = 0;
     this.draftClassAcademicYearId = '';
     this.createOpen = true;
@@ -223,6 +308,8 @@ export class HeadStudents {
     this.draftName = r.name;
     this.draftSurname = r.surname;
     this.draftEmail = r.email;
+    this.draftLogin = r.login;
+    this.draftPassword = '';
     this.draftCarryovers = r.carryovers;
     this.draftClassAcademicYearId = r.classAcademicYearId;
     this.editOpen = true;
@@ -237,115 +324,133 @@ export class HeadStudents {
     this.deleteOpen = true;
   }
 
-  confirmCreate(): void {
+  async confirmCreate(): Promise<void> {
     if (!this.draftMatricule.trim()) return;
     if (!this.draftName.trim() || !this.draftSurname.trim()) return;
     if (!this.draftEmail.trim()) return;
+    if (!this.draftLogin.trim()) return;
+    if (!this.draftPassword.trim()) return;
     if (!this.draftClassAcademicYearId) return;
 
-    const cay = this.classAcademicYears.find(c => c.id === this.draftClassAcademicYearId);
-    const className = cay?.class?.name ?? '—';
-    const level = String(cay?.class?.level ?? '');
-    const ay = cay?.academicYear;
-    const academicYearId = ay?.id ?? '';
-    const academicYearLabel = ay ? `${ay.start.split('-')[0]}–${ay.end.split('-')[0]}` : '';
+    this.loading = true;
+    this.errorMessage = '';
 
-    const newRow: HeadStudentRow = {
-      id: `TEMP-${Date.now()}`,
-      matricule: this.draftMatricule.trim(),
-      name: this.draftName.trim(),
-      surname: this.draftSurname.trim(),
-      classAcademicYearId: this.draftClassAcademicYearId,
-      className,
-      level,
-      academicYearId,
-      academicYearLabel,
-      carryovers: Number(this.draftCarryovers) || 0,
-      email: this.draftEmail.trim(),
-    };
+    try {
+      const created = await firstValueFrom(
+        this.headApi.createStudent({
+          matricule: this.draftMatricule.trim(),
+          name: this.draftName.trim(),
+          surname: this.draftSurname.trim(),
+          email: this.draftEmail.trim(),
+          login: this.draftLogin.trim(),
+          password: this.draftPassword,
+          classAcademicYearIds: [this.draftClassAcademicYearId],
+        }),
+      );
 
-    this.rows = [newRow, ...this.rows];
-    this.applyFilters();
-    this.selectRow(newRow);
+      this.createOpen = false;
 
-    this.activity.unshift({ message: `Added student ${newRow.name} ${newRow.surname}`, timeAgo: 'Just now', tone: 'success' });
-    this.createOpen = false;
+      if (this.selectedAcademicYearId) {
+        await this.loadForAcademicYear(this.selectedAcademicYearId);
+      }
 
-    this.infoMessage = 'Create is UI-only (API not wired yet).';
+      const createdRow = this.rows.find(r => r.id === created?.id) ?? null;
+      if (createdRow) this.selectedRow = createdRow;
+
+      this.activity.unshift({ message: 'Added student', timeAgo: 'Just now', tone: 'success' });
+    } catch (err: unknown) {
+      this.errorMessage = err instanceof Error ? err.message : 'Failed to create student.';
+    } finally {
+      this.loading = false;
+    }
   }
 
-  confirmEdit(): void {
+  async confirmEdit(): Promise<void> {
     if (!this.selectedRow) return;
     if (!this.draftMatricule.trim()) return;
     if (!this.draftName.trim() || !this.draftSurname.trim()) return;
     if (!this.draftEmail.trim()) return;
+    if (!this.draftLogin.trim()) return;
     if (!this.draftClassAcademicYearId) return;
 
-    const cay = this.classAcademicYears.find(c => c.id === this.draftClassAcademicYearId);
-    const className = cay?.class?.name ?? '—';
-    const level = String(cay?.class?.level ?? '');
-    const ay = cay?.academicYear;
-    const academicYearId = ay?.id ?? '';
-    const academicYearLabel = ay ? `${ay.start.split('-')[0]}–${ay.end.split('-')[0]}` : '';
-
     const id = this.selectedRow.id;
+    this.loading = true;
+    this.errorMessage = '';
 
-    this.rows = this.rows.map(r =>
-      r.id === id
-        ? {
-            ...r,
-            matricule: this.draftMatricule.trim(),
-            name: this.draftName.trim(),
-            surname: this.draftSurname.trim(),
-            email: this.draftEmail.trim(),
-            carryovers: Number(this.draftCarryovers) || 0,
-            classAcademicYearId: this.draftClassAcademicYearId,
-            className,
-            level,
-            academicYearId,
-            academicYearLabel,
-          }
-        : r,
-    );
+    try {
+      await firstValueFrom(
+        this.headApi.updateStudent(id, {
+          matricule: this.draftMatricule.trim(),
+          name: this.draftName.trim(),
+          surname: this.draftSurname.trim(),
+          email: this.draftEmail.trim(),
+          login: this.draftLogin.trim(),
+          ...(this.draftPassword.trim() ? { password: this.draftPassword } : {}),
+          classAcademicYearIds: [this.draftClassAcademicYearId],
+        }),
+      );
 
-    this.applyFilters();
-    const updated = this.rows.find(r => r.id === id) ?? null;
-    if (updated) this.selectedRow = updated;
+      this.editOpen = false;
 
-    this.activity.unshift({ message: `Edited student ${this.draftName.trim()} ${this.draftSurname.trim()}`, timeAgo: 'Just now', tone: 'info' });
-    this.editOpen = false;
+      if (this.selectedAcademicYearId) {
+        await this.loadForAcademicYear(this.selectedAcademicYearId);
+      }
 
-    this.infoMessage = 'Edit is UI-only (API not wired yet).';
+      this.selectedRow = this.rows.find(r => r.id === id) ?? this.selectedRow;
+      this.activity.unshift({ message: 'Edited student', timeAgo: 'Just now', tone: 'info' });
+    } catch (err: unknown) {
+      this.errorMessage = err instanceof Error ? err.message : 'Failed to update student.';
+    } finally {
+      this.loading = false;
+    }
   }
 
-  confirmDelete(): void {
+  async confirmDelete(): Promise<void> {
     if (!this.selectedRow) return;
 
-    const name = `${this.selectedRow.name} ${this.selectedRow.surname}`;
     const id = this.selectedRow.id;
+    this.loading = true;
+    this.errorMessage = '';
 
-    this.rows = this.rows.filter(r => r.id !== id);
-    this.applyFilters();
-    this.selectedRow = this.filteredRows[0] ?? null;
+    try {
+      await firstValueFrom(this.headApi.deleteStudent(id));
+      this.deleteOpen = false;
 
-    this.activity.unshift({ message: `Deleted student ${name}`, timeAgo: 'Just now', tone: 'danger' });
-    this.deleteOpen = false;
+      if (this.selectedAcademicYearId) {
+        await this.loadForAcademicYear(this.selectedAcademicYearId);
+      }
 
-    this.infoMessage = 'Delete is UI-only (API not wired yet).';
+      this.activity.unshift({ message: 'Deleted student', timeAgo: 'Just now', tone: 'danger' });
+    } catch (err: unknown) {
+      this.errorMessage = err instanceof Error ? err.message : 'Failed to delete student.';
+    } finally {
+      this.loading = false;
+    }
   }
 
-  archiveSelected(): void {
+  async archiveSelected(): Promise<void> {
     if (this.selectedRows.length === 0) return;
 
     const count = this.selectedRows.length;
-    const ids = new Set(this.selectedRows.map(r => r.id));
+    const ids = [...new Set(this.selectedRows.map(r => r.id))];
 
-    this.rows = this.rows.filter(r => !ids.has(r.id));
-    this.applyFilters();
-    this.selectedRows = [];
+    this.loading = true;
+    this.errorMessage = '';
 
-    this.activity.unshift({ message: `Archived ${count} student(s)`, timeAgo: 'Just now', tone: 'warning' });
-    this.infoMessage = 'Archive is UI-only (API not wired yet).';
+    try {
+      await Promise.all(ids.map(id => firstValueFrom(this.headApi.deleteStudent(id))));
+      this.selectedRows = [];
+
+      if (this.selectedAcademicYearId) {
+        await this.loadForAcademicYear(this.selectedAcademicYearId);
+      }
+
+      this.activity.unshift({ message: `Archived ${count} student(s)`, timeAgo: 'Just now', tone: 'warning' });
+    } catch (err: unknown) {
+      this.errorMessage = err instanceof Error ? err.message : 'Failed to archive students.';
+    } finally {
+      this.loading = false;
+    }
   }
 
   importExcel(): void {

@@ -7,11 +7,11 @@
         <ui-select
         label="Scope"
         [options]="academicYearOptions()"
+                [(ngModel)]="selectedAcademicYearId"
         (ngModelChange)="onFilterChanged()"
         [searchable]="true"
       ></ui-select>
     </header>
-        <!-- [(ngModel)]="selectedAcademicYearId" -->
 
     @if (errorMessage) {
     <ui-alert type="danger" variant="outlined">

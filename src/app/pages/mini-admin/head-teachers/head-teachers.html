@@ -14,7 +14,7 @@
         label="Select academic year"
         [options]="academicYearOptions()"
         [(ngModel)]="selectedAcademicYearId"
-        (ngModelChange)="applyFilters()"
+        (ngModelChange)="onAcademicYearChanged()"
         [searchable]="true"
       ></ui-select>
 
@@ -162,6 +162,8 @@
       <ui-input label="Name" [(ngModel)]="draftName" placeholder="e.g., John"></ui-input>
       <ui-input label="Surname" [(ngModel)]="draftSurname" placeholder="e.g., Doe"></ui-input>
       <ui-input label="Email" [(ngModel)]="draftEmail" placeholder="e.g., john.doe@example.com"></ui-input>
+      <ui-input label="Login" [(ngModel)]="draftLogin" placeholder="e.g., john.doe"></ui-input>
+      <ui-input label="Password" type="password" [(ngModel)]="draftPassword" placeholder="Min 6 characters"></ui-input>
     </div>
 
     <div slot="footer" class="modal-actions">
@@ -176,6 +178,8 @@
       <ui-input label="Name" [(ngModel)]="draftName"></ui-input>
       <ui-input label="Surname" [(ngModel)]="draftSurname"></ui-input>
       <ui-input label="Email" [(ngModel)]="draftEmail"></ui-input>
+      <ui-input label="Login" [(ngModel)]="draftLogin"></ui-input>
+      <ui-input label="Password (leave blank to keep)" type="password" [(ngModel)]="draftPassword"></ui-input>
     </div>
 
     <div slot="footer" class="modal-actions">
@@ -188,7 +192,7 @@
   <ui-modal
     [isOpen]="deleteOpen"
     title="Delete Teacher"
-    description="This will remove the teacher from the list (UI only)."
+    description="This will delete the teacher."
     [showFooter]="true"
     (closed)="deleteOpen = false"
   >

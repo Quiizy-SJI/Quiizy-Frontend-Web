@@ -11,26 +11,31 @@
         <div class="login-page__logo-circle">
           <span class="login-page__logo-text">Q</span>
         </div>
-        <img src="assets/images/logos/iusj-logo.png" alt="IUSJ logo" class="login-page__school-logo" />
-        <span class="login-page__brand-text">QUIZZY</span>
+        <img style="border-radius: 20px;" src="assets/images/logos/iusj-logo.png" alt="IUSJ logo"
+          class="login-page__school-logo" />
       </div>
 
       <!-- Cycling Images -->
       <div class="login-page__image-slider">
         <div class="login-page__slide active" data-slide="0">
-          <img src="https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=800&h=600&fit=crop" alt="Students taking quiz" />
+          <img src="https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            alt="Students taking quiz" />
         </div>
         <div class="login-page__slide" data-slide="1">
-          <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800&h=600&fit=crop" alt="Classroom examination" />
+          <img src="https://images.unsplash.com/photo-1670852714979-f73d21652a83?q=80&w=1169&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            alt="Classroom examination" />
         </div>
         <div class="login-page__slide" data-slide="2">
-          <img src="https://images.unsplash.com/photo-1509062522246-3755977927d7?w=800&h=600&fit=crop" alt="Students studying together" />
+          <img src="https://images.unsplash.com/photo-1509062522246-3755977927d7?w=800&h=600&fit=crop"
+            alt="Students studying together" />
         </div>
         <div class="login-page__slide" data-slide="3">
-          <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=600&fit=crop" alt="Group quiz session" />
+          <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=600&fit=crop"
+            alt="Group quiz session" />
         </div>
         <div class="login-page__slide" data-slide="4">
-          <img src="https://images.unsplash.com/photo-1581726690015-c9861fa5057f?w=800&h=600&fit=crop" alt="Digital learning platform" />
+          <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1115&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            alt="Digital learning platform" />
         </div>
       </div>
 
@@ -58,7 +63,8 @@
     </div>
 
     <!-- Right Card - Login Form -->
-    <div class="login-page__form-card">
+    <div class="login-page__form-card" >   
+
       <!-- Theme Toggle -->
       <div class="login-page__theme-toggle">
         <ui-theme-toggle />
@@ -66,37 +72,24 @@
 
       <!-- Form Header -->
       <div class="login-page__form-header">
-        <h2 class="login-page__form-title">Welcome Back to Quizzy</h2>
+        <h2 class="login-page__form-title">Welcome Back </h2>
         <p class="login-page__form-subtitle">Login to access your Quizzy dashboard</p>
       </div>
 
       <!-- Login Form -->
       <form class="login-page__form" (ngSubmit)="onSubmit()" #loginForm="ngForm">
         <!-- Error Alert -->
-        <ui-alert
-          *ngIf="errorMessage"
-          variant="soft"
-          color="danger"
-          [title]="'Authentication Failed'"
-          [dismissible]="true"
-          (dismissed)="errorMessage = ''"
-        >
+        <ui-alert *ngIf="errorMessage" variant="soft" color="danger" [title]="'Authentication Failed'"
+          [dismissible]="true" (dismissed)="errorMessage = ''">
           {{ errorMessage }}
         </ui-alert>
 
         <!-- Role Selection -->
         <div class="login-page__field">
           <label class="login-page__label">Select Role</label>
-          <ui-select
-            placeholder="Teacher"
-            [options]="roleOptions"
-            [(ngModel)]="loginRequest.role"
-            name="role"
-            [required]="true"
-            [validationState]="roleError ? 'invalid' : 'default'"
-            [errorMessage]="roleError"
-            [iconLeft]="true"
-          >
+          <ui-select placeholder="Teacher" [options]="roleOptions" [(ngModel)]="loginRequest.role" name="role"
+            [required]="true" [validationState]="roleError ? 'invalid' : 'default'" [errorMessage]="roleError"
+            [iconLeft]="true">
             <mat-icon slot="icon-left">person_outline</mat-icon>
           </ui-select>
         </div>
@@ -104,17 +97,10 @@
         <!-- Identifier (email or matricule) -->
         <div class="login-page__field">
           <label class="login-page__label">{{ identifierLabel }}</label>
-          <ui-input
-            [placeholder]="identifierPlaceholder"
-            [type]="loginRequest.role === 'STUDENT' ? 'text' : 'email'"
-            [(ngModel)]="loginRequest.identifier"
-            name="identifier"
-            [required]="true"
-            [validationState]="identifierError ? 'invalid' : 'default'"
-            [errorMessage]="identifierError"
-            autocomplete="username"
-            [iconLeft]="true"
-          >
+          <ui-input [placeholder]="identifierPlaceholder" [type]="loginRequest.role === 'STUDENT' ? 'text' : 'email'"
+            [(ngModel)]="loginRequest.identifier" name="identifier" [required]="true"
+            [validationState]="identifierError ? 'invalid' : 'default'" [errorMessage]="identifierError"
+            autocomplete="username" [iconLeft]="true">
             <mat-icon slot="icon-left">email</mat-icon>
           </ui-input>
         </div>
@@ -122,18 +108,10 @@
         <!-- Password -->
         <div class="login-page__field">
           <label class="login-page__label">Password</label>
-          <ui-input
-            placeholder="Enter your password"
-            type="password"
-            [(ngModel)]="loginRequest.password"
-            name="password"
-            [required]="true"
-            [showPasswordToggle]="true"
-            [validationState]="passwordError ? 'invalid' : 'default'"
-            [errorMessage]="passwordError"
-            autocomplete="current-password"
-            [iconLeft]="true"
-          >
+          <ui-input placeholder="Enter your password" type="password" [(ngModel)]="loginRequest.password"
+            name="password" [required]="true" [showPasswordToggle]="true"
+            [validationState]="passwordError ? 'invalid' : 'default'" [errorMessage]="passwordError"
+            autocomplete="current-password" [iconLeft]="true">
             <mat-icon slot="icon-left">lock_outline</mat-icon>
           </ui-input>
         </div>
@@ -145,15 +123,8 @@
 
         <!-- Submit Button -->
         <div class="login-page__submit">
-          <ui-button
-            type="submit"
-            variant="solid"
-            color="primary"
-            size="lg"
-            [fullWidth]="true"
-            [loading]="isLoading"
-            [disabled]="isLoading"
-          >
+          <ui-button type="submit" variant="solid" color="primary" size="lg" [fullWidth]="true" [loading]="isLoading"
+            [disabled]="isLoading">
             {{ isLoading ? 'Signing in...' : 'Login' }}
           </ui-button>
         </div>
