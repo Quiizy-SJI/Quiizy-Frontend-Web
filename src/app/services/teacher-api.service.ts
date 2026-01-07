@@ -23,6 +23,8 @@ import type {
   TeachingUnitQuestionsDto,
   SelectQuestionForQuizDto,
   CreateAndAddQuestionDto,
+  CreateQuestionBankDto,
+  UpdateQuestionBankDto,
   InviteCollaboratorDto,
   AddCourseToQuizDto,
   QuizCollaboratorDto,
@@ -308,6 +310,42 @@ export class TeacherApiService {
     return this.api.get<TeachingUnitQuestionsDto>(
       `${this.basePath}/teaching-units/${teachingUnitId}/questions`,
     );
+  }
+
+  /**
+   * Create a new question in the question bank (teacher contribution).
+   * Route: POST /teacher/quizzes/teaching-units/:teachingUnitId/questions
+   */
+  createQuestionInBank(dto: CreateQuestionBankDto): Observable<QuestionDto> {
+    const payload: Record<string, unknown> = {
+      question: toString(dto.question),
+      type: toStringRequired(dto.type),
+      difficultyLevel: toStringRequired(dto.difficultyLevel),
+      teachingUnitId: toStringRequired(dto.teachingUnitId),
+    };
+
+    if (dto.proposedAnswers?.length) payload['proposedAnswers'] = toStringArray(dto.proposedAnswers);
+    if (dto.correctAnswer !== undefined) payload['correctAnswer'] = toString(dto.correctAnswer);
+
+    return this.api.post<QuestionDto>(
+      `${this.basePath}/teaching-units/${payload['teachingUnitId']}/questions`,
+      payload,
+    );
+  }
+
+  /**
+   * Update an existing question in the question bank.
+   * Route: PATCH /teacher/quizzes/questions/:questionId
+   */
+  updateQuestionInBank(questionId: string, dto: Partial<UpdateQuestionBankDto>): Observable<QuestionDto> {
+    const payload: Record<string, unknown> = {};
+    if (dto.question !== undefined) payload['question'] = toString(dto.question);
+    if (dto.type !== undefined) payload['type'] = toString(dto.type);
+    if (dto.difficultyLevel !== undefined) payload['difficultyLevel'] = toString(dto.difficultyLevel);
+    if (dto.proposedAnswers !== undefined) payload['proposedAnswers'] = toStringArray(dto.proposedAnswers as string[]);
+    if (dto.correctAnswer !== undefined) payload['correctAnswer'] = toString(dto.correctAnswer);
+
+    return this.api.patch<QuestionDto>(`${this.basePath}/questions/${questionId}`, payload);
   }
 
   /**

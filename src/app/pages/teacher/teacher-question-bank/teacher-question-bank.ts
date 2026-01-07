@@ -2,15 +2,20 @@ import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
+import { TableComponent } from '../../../components/ui/tables/table/table.component';
+import { ModalComponent } from '../../../components/ui/modals/modal/modal.component';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
 import { TeacherApiService } from '../../../services/teacher-api.service';
+import { AuthStoreService } from '../../../core/auth/auth-store.service';
 import type {
   QuestionDto,
   QuestionType,
   TeachingUnitQuestionsDto,
   QuestionBankItemDto,
+  CreateQuestionBankDto,
+  DifficultyLevel,
 } from '../../../domain/dtos/teacher/teacher-quiz.dto';
 import type { TeachingUnitDto } from '../../../domain/dtos/dean/dean-shared.dto';
 
@@ -30,14 +35,22 @@ interface Question {
   options?: string[];
   correctAnswer?: number | number[];
   usedCount: number;
+  used?: number;
   lastEdit: string;
   folderId: string;
+  authorId?: string | null;
+  canEdit?: boolean;
+}
+
+// Extended question item that includes its teaching unit id (added at fetch time)
+interface ExtendedQuestionBankItemDto extends QuestionBankItemDto {
+  teachingUnitId: string;
 }
 
 @Component({
   selector: 'app-teacher-question-bank',
   standalone: true,
-  imports: [CommonModule, MatIconModule, FormsModule],
+  imports: [CommonModule, MatIconModule, FormsModule, TableComponent, ModalComponent],
   template: `
     <div class="question-bank">
       <div class="page-header">
@@ -76,98 +89,53 @@ interface Question {
 
         <!-- Main Content Area -->
         <div class="questions-content">
-          <!-- Filter Bar -->
-          <div class="filter-bar">
-            <div class="filter-group">
-              <select class="filter-select" [(ngModel)]="selectedSubject" (change)="applyFilters()">
-                <option value="">Subject</option>
-                <option value="AI Systems">AI Systems</option>
-                <option value="Networks">Networks</option>
-                <option value="Web Dev">Web Dev</option>
-                <option value="All subjects">All subjects</option>
-              </select>
 
-              <select class="filter-select" [(ngModel)]="selectedDifficulty" (change)="applyFilters()">
-                <option value="">Difficulty</option>
-                <option value="Easy">Easy</option>
-                <option value="Medium">Medium</option>
-                <option value="Hard">Hard</option>
-              </select>
-
-              <select class="filter-select" [(ngModel)]="selectedType" (change)="applyFilters()">
-                <option value="">Type</option>
-                <option value="MCQ">MCQ only</option>
-                <option value="Essay">Essay</option>
-                <option value="Multi-answer">Multi-answer</option>
-              </select>
-
-              <input
-                type="text"
-                placeholder="Search..."
-                class="search-input"
-                [(ngModel)]="searchTerm"
-                (input)="applyFilters()"
-              >
-            </div>
-          </div>
-
-          <!-- Questions Table -->
-          <div class="questions-table">
-            <div class="table-header">
-              <div class="col-question">Question</div>
-              <div class="col-subject">Subject</div>
-              <div class="col-difficulty">Difficulty</div>
-              <div class="col-used">Used</div>
-              <div class="col-last-edit">Last edit</div>
-              <div class="col-actions">Actions</div>
-            </div>
-
-            <div class="table-body">
-              <div class="question-row" *ngFor="let question of filteredQuestions">
-                <div class="col-question">
+          <!-- Questions Table (uses shared ui-table) -->
+          <ui-table
+            [columns]="tableColumns"
+            [data]="tableData"
+            [pagination]="{ page: currentPage, pageSize: itemsPerPage, total: totalQuestions }"
+            [sortColumn]="sortColumn"
+            [sortDirection]="sortDirection"
+            [searchable]="true"
+            [showPagination]="true"
+            (pageChange)="onTablePageChange($event)"
+            (pageSizeChange)="onTablePageSizeChange($event)"
+            (searchChange)="onTableSearch($event)"
+            (sortChange)="onSortChange($event)"
+          >
+            <ng-template #cell let-row let-index="index" let-column="column">
+              <ng-container [ngSwitch]="column.key">
+                <div *ngSwitchCase="'text'">
                   <div class="question-content">
-                    <h4>{{question.text}}</h4>
+                    <h4>{{ row.text }}</h4>
                     <div class="question-meta">
-                      <span class="question-type">{{getQuestionTypeText(question)}}</span>
+                      <span class="question-type">{{ getQuestionTypeText(row) }}</span>
                     </div>
                   </div>
                 </div>
-                <div class="col-subject">
-                  <span class="subject-badge" [class]="getSubjectClass(question.subject)">
-                    {{question.subject}}
-                  </span>
+                <div *ngSwitchCase="'subject'">
+                  <span class="subject-badge" [class]="getSubjectClass(row.subject)">{{ row.subject }}</span>
                 </div>
-                <div class="col-difficulty">
-                  <span class="difficulty-badge" [class]="question.difficulty.toLowerCase()">
-                    {{question.difficulty}}
-                  </span>
+                <div *ngSwitchCase="'difficulty'">
+                  <span class="difficulty-badge" [class]="row.difficulty.toLowerCase()">{{ row.difficulty }}</span>
                 </div>
-                <div class="col-used">{{question.usedCount}} exams</div>
-                <div class="col-last-edit">{{question.lastEdit}}</div>
-                <div class="col-actions">
-                  <button class="action-btn edit" (click)="editQuestion(question)" *ngIf="question.type !== 'Essay'">
-                    Edit
+                <div *ngSwitchCase="'used'">{{ row.usedCount }} exams</div>
+                <div *ngSwitchCase="'lastEdit'">{{ row.lastEdit }}</div>
+                <div *ngSwitchCase="'actions'">
+                  <button class="action-btn edit" (click)="editQuestion(row)" *ngIf="row.type !== 'Essay' && row.canEdit">
+                    <mat-icon>edit</mat-icon>
+                    <span>Edit</span>
                   </button>
-                  <button class="action-btn view" (click)="viewQuestion(question)" *ngIf="question.type === 'Essay'">
-                    View only
+                  <button class="action-btn view" (click)="viewQuestion(row)" *ngIf="row.type === 'Essay' || !row.canEdit">
+                    <mat-icon>visibility</mat-icon>
+                    <span>View</span>
                   </button>
                 </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Pagination -->
-          <div class="pagination">
-            <span class="pagination-info">Showing {{paginationStart}}-{{paginationEnd}} of {{totalQuestions}}</span>
-            <div class="pagination-controls">
-              <button class="page-btn" [disabled]="currentPage === 1" (click)="previousPage()">
-                Prev
-              </button>
-              <button class="page-btn" [disabled]="currentPage === totalPages" (click)="nextPage()">
-                Next
-              </button>
-            </div>
-          </div>
+                <div *ngSwitchDefault>{{ row[column.key] }}</div>
+              </ng-container>
+            </ng-template>
+          </ui-table>
         </div>
       </div>
 
@@ -175,7 +143,8 @@ interface Question {
       <div class="modal-overlay" *ngIf="showNewMCQModal" (click)="closeNewMCQModal()">
         <div class="modal-content" (click)="$event.stopPropagation()">
           <div class="modal-header">
-            <h3>Create New MCQ Question</h3>
+            <h3 *ngIf="!editingQuestionId">Create New MCQ Question</h3>
+            <h3 *ngIf="editingQuestionId">Edit MCQ Question</h3>
             <button class="close-btn" (click)="closeNewMCQModal()">
               <mat-icon>close</mat-icon>
             </button>
@@ -193,24 +162,21 @@ interface Question {
             </div>
 
             <div class="form-group">
-              <label>Subject *</label>
-              <select [(ngModel)]="newQuestion.subject" class="form-select">
-                <option value="">Select subject</option>
-                <option value="AI Systems">AI Systems</option>
-                <option value="Networks">Networks</option>
-                <option value="Web Dev">Web Dev</option>
-                <option value="Ethics">Ethics</option>
-                <option value="Operating Systems">Operating Systems</option>
-                <option value="Security">Security</option>
+              <label>Teaching Unit *</label>
+              <select [(ngModel)]="newQuestion.teachingUnitId" class="form-select">
+                <option value="">Select teaching unit</option>
+                <option *ngFor="let tu of teachingUnits" [value]="tu.id">{{tu.name}}</option>
               </select>
             </div>
 
             <div class="form-group">
               <label>Difficulty *</label>
               <select [(ngModel)]="newQuestion.difficulty" class="form-select">
-                <option value="Easy">Easy</option>
-                <option value="Medium">Medium</option>
-                <option value="Hard">Hard</option>
+                <option value="LEVEL_1">Level 1 (LEVEL_1)</option>
+                <option value="LEVEL_2">Level 2 (LEVEL_2)</option>
+                <option value="LEVEL_3">Level 3 (LEVEL_3)</option>
+                <option value="LEVEL_4">Level 4 (LEVEL_4)</option>
+                <option value="LEVEL_5">Level 5 (LEVEL_5)</option>
               </select>
             </div>
 
@@ -220,10 +186,6 @@ interface Question {
                 <label class="radio-option">
                   <input type="radio" [(ngModel)]="newQuestion.answerType" value="single">
                   <span>Single answer</span>
-                </label>
-                <label class="radio-option">
-                  <input type="radio" [(ngModel)]="newQuestion.answerType" value="multiple">
-                  <span>Multiple answers</span>
                 </label>
               </div>
             </div>
@@ -266,7 +228,8 @@ interface Question {
           <div class="modal-footer">
             <button class="btn secondary" (click)="closeNewMCQModal()">Cancel</button>
             <button class="btn primary" (click)="saveNewQuestion()" [disabled]="!isNewQuestionValid()">
-              Create Question
+              <span *ngIf="!editingQuestionId">Create Question</span>
+              <span *ngIf="editingQuestionId">Save Changes</span>
             </button>
           </div>
         </div>
@@ -321,6 +284,37 @@ interface Question {
         </div>
       </div>
     </div>
+
+    <ui-modal [isOpen]="showViewModal" [title]="'Question Details'" (closed)="closeViewModal()" [showFooter]="true">
+      <div *ngIf="viewQuestionDto; else noData">
+        <h4 style="margin-bottom:0.5rem">{{ viewQuestionDto.question }}</h4>
+        <div style="font-size:0.9rem;color:var(--color-text-secondary);margin-bottom:1rem">
+          <span>{{ getTeachingUnitDisplayName(viewQuestionDto?.teachingUnitId) }} • {{ mapDifficultyLevel(viewQuestionDto.difficultyLevel) }} • {{ viewQuestionDto.usageCount }} uses</span>
+        </div>
+
+        <div *ngIf="viewQuestionDto.proposedAnswers?.length">
+          <h5>Options</h5>
+          <ul>
+            <li *ngFor="let opt of viewQuestionDto.proposedAnswers; let i = index" [style.fontWeight]="(opt == viewQuestionDto.correctAnswer) ? '600' : '400'">
+                  <span>{{ i + 1 }}.</span>
+                  <span style="margin-left:0.5rem">{{ opt }}</span>
+                  <span *ngIf="opt == viewQuestionDto.correctAnswer" style="color:var(--color-success-600); margin-left:0.5rem">(Correct)</span>
+                </li>
+          </ul>
+        </div>
+
+        <div *ngIf="!viewQuestionDto.proposedAnswers || viewQuestionDto.proposedAnswers.length === 0">
+          <p>No options provided for this question.</p>
+        </div>
+      </div>
+      <ng-template #noData>
+        <p>Question details not available.</p>
+      </ng-template>
+
+      <div slot="footer">
+        <button class="btn secondary" (click)="closeViewModal()">Close</button>
+      </div>
+    </ui-modal>
   `,
   styles: [`
     .question-bank {
@@ -426,16 +420,6 @@ interface Question {
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
-    .filter-bar {
-      margin-bottom: 1.5rem;
-    }
-
-    .filter-group {
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-      flex-wrap: wrap;
-    }
 
     .filter-select, .search-input {
       padding: 0.5rem 0.75rem;
@@ -875,6 +859,7 @@ export class TeacherQuestionBank implements OnInit {
   private readonly teacherApi = inject(TeacherApiService);
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly authStore = inject(AuthStoreService);
 
   // Loading states
   isLoading = false;
@@ -883,8 +868,11 @@ export class TeacherQuestionBank implements OnInit {
   // Teaching units from API (folders)
   teachingUnits: TeachingUnitDto[] = [];
 
+  // Cached counts per teaching unit
+  teachingUnitCounts: Record<string, number> = {};
+
   // Questions from selected teaching unit (from question bank API)
-  allQuestions: QuestionBankItemDto[] = [];
+  allQuestions: ExtendedQuestionBankItemDto[] = [];
 
   // Legacy folder structure (dynamically built from teaching units)
   folders: QuestionFolder[] = [
@@ -894,6 +882,8 @@ export class TeacherQuestionBank implements OnInit {
   // Questions mapped to legacy format for UI compatibility
   questions: Question[] = [];
   filteredQuestions: Question[] = [];
+  // Data passed directly to `ui-table` (ensures column keys match row props)
+  tableData: any[] = [];
 
   // Filter properties
   selectedSubject = '';
@@ -907,16 +897,34 @@ export class TeacherQuestionBank implements OnInit {
   itemsPerPage = 20;
   totalQuestions = 180;
 
+  // Table columns for ui-table
+  tableColumns = [
+    { key: 'text', label: 'Question', sortable: true, width: '40%' },
+    { key: 'subject', label: 'Subject', sortable: false, width: '15%' },
+    { key: 'difficulty', label: 'Difficulty', sortable: false, width: '10%' },
+    { key: 'used', label: 'Used', sortable: false, width: '10%' },
+    { key: 'lastEdit', label: 'Last edit', sortable: false, width: '15%' },
+    { key: 'actions', label: 'Actions', sortable: false, width: '10%' },
+  ];
+
+  // Sort state for ui-table
+  sortColumn: string | null = null;
+  sortDirection: 'asc' | 'desc' | null = null;
+
   // Modal states
   showNewMCQModal = false;
   showImportModal = false;
+  showViewModal = false;
+  viewQuestionDto: ExtendedQuestionBankItemDto | null = null;
   selectedFile: File | null = null;
+  // Edit state
+  editingQuestionId: string | null = null;
 
   // New question form
   newQuestion: any = {
     text: '',
-    subject: '',
-    difficulty: 'Medium',
+    teachingUnitId: '',
+    difficulty: 'LEVEL_3',
     answerType: 'single',
     options: [
       { text: '', isCorrect: true },
@@ -954,24 +962,61 @@ export class TeacherQuestionBank implements OnInit {
       ...this.teachingUnits.map(tu => ({
         id: tu.id,
         name: tu.name,
-        count: 0, // Will be updated when questions are loaded
+        count: this.teachingUnitCounts[tu.id] ?? 0,
       })),
     ];
   }
 
   async loadQuestionsForTeachingUnit(teachingUnitId: string): Promise<void> {
     if (!teachingUnitId || teachingUnitId === 'all') {
-      this.allQuestions = [];
-      this.mapQuestionsToLegacy();
+      // Load questions for ALL teaching units (parallel) and merge
+      this.isLoading = true;
+      try {
+        const tus = this.teachingUnits || [];
+        const promises = tus.map(tu =>
+          firstValueFrom(this.teacherApi.getQuestionBank(tu.id)).then(res => ({ res, tu }))
+        );
+        const results = await Promise.all(promises);
+        // flatten and attach teachingUnitId
+        const merged: ExtendedQuestionBankItemDto[] = [];
+        results.forEach(({ res, tu }) => {
+          const qs = (res.questions || []).map(q => ({ ...q, teachingUnitId: tu.id } as ExtendedQuestionBankItemDto));
+          merged.push(...qs);
+          // cache counts per TU
+          this.teachingUnitCounts[tu.id] = qs.length;
+          const folder = this.folders.find(f => f.id === tu.id);
+          if (folder) folder.count = qs.length;
+        });
+        this.allQuestions = merged;
+        // update All folder count
+        const total = Object.values(this.teachingUnitCounts).reduce((s, v) => s + v, 0);
+        const all = this.folders.find(f => f.id === 'all');
+        if (all) all.count = total;
+        this.mapQuestionsToLegacy();
+      } catch (err: unknown) {
+        console.error('Failed to load questions for all teaching units:', err);
+      } finally {
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      }
       return;
     }
 
     this.isLoading = true;
     try {
       const result = await firstValueFrom(
-        this.teacherApi.getTeachingUnitPastQuestions(teachingUnitId)
+        this.teacherApi.getQuestionBank(teachingUnitId)
       );
-      this.allQuestions = result.questions;
+      // attach teachingUnitId to each item so mapping knows its origin
+      this.allQuestions = (result.questions || []).map(q => ({ ...q, teachingUnitId } as ExtendedQuestionBankItemDto));
+      // update cached count for this teaching unit and folders
+      this.teachingUnitCounts[teachingUnitId] = result.questions.length;
+      const folder = this.folders.find(f => f.id === teachingUnitId);
+      if (folder) folder.count = result.questions.length;
+      // update All count
+      const total = Object.values(this.teachingUnitCounts).reduce((s, v) => s + v, 0);
+      const all = this.folders.find(f => f.id === 'all');
+      if (all) all.count = total;
       this.mapQuestionsToLegacy();
     } catch (err: unknown) {
       console.error('Failed to load past questions:', err);
@@ -984,18 +1029,26 @@ export class TeacherQuestionBank implements OnInit {
   mapQuestionsToLegacy(): void {
     // Map QuestionBankItemDto to the legacy Question interface for UI compatibility
     // Question bank items have difficultyLevel and usage tracking
-    this.questions = this.allQuestions.map((q, idx) => ({
-      id: q.questionId,
-      text: q.question,
-      type: this.mapQuestionType(q.type),
-      subject: this.getActiveTeachingUnitName(),
-      difficulty: this.mapDifficultyLevel(q.difficultyLevel),
-      options: q.proposedAnswers ?? [],
-      correctAnswer: q.proposedAnswers?.indexOf(q.correctAnswer ?? '') ?? 0,
-      usedCount: q.usageCount ?? 1,
-      lastEdit: q.createdAt ? new Date(q.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'N/A',
-      folderId: this.activeFolder,
-    }));
+    this.questions = this.allQuestions.map((q, idx) => {
+      const tu = this.teachingUnits.find(t => t.id === (q as any).teachingUnitId);
+      const subjectName = tu?.name ?? this.getActiveTeachingUnitName();
+      return {
+        id: q.questionId,
+        text: q.question,
+        type: this.mapQuestionType(q.type),
+        subject: subjectName,
+        difficulty: this.mapDifficultyLevel(q.difficultyLevel),
+        options: q.proposedAnswers ?? [],
+        correctAnswer: q.proposedAnswers?.indexOf(q.correctAnswer ?? '') ?? 0,
+        usedCount: q.usageCount ?? 1,
+        // also expose `used` to match the ui-table column key ('used')
+        used: q.usageCount ?? 1,
+        lastEdit: q.createdAt ? new Date(q.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'N/A',
+        folderId: (q as any).teachingUnitId ?? this.activeFolder,
+        authorId: q.createdById ?? null,
+        canEdit: !!(this.authStore.getSession()?.user?.entityId && q.createdById && this.authStore.getSession()!.user.entityId === q.createdById),
+      } as Question;
+    });
     this.applyFilters();
   }
 
@@ -1091,6 +1144,8 @@ export class TeacherQuestionBank implements OnInit {
     }
 
     this.filteredQuestions = filtered;
+    // Keep `tableData` in sync with filtered results; ui-table expects column keys like 'used'
+    this.tableData = filtered.map(q => ({ ...q }));
     this.totalQuestions = filtered.length;
   }
 
@@ -1109,12 +1164,18 @@ export class TeacherQuestionBank implements OnInit {
     return subject.toLowerCase().replace(/\s+/g, '-');
   }
 
+  getTeachingUnitDisplayName(teachingUnitId?: string | null): string {
+    if (!teachingUnitId) return this.getActiveTeachingUnitName();
+    const tu = this.teachingUnits.find(t => t.id === teachingUnitId);
+    return tu?.name ?? this.getActiveTeachingUnitName();
+  }
+
   // CRUD Operations
   createNewMCQ(): void {
     this.newQuestion = {
       text: '',
-      subject: '',
-      difficulty: 'Medium',
+      teachingUnitId: '',
+      difficulty: 'LEVEL_3',
       answerType: 'single',
       options: [
         { text: '', isCorrect: true },
@@ -1124,6 +1185,7 @@ export class TeacherQuestionBank implements OnInit {
       ]
     };
     this.showNewMCQModal = true;
+    this.editingQuestionId = null;
   }
 
   closeNewMCQModal(): void {
@@ -1131,7 +1193,7 @@ export class TeacherQuestionBank implements OnInit {
   }
 
   isNewQuestionValid(): boolean {
-    if (!this.newQuestion.text.trim() || !this.newQuestion.subject) return false;
+    if (!this.newQuestion.text.trim() || !this.newQuestion.teachingUnitId) return false;
 
     const validOptions = this.newQuestion.options.filter((opt: any) => opt.text.trim());
     const hasCorrectAnswer = this.newQuestion.options.some((opt: any) => opt.isCorrect);
@@ -1139,12 +1201,45 @@ export class TeacherQuestionBank implements OnInit {
     return validOptions.length >= 2 && hasCorrectAnswer;
   }
 
-  saveNewQuestion(): void {
-    if (this.isNewQuestionValid()) {
-      console.log('Creating new question:', this.newQuestion);
-      alert('Question created successfully!');
-      this.closeNewMCQModal();
-      // Here you would typically save to backend and refresh the list
+  async saveNewQuestion(): Promise<void> {
+    if (!this.isNewQuestionValid()) return;
+
+    const payload: CreateQuestionBankDto = {
+      question: String(this.newQuestion.text).trim(),
+      type: 'SINGLE_CHOICE',
+      difficultyLevel: this.newQuestion.difficulty as DifficultyLevel,
+      teachingUnitId: String(this.newQuestion.teachingUnitId),
+      proposedAnswers: this.newQuestion.options.map((o: any) => String(o.text).trim()),
+      correctAnswer: (() => {
+        const opt = this.newQuestion.options.find((o: any) => o.isCorrect);
+        return opt ? String(opt.text).trim() : undefined;
+      })(),
+    };
+
+    try {
+      if (this.editingQuestionId) {
+        // Update existing question
+        await firstValueFrom(this.teacherApi.updateQuestionInBank(this.editingQuestionId, {
+          question: payload.question,
+          difficultyLevel: payload.difficultyLevel,
+          proposedAnswers: payload.proposedAnswers,
+          correctAnswer: payload.correctAnswer,
+        }));
+        alert('Question updated successfully!');
+        this.closeNewMCQModal();
+        // Refresh current folder/all
+        await this.loadQuestionsForTeachingUnit(this.activeFolder === 'all' ? 'all' : payload.teachingUnitId);
+      } else {
+        const created = await firstValueFrom(this.teacherApi.createQuestionInBank(payload));
+        alert('Question created successfully!');
+        this.closeNewMCQModal();
+        if (this.activeFolder === payload.teachingUnitId || this.activeFolder === 'all') {
+          await this.loadQuestionsForTeachingUnit(payload.teachingUnitId);
+        }
+      }
+    } catch (err: unknown) {
+      console.error('Failed to save question in bank:', err);
+      alert('Failed to save question.');
     }
   }
 
@@ -1179,13 +1274,51 @@ export class TeacherQuestionBank implements OnInit {
   }
 
   editQuestion(question: Question): void {
-    console.log('Editing question:', question.id);
-    alert(`Edit question functionality would open editor for: ${question.text.substring(0, 50)}...`);
+    // Prefill modal with existing question data
+    const original = this.allQuestions.find(q => q.questionId === question.id);
+    const options = (original?.proposedAnswers ?? question.options ?? []).map((opt: any) => ({ text: opt, isCorrect: String(opt) === String(original?.correctAnswer ?? '') }));
+    // Ensure at least 2 options for UI
+    while (options.length < 2) options.push({ text: '', isCorrect: false });
+
+    this.newQuestion = {
+      text: question.text,
+      teachingUnitId: original?.teachingUnitId ?? question.folderId,
+      difficulty: original?.difficultyLevel ?? 'LEVEL_3',
+      answerType: question.type === 'Multi-answer' ? 'multiple' : 'single',
+      options,
+    };
+    this.editingQuestionId = question.id;
+    this.showNewMCQModal = true;
   }
 
   viewQuestion(question: Question): void {
-    console.log('Viewing question:', question.id);
-    alert(`View-only mode for: ${question.text.substring(0, 50)}...`);
+    // Find original DTO (to get full text, proposedAnswers, correctAnswer, createdByName)
+    const original = this.allQuestions.find(q => q.questionId === question.id) ?? null;
+    if (!original) {
+      // fallback to show simple view
+      this.viewQuestionDto = {
+        questionId: question.id,
+        question: question.text,
+        type: question.type === 'Essay' ? 'OPEN_ENDED' : 'SINGLE_CHOICE',
+        difficultyLevel: question.difficulty === 'Easy' ? 'LEVEL_2' : question.difficulty === 'Hard' ? 'LEVEL_4' : 'LEVEL_3',
+        proposedAnswers: question.options ?? [],
+        correctAnswer: question.options && question.correctAnswer !== undefined ? question.options[question.correctAnswer as number] : undefined,
+        createdById: question.authorId ?? null,
+        createdByName: null,
+        createdAt: new Date().toISOString(),
+        usageCount: question.usedCount ?? 0,
+        teachingUnitId: question.folderId,
+      } as ExtendedQuestionBankItemDto;
+    } else {
+      this.viewQuestionDto = original;
+    }
+
+    this.showViewModal = true;
+  }
+
+  closeViewModal(): void {
+    this.showViewModal = false;
+    this.viewQuestionDto = null;
   }
 
   // Import functionality
@@ -1230,5 +1363,54 @@ export class TeacherQuestionBank implements OnInit {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
     }
+  }
+
+  // ui-table handlers
+  onTablePageChange(page: number): void {
+    this.currentPage = page;
+  }
+
+  onTablePageSizeChange(size: number): void {
+    this.itemsPerPage = size;
+    this.currentPage = 1;
+  }
+
+  onTableSearch(term: string): void {
+    this.searchTerm = term || '';
+    this.applyFilters();
+  }
+
+  onSortChange(event: { column: string; direction: 'asc' | 'desc' | null }): void {
+    this.sortColumn = event.column;
+    this.sortDirection = event.direction;
+    // Re-apply filters (resets to current filtered set) then apply sort
+    this.applyFilters();
+    if (this.sortColumn && this.sortDirection) {
+      const dir = this.sortDirection === 'asc' ? 1 : -1;
+      this.filteredQuestions.sort((a: any, b: any) => {
+        const key = this.sortColumn as string;
+        const va = a[key];
+        const vb = b[key];
+        if (va == null && vb == null) return 0;
+        if (va == null) return -1 * dir;
+        if (vb == null) return 1 * dir;
+        // numeric compare for usedCount
+        if (key === 'used') {
+          return (Number(va) - Number(vb)) * dir;
+        }
+        // string compare
+        return String(va).localeCompare(String(vb)) * dir;
+      });
+      // update tableData so ui-table receives the sorted rows
+      this.tableData = this.filteredQuestions.map(q => ({ ...q }));
+    }
+    else {
+      // no sort: ensure tableData matches filteredQuestions
+      this.tableData = this.filteredQuestions.map(q => ({ ...q }));
+    }
+  }
+
+  getCellDefault(row: any, column: any): any {
+    return row[column.key];
   }
 }

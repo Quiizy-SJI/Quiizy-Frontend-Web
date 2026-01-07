@@ -1,4 +1,5 @@
 import { Component, inject, ChangeDetectorRef, OnInit, signal, computed } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterModule, Router } from '@angular/router';
@@ -383,6 +384,7 @@ import type { DropdownOption } from '../../../components/ui';
 export class TeacherCreateExam implements OnInit {
   private readonly teacherApi = inject(TeacherApiService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly cdr = inject(ChangeDetectorRef);
 
   // Reactive state using signals
@@ -437,6 +439,61 @@ export class TeacherCreateExam implements OnInit {
     // Load any saved data from previous session
     this.loadSavedData();
     await this.loadCourses();
+
+    // Handle incoming query params (edit / fromQuiz / draft)
+    this.handleQueryParams();
+  }
+
+  private async handleQueryParams(): Promise<void> {
+    const qp = this.route.snapshot.queryParamMap;
+    const editId = qp.get('edit') || qp.get('draft') || qp.get('fromQuiz');
+    if (!editId) return;
+
+    try {
+      this.isLoading.set(true);
+      const quiz = await firstValueFrom(this.teacherApi.getQuiz(String(editId)));
+
+      // Prefill step1 form
+      const courseId = quiz.courseQuizes?.[0]?.course?.id ?? '';
+      const step1 = {
+        courseId: courseId,
+        type: quiz.type,
+        lectures: Number(quiz.lectures) || 1,
+        date: String(quiz.date) || '',
+        durationMinutes: Number(quiz.durationMinutes) || 60,
+        teachingUnitId: quiz.courseQuizes?.[0]?.course?.teachingUnit?.id ?? '',
+        teachingUnitName: quiz.courseQuizes?.[0]?.course?.teachingUnit?.name ?? '',
+      };
+      sessionStorage.setItem('examFormStep1', JSON.stringify(step1));
+
+      // Prefill step2 questions (map CourseQuizQuestions to the local QuestionFormData shape)
+      const questions: Array<any> = [];
+      const courseQuizQuestions = quiz.courseQuizes?.[0]?.courseQuizQuestions ?? [];
+      for (const qq of courseQuizQuestions) {
+        if (!qq.question) continue;
+        questions.push({
+          question: qq.question.question,
+          type: qq.question.type,
+          proposedAnswers: qq.question.proposedAnswers ?? [],
+          correctAnswer: qq.question.correctAnswer ?? '',
+          markAllocation: Number(qq.markAllocation) || 1,
+        });
+      }
+      sessionStorage.setItem('examFormStep2', JSON.stringify({ questions }));
+
+      // Mark editing id so downstream steps can detect an edit intent
+      sessionStorage.setItem('examEditingId', String(editId));
+
+      // Navigate to step 2 so teacher can continue editing or reviewing questions
+      void this.router.navigate(['/teacher/create-exam/step2']);
+    } catch (err) {
+      // If fetch fails, keep user on the create page and show an error message
+      this.errorMessage.set('Failed to load quiz for editing. You can start a new quiz instead.');
+      console.warn('Failed to load quiz for edit/fromQuiz:', err);
+    } finally {
+      this.isLoading.set(false);
+      this.cdr.markForCheck();
+    }
   }
 
   private loadSavedData(): void {

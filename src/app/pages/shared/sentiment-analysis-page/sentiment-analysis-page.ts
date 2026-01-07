@@ -38,6 +38,13 @@ interface QuizOption {
   submittedCount: number;
 }
 
+type EnrichedAnalysis = SentimentAnalysisResponseDto & {
+  quiz?: any;
+  courseName?: string | null;
+  questionText?: string | null;
+  type?: string | null;
+};
+
 /**
  * Shared Sentiment Analysis Page Component
  *
@@ -103,6 +110,10 @@ export class SentimentAnalysisPage implements OnInit {
   readonly selectedQuizId = signal<string | null>(null);
   readonly analysisResult = signal<SentimentAnalysisResponseDto | null>(null);
   readonly existingAnalyses = signal<SentimentAnalysisResponseDto[]>([]);
+
+
+  readonly allAnalyses = signal<EnrichedAnalysis[]>([]);
+  readonly isLoadingAllAnalyses = signal(false);
 
   // ============================================
   // Computed Properties
@@ -213,6 +224,7 @@ export class SentimentAnalysisPage implements OnInit {
 
   ngOnInit(): void {
     this.loadQuizzes();
+    this.loadAllAnalyses();
   }
 
   // ============================================
@@ -291,6 +303,72 @@ export class SentimentAnalysisPage implements OnInit {
     } finally {
       this.isLoadingExisting.set(false);
     }
+  }
+
+  private async loadAllAnalyses(): Promise<void> {
+    this.isLoadingAllAnalyses.set(true);
+    try {
+      const analyses = await firstValueFrom(this.sentimentService.getAll());
+      // Enrich analyses with quiz metadata when possible
+      const quizIds = Array.from(new Set(analyses.map((a) => a.quizId).filter(Boolean)));
+
+      const isDeanRole = this.role() === 'dean' || this.router.url.includes('/dean');
+
+      const quizMap: Record<string, any> = {};
+
+      if (quizIds.length > 0) {
+        if (isDeanRole) {
+          try {
+            const quizzes = await firstValueFrom(this.deanApi.listQuizzes());
+            for (const q of quizzes) {
+              if (q?.id) quizMap[q.id] = q;
+            }
+          } catch (err) {
+            console.warn('Failed to load quizzes list for dean metadata enrichment', err);
+          }
+        } else {
+          // For teachers, fetch each quiz individually (teacher-scoped)
+          await Promise.all(
+            quizIds.map(async (id) => {
+              try {
+                const q = await firstValueFrom(this.teacherApi.getQuiz(id));
+                if (q?.id) quizMap[q.id] = q;
+              } catch (err) {
+                // ignore individual failures
+              }
+            })
+          );
+        }
+      }
+
+      // Attach found quiz metadata to the analyses objects (non-mutating copy)
+      const enriched = analyses.map((a) => {
+        const anyA = a as any;
+        const quizFromMap = quizMap[a.quizId as string];
+        const courseNameFromQuiz =
+          quizFromMap?.courseQuizes?.[0]?.course?.teachingUnit?.name ??
+          quizFromMap?.courseQuizes?.[0]?.course?.classAcademicYear?.class?.name ?? null;
+
+        const questionText = anyA.questionText ?? anyA.resultJson?.question ?? anyA.resultJson?.summary ?? null;
+        const quizType = quizFromMap?.type ?? anyA.type ?? null;
+
+        return ({
+          ...(anyA),
+          quiz: anyA.quiz ?? quizFromMap ?? null,
+          courseName: anyA.courseName ?? courseNameFromQuiz,
+          questionText,
+          type: quizType,
+        } as EnrichedAnalysis);
+      });
+
+      this.allAnalyses.set(enriched);
+    } catch (error) {
+      console.error('Error loading all analyses:', error);
+      this.allAnalyses.set([]);
+    } finally {
+      this.isLoadingAllAnalyses.set(false);
+    }
+
   }
 
   // ============================================

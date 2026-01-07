@@ -1295,6 +1295,7 @@ export class TeacherCreateExamStep2 implements OnInit {
   // Navigation
   goBack(): void {
     this.saveToSession();
+    this.persistSelectedTeachingUnitToStep1();
     this.router.navigate(['/teacher/create-exam']);
   }
 
@@ -1302,6 +1303,7 @@ export class TeacherCreateExamStep2 implements OnInit {
     if (this.questions().length === 0) return;
 
     this.saveToSession();
+    this.persistSelectedTeachingUnitToStep1();
     // Skip step 3 (settings not in API) and go directly to review (step 3 in new flow)
     this.router.navigate(['/teacher/create-exam/step3']);
   }
@@ -1310,5 +1312,25 @@ export class TeacherCreateExamStep2 implements OnInit {
     sessionStorage.setItem('examFormStep2', JSON.stringify({
       questions: this.questions(),
     }));
+  }
+
+  /**
+   * Persist selected teaching unit back into step1 storage so downstream steps
+   * (review/publish) can reliably derive the teachingUnitId when publishing.
+   */
+  private persistSelectedTeachingUnitToStep1(): void {
+    try {
+      const raw = sessionStorage.getItem('examFormStep1');
+      const step1 = raw ? JSON.parse(raw) : {};
+      // Only overwrite if we have a selectedTeachingUnitId
+      if (this.selectedTeachingUnitId) {
+        step1.teachingUnitId = String(this.selectedTeachingUnitId);
+        const tu = this.teachingUnits().find(t => t.id === this.selectedTeachingUnitId);
+        if (tu?.name) step1.teachingUnitName = tu.name;
+        sessionStorage.setItem('examFormStep1', JSON.stringify(step1));
+      }
+    } catch {
+      // ignore errors
+    }
   }
 }

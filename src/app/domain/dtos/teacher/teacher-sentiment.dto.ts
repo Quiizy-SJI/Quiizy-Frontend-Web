@@ -82,6 +82,11 @@ export interface SentimentAnalysisResponseDto {
   error?: string | null;
   createdAt: string;
   updatedAt: string;
+  // Optional runtime-enriched fields used by the UI
+  quiz?: any;
+  courseName?: string | null;
+  questionText?: string | null;
+  type?: string | null;
 }
 
 /**

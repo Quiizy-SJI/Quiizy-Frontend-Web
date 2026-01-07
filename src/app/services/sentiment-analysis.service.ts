@@ -135,6 +135,13 @@ export class SentimentAnalysisService {
     return this.api.post<SentimentAnalysisResponseDto>(this.basePath, payload);
   }
 
+  /**
+   * Get all sentiment analyses (site/instructor scope) — maps to /all endpoint
+   */
+  getAll(): Observable<SentimentAnalysisResponseDto[]> {
+    return this.api.get<SentimentAnalysisResponseDto[]>(`${this.basePath}/all/analysis`);
+  }
+
   // ============================================
   // Signal-based Methods
   // ============================================
