@@ -90,31 +90,6 @@
 
         <ui-card variant="outlined" class="panel">
             <div class="panel__header">
-                <div class="panel__title">Upcoming Exams</div>
-            </div>
-
-            <div class="calendar-header">{{ weekLabel }}</div>
-
-            <div class="calendar-weekdays">
-                @for (day of weekdays; track day) {
-                    <div class="weekday">{{ day }}</div>
-                }
-            </div>
-
-            <div class="exams-list">
-                @for (exam of upcomingExams; track exam.name) {
-                    <div class="exam-item" [class]="'exam-item exam-item--' + exam.tone">
-                        <div class="exam-name">{{ exam.name }}</div>
-                        <div class="exam-time">{{ exam.time }}</div>
-                    </div>
-                }
-            </div>
-        </ui-card>
-    </section>
-
-    <section class="dashboard__grid dashboard__grid--bottom">
-        <ui-card variant="outlined" class="panel">
-            <div class="panel__header">
                 <div class="panel__title">Recent Activity</div>
             </div>
 
@@ -129,45 +104,6 @@
                     </div>
                 }
             </div>
-        </ui-card>
-
-        <ui-card variant="outlined" class="panel">
-            <div class="panel__header">
-                <div class="panel__title">Critical Sentiment Alerts</div>
-                <div class="panel__subtitle">Essays flagged for immediate counselor review</div>
-            </div>
-
-            <ui-table
-                [columns]="sentimentColumns"
-                [data]="pagedSentimentData"
-                [loading]="loading"
-                [searchable]="true"
-                [showPagination]="true"
-                [pagination]="sentimentPagination"
-                (pageChange)="onSentimentPageChange($event)"
-                (pageSizeChange)="onSentimentPageSizeChange($event)"
-                emptyMessage=""
-            >
-                <ng-template #empty>
-                    <div class="table-empty">No critical alerts right now.</div>
-                </ng-template>
-
-                <ng-template #cell let-row let-column="column">
-                    @switch (column.key) {
-                        @case ('mood') {
-                            <ui-badge [color]="moodColor(row.mood)" variant="subtle">{{ row.mood }}</ui-badge>
-                        }
-                        @case ('actions') {
-                            <div class="table-actions">
-                                <ui-button size="sm" variant="soft" color="primary">Review</ui-button>
-                            </div>
-                        }
-                        @default {
-                            {{ row[column.key] }}
-                        }
-                    }
-                </ng-template>
-            </ui-table>
         </ui-card>
     </section>
 </div>
