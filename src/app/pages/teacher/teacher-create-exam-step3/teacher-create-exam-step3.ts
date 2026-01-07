@@ -199,7 +199,7 @@ interface Step2Data {
                 </div>
                 <p class="question-text">{{ q.question }}</p>
 
-                <div *ngIf="q.type !== 'OPEN_ENDED' && q.proposedAnswers?.length > 0" class="answer-preview">
+                <div *ngIf="q.type !== 'OPEN_ENDED' && q.proposedAnswers && q.proposedAnswers.length > 0" class="answer-preview">
                   <div *ngFor="let option of q.proposedAnswers; let j = index" class="answer-option" [class.correct]="option === q.correctAnswer">
                     <span class="option-letter">{{ getOptionLetter(j) }}</span>
                     <span class="option-text">{{ option }}</span>
