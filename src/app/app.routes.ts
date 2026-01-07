@@ -155,11 +155,11 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/mini-admin/head-teachers/head-teachers').then(m => m.HeadTeachers),
         title: 'Teachers'
       },
-      // {
-      //   path: 'sentiment-analysis',
-      //   loadComponent: () => import('./pages/shared/sentiment-analysis-page/sentiment-analysis-page').then(m => m.SentimentAnalysisPage),
-      //   title: 'Sentiment Analysis'
-      // },
+      {
+        path: 'sentiment-analysis',
+        loadComponent: () => import('./pages/shared/sentiment-analysis-page/sentiment-analysis-page').then(m => m.SentimentAnalysisPage),
+        title: 'Sentiment Analysis'
+      },
     ]
   }
 ];
