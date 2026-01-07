@@ -1,0 +1,246 @@
+// ============================================
+// Specialty Head Dashboard (Main Content Only)
+// ============================================
+
+.dashboard {
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+	padding: 0.5rem;
+}
+
+.dashboard__header {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 1rem;
+	flex-wrap: wrap;
+}
+
+.dashboard__title-section {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+}
+
+.dashboard__title {
+	font-size: 1.75rem;
+	font-weight: 700;
+	color: var(--text-primary);
+	margin: 0;
+}
+
+.dashboard__subtitle {
+	font-size: 0.875rem;
+	color: var(--text-tertiary);
+	margin: 0;
+}
+
+.dashboard__stats {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 1rem;
+
+	@media (max-width: 1100px) {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	@media (max-width: 600px) {
+		grid-template-columns: 1fr;
+	}
+}
+
+.dashboard__grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 1rem;
+	align-items: start;
+
+	@media (max-width: 1100px) {
+		grid-template-columns: 1fr;
+	}
+}
+
+.dashboard__grid--bottom {
+	grid-template-columns: 1fr 1fr;
+
+	@media (max-width: 1100px) {
+		grid-template-columns: 1fr;
+	}
+}
+
+.panel {
+	width: 100%;
+}
+
+.panel__header {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	padding: 0.25rem 0 1rem;
+}
+
+.panel__title {
+	font-size: 1rem;
+	font-weight: 700;
+	color: var(--text-primary);
+}
+
+.panel__subtitle {
+	font-size: 0.8125rem;
+	color: var(--text-tertiary);
+}
+
+// ============================================
+// Table helpers
+// ============================================
+
+.table-actions {
+	display: flex;
+	justify-content: flex-end;
+}
+
+.table-empty {
+	padding: 1rem 0;
+	color: var(--text-tertiary);
+	font-size: 0.875rem;
+}
+
+// ============================================
+// Upcoming exams widget
+// ============================================
+
+.calendar-header {
+	font-size: 0.75rem;
+	color: var(--text-tertiary);
+	margin-bottom: 0.75rem;
+}
+
+.calendar-weekdays {
+	display: grid;
+	grid-template-columns: repeat(7, 1fr);
+	gap: 0.5rem;
+	margin-bottom: 0.75rem;
+}
+
+.weekday {
+	text-align: center;
+	font-size: 0.75rem;
+	color: var(--text-tertiary);
+}
+
+.exams-list {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.exam-item {
+	padding: 0.75rem;
+	border-radius: 10px;
+	border: 1px solid var(--border-subtle);
+}
+
+.exam-item--info {
+	background: var(--surface-info);
+	border-color: var(--color-info-border);
+}
+
+.exam-item--success {
+	background: var(--surface-success);
+	border-color: var(--color-success-border);
+}
+
+.exam-item--warning {
+	background: var(--surface-warning);
+	border-color: var(--color-warning-border);
+}
+
+.exam-item--danger {
+	background: var(--surface-danger);
+	border-color: var(--color-danger-border);
+}
+
+.exam-name {
+	font-size: 0.875rem;
+	font-weight: 700;
+	color: var(--text-primary);
+}
+
+.exam-time {
+	font-size: 0.75rem;
+	color: var(--text-tertiary);
+	margin-top: 0.25rem;
+}
+
+// ============================================
+// Activity list
+// ============================================
+
+.activity-list {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+.activity-item {
+	display: flex;
+	gap: 0.75rem;
+	align-items: flex-start;
+}
+
+.activity-item__content {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+}
+
+.activity-item__message {
+	font-size: 0.875rem;
+	color: var(--text-primary);
+}
+
+.activity-item__time {
+	font-size: 0.75rem;
+	color: var(--text-tertiary);
+}
+
+.dot {
+	width: 10px;
+	height: 10px;
+	border-radius: 999px;
+	margin-top: 0.35rem;
+	flex: 0 0 10px;
+}
+
+.dot--info {
+	background: var(--color-info);
+}
+
+.dot--success {
+	background: var(--color-success);
+}
+
+.dot--warning {
+	background: var(--color-warning);
+}
+
+.dot--danger {
+	background: var(--color-danger);
+}
+
+.dot--primary {
+	background: var(--color-primary);
+}
+
+.dot--neutral {
+	background: var(--text-tertiary);
+}
+
+.dot--secondary {
+	background: var(--color-secondary);
+}
+
+.dot--accent {
+	background: var(--color-accent);
+}

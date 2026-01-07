@@ -23,7 +23,7 @@ export const roleRedirectGuard: CanActivateFn = () => {
       break;
     case 'SPECIALITY_HEAD':
       // Add mini-admin route when implemented
-      void router.navigateByUrl('/showcase');
+      void router.navigateByUrl('/head');
       break;
     case 'STUDENT':
       // Add student route when implemented

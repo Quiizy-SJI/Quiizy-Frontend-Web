@@ -42,6 +42,10 @@ export interface ClassDto {
   id: string;
   name: string;
   level?: string;
+  speciality?: {
+    id: string;
+    name: string;
+  }
 }
 
 export interface AcademicYearDto {

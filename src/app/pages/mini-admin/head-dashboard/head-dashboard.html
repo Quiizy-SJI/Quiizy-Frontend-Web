@@ -1,0 +1,157 @@
+<div class="dashboard">
+    <header class="dashboard__header">
+        <div class="dashboard__title-section">
+            <h1 class="dashboard__title">Dashboard Overview</h1>
+            <p class="dashboard__subtitle">Monitor classes, students and teachers</p>
+        </div>
+        <ui-select
+        label="Scope"
+        [options]="academicYearOptions()"
+        (ngModelChange)="onFilterChanged()"
+        [searchable]="true"
+      ></ui-select>
+    </header>
+        <!-- [(ngModel)]="selectedAcademicYearId" -->
+
+    @if (errorMessage) {
+    <ui-alert type="danger" variant="outlined">
+      {{ errorMessage }}
+    </ui-alert>
+  }
+
+    <section class="dashboard__stats">
+        <ui-stat-card
+            label="Classes Managed"
+            [value]="stats.classesManaged"
+            color="primary"
+            icon="class"
+            format="number"
+        ></ui-stat-card>
+        <ui-stat-card
+            label="Students"
+            [value]="stats.students"
+            color="accent"
+            icon="star"
+            format="number"
+        ></ui-stat-card>
+        <ui-stat-card
+            label="Teachers"
+            [value]="stats.teachers"
+            color="info"
+            icon="groups"
+            format="number"
+        ></ui-stat-card>
+        <ui-stat-card
+            label="Upcoming Exams"
+            [value]="stats.upcomingExams"
+            color="warning"
+            icon="warning"
+            format="number"
+        ></ui-stat-card>
+    </section>
+
+    <section class="dashboard__grid">
+        <ui-card variant="outlined" class="panel">
+            <div class="panel__header">
+                <div class="panel__title">Classes Overview</div>
+                <div class="panel__subtitle">Teacher/class assignments are completed by specialty heads.</div>
+            </div>
+
+            <ui-table
+                [columns]="classesColumns"
+                [data]="classesData"
+                [searchable]="false"
+            >
+                <ng-template #cell let-row let-column="column">
+                    @switch (column.key) {
+                        @case ('actions') {
+                            <div class="table-actions">
+                                <ui-button size="sm" variant="soft" color="primary">View</ui-button>
+                            </div>
+                        }
+                        @default {
+                            {{ row[column.key] }}
+                        }
+                    }
+                </ng-template>
+            </ui-table>
+        </ui-card>
+
+        <ui-card variant="outlined" class="panel">
+            <div class="panel__header">
+                <div class="panel__title">Upcoming Exams</div>
+            </div>
+
+            <div class="calendar-header">{{ weekLabel }}</div>
+
+            <div class="calendar-weekdays">
+                @for (day of weekdays; track day) {
+                    <div class="weekday">{{ day }}</div>
+                }
+            </div>
+
+            <div class="exams-list">
+                @for (exam of upcomingExams; track exam.name) {
+                    <div class="exam-item" [class]="'exam-item exam-item--' + exam.tone">
+                        <div class="exam-name">{{ exam.name }}</div>
+                        <div class="exam-time">{{ exam.time }}</div>
+                    </div>
+                }
+            </div>
+        </ui-card>
+    </section>
+
+    <section class="dashboard__grid dashboard__grid--bottom">
+        <ui-card variant="outlined" class="panel">
+            <div class="panel__header">
+                <div class="panel__title">Recent Activity</div>
+            </div>
+
+            <div class="activity-list">
+                @for (item of activity; track item.message) {
+                    <div class="activity-item">
+                        <span [class]="activityDotClass(item.tone)"></span>
+                        <div class="activity-item__content">
+                            <div class="activity-item__message">{{ item.message }}</div>
+                            <div class="activity-item__time">{{ item.timeAgo }}</div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </ui-card>
+
+        <ui-card variant="outlined" class="panel">
+            <div class="panel__header">
+                <div class="panel__title">Critical Sentiment Alerts</div>
+                <div class="panel__subtitle">Essays flagged for immediate counselor review</div>
+            </div>
+
+            <ui-table
+                [columns]="sentimentColumns"
+                [data]="sentimentData"
+                [searchable]="false"
+                emptyMessage=""
+            >
+                <ng-template #empty>
+                    <div class="table-empty">No critical alerts right now.</div>
+                </ng-template>
+
+                <ng-template #cell let-row let-column="column">
+                    @switch (column.key) {
+                        @case ('mood') {
+                            <ui-badge [color]="moodColor(row.mood)" variant="subtle">{{ row.mood }}</ui-badge>
+                        }
+                        @case ('actions') {
+                            <div class="table-actions">
+                                <ui-button size="sm" variant="soft" color="primary">Review</ui-button>
+                            </div>
+                        }
+                        @default {
+                            {{ row[column.key] }}
+                        }
+                    }
+                </ng-template>
+            </ui-table>
+        </ui-card>
+    </section>
+</div>

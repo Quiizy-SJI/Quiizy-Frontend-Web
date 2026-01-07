@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { deanGuard } from './core/auth/dean.guard';
 import { teacherGuard } from './core/auth/teacher.guard';
 import { roleRedirectGuard } from './core/auth/role-redirect.guard';
+import { headGuard } from './core/auth/head.guard';
 
 export const routes: Routes = [
   {
@@ -122,6 +123,43 @@ export const routes: Routes = [
         redirectTo: 'create-exam/step3',
         pathMatch: 'full'
       },
+    ]
+  },
+  {
+    path: 'head',
+    canActivate: [headGuard],
+    loadComponent: () => import("./pages/mini-admin/head-layout/head-layout").then(m => m.HeadLayout),
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./pages/mini-admin/head-dashboard/head-dashboard').then(m => m.HeadDashboard),
+        title: 'Specialty Head Dashboard'
+      },
+      {
+        path: 'classes',
+        loadComponent: () => import('./pages/mini-admin/head-classes/head-classes').then(m => m.HeadClasses),
+        title: 'Class Management'
+     },
+      {
+        path: 'students',
+        loadComponent: () => import('./pages/mini-admin/head-students/head-students').then(m => m.HeadStudents),
+        title: 'Students'
+      },
+      {
+        path: 'courses',
+        loadComponent: () => import('./pages/mini-admin/head-courses/head-courses').then(m => m.HeadCourses),
+        title: 'Courses'
+      },
+      {
+        path: 'teachers',
+        loadComponent: () => import('./pages/mini-admin/head-teachers/head-teachers').then(m => m.HeadTeachers),
+        title: 'Teachers'
+      },
+      // {
+      //   path: 'sentiment-analysis',
+      //   loadComponent: () => import('./pages/shared/sentiment-analysis-page/sentiment-analysis-page').then(m => m.SentimentAnalysisPage),
+      //   title: 'Sentiment Analysis'
+      // },
     ]
   }
 ];

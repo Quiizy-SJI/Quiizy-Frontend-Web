@@ -60,7 +60,7 @@ export class Login implements OnInit, OnDestroy {
   // Role options for the select dropdown
   roleOptions: DropdownOption<Role>[] = [
     { value: 'TEACHER', label: 'Teacher', icon: '👨‍🏫' },
-    { value: 'SPECIALITY_HEAD', label: 'Speciality Head (Speciality Head)', icon: '📋' },
+    { value: 'SPECIALITY_HEAD', label: 'Speciality Head', icon: '📋' },
     { value: 'DEAN', label: 'Dean (Administrator)', icon: '🏛️' }
   ];
 
@@ -199,8 +199,7 @@ export class Login implements OnInit, OnDestroy {
       case 'TEACHER':
         return '/teacher';
       case 'SPECIALITY_HEAD':
-        // Mini-admin web routes not yet implemented
-        return '/showcase';
+        return '/head';
       case 'STUDENT':
         // Student web routes not yet implemented
         return '/showcase';

@@ -1,0 +1,213 @@
+<div class="courses">
+  <header class="courses__header">
+    <div class="courses__title-section">
+      <h1 class="courses__title">Course Management</h1>
+      <p class="courses__subtitle">Create and assign courses to classes &amp; teachers</p>
+    </div>
+
+    <div class="courses__header-actions">
+      <ui-button color="primary" variant="solid" size="sm" (clicked)="openCreate()">
+        + Create Course
+      </ui-button>
+
+      <ui-select
+        label="Select academic year"
+        [options]="academicYearOptions()"
+        [(ngModel)]="selectedAcademicYearId"
+        (ngModelChange)="applyFilters()"
+        [searchable]="true"
+      ></ui-select>
+
+      <ui-select
+        label="Select level"
+        [options]="levelOptions()"
+        [(ngModel)]="selectedLevel"
+        (ngModelChange)="applyFilters()"
+        [searchable]="true"
+      ></ui-select>
+    </div>
+  </header>
+
+  @if (errorMessage) {
+    <ui-alert type="danger" variant="outlined">{{ errorMessage }}</ui-alert>
+  }
+
+  @if (infoMessage) {
+    <ui-alert type="info" variant="outlined">{{ infoMessage }}</ui-alert>
+  }
+
+  <div class="courses__toolbar">
+    <ui-button
+      color="success"
+      variant="soft"
+      size="sm"
+      [disabled]="selectedRows.length === 0"
+      (clicked)="archiveSelected()"
+    >
+      Archive Selected
+    </ui-button>
+
+    <ui-button color="warning" variant="soft" size="sm" (clicked)="importExcel()">
+      Import Excel
+    </ui-button>
+
+    <ui-button color="secondary" variant="soft" size="sm" (clicked)="exportExcel()">
+      Export Excel
+    </ui-button>
+  </div>
+
+  <section class="courses__grid">
+    <ui-card variant="outlined" class="panel">
+      <div class="panel__header">
+        <div class="panel__title">Courses Directory</div>
+        <div class="panel__subtitle">View teaching unit, class, credits and assigned teacher.</div>
+      </div>
+
+      <ui-table
+        [columns]="columns"
+        [data]="filteredRows"
+        [loading]="loading"
+        [searchable]="false"
+        [selectable]="true"
+        [rowClickable]="true"
+        trackByKey="id"
+        (rowClick)="onRowClick($event.row)"
+        (selectionChange)="onSelectionChange($event)"
+      >
+        <ng-template #cell let-row let-column="column">
+          @switch (column.key) {
+            @case ('actions') {
+              <div class="table-actions">
+                <ui-button size="sm" variant="soft" color="primary" (clicked)="selectRow(row)">View</ui-button>
+                <ui-button size="sm" variant="soft" color="secondary" (clicked)="openEdit(row)">Edit</ui-button>
+                <ui-button size="sm" variant="soft" color="danger" (clicked)="openDelete(row)">Delete</ui-button>
+              </div>
+            }
+            @default {
+              {{ row[column.key] }}
+            }
+          }
+        </ng-template>
+
+        <ng-template #empty>
+          <div class="table-empty">No courses found for this scope.</div>
+        </ng-template>
+      </ui-table>
+    </ui-card>
+
+    <ui-card variant="outlined" class="panel">
+      <div class="panel__header">
+        <div class="panel__title">Course Detail</div>
+      </div>
+
+      @if (!selectedRow) {
+        <div class="detail-empty">Select a course to view details.</div>
+      } @else {
+        <div class="detail">
+          <div class="detail__top">
+            <div class="detail__name">{{ selectedRow.teachingUnitName }}</div>
+            <div class="detail__meta">
+              <ui-badge color="primary" variant="subtle">{{ selectedRow.className }}</ui-badge>
+              <ui-badge color="neutral" variant="subtle">Credits {{ selectedRow.credits }}</ui-badge>
+              @if (selectedRow.academicYearLabel) {
+                <ui-badge color="neutral" variant="subtle">{{ selectedRow.academicYearLabel }}</ui-badge>
+              }
+            </div>
+          </div>
+
+          <div class="detail__fields">
+            <div class="detail-field">
+              <div class="detail-field__label">Teacher</div>
+              <div class="detail-field__value">{{ selectedRow.teacherName }}</div>
+            </div>
+            <div class="detail-field">
+              <div class="detail-field__label">Level</div>
+              <div class="detail-field__value">{{ selectedRow.level || '—' }}</div>
+            </div>
+            <div class="detail-field">
+              <div class="detail-field__label">Academic year</div>
+              <div class="detail-field__value">{{ selectedRow.academicYearLabel || '—' }}</div>
+            </div>
+          </div>
+
+          <div class="detail__actions">
+            <ui-button color="secondary" variant="soft" size="sm" (clicked)="openEdit()">Edit Course</ui-button>
+            <ui-button color="danger" variant="soft" size="sm" (clicked)="openDelete()">Delete Course</ui-button>
+          </div>
+        </div>
+      }
+    </ui-card>
+  </section>
+
+  <section class="courses__bottom">
+    <ui-card variant="outlined" class="panel">
+      <div class="panel__header">
+        <div class="panel__title">Recent Activity</div>
+      </div>
+
+      <div class="activity-list">
+        @for (item of activity; track item.message) {
+          <div class="activity-item">
+            <span [class]="activityDotClass(item.tone)"></span>
+            <div class="activity-item__content">
+              <div class="activity-item__message">{{ item.message }}</div>
+              <div class="activity-item__time">{{ item.timeAgo }}</div>
+            </div>
+          </div>
+        }
+      </div>
+    </ui-card>
+  </section>
+
+  <!-- Create modal -->
+  <ui-modal [isOpen]="createOpen" title="Create Course" [showFooter]="true" (closed)="createOpen = false">
+    <div class="modal-form">
+      <ui-input label="Teaching unit" [(ngModel)]="draftTeachingUnitName" placeholder="e.g., Database Systems"></ui-input>
+      <ui-input label="Credits" type="number" [(ngModel)]="draftCredits" placeholder="3"></ui-input>
+      <ui-input label="Level" [(ngModel)]="draftLevel" placeholder="e.g., 4"></ui-input>
+      <ui-select label="Class" [options]="classOptions()" [(ngModel)]="draftClassAcademicYearId" [searchable]="true"></ui-select>
+      <ui-select label="Teacher" [options]="teacherOptions()" [(ngModel)]="draftTeacherId" [searchable]="true"></ui-select>
+    </div>
+
+    <div slot="footer" class="modal-actions">
+      <ui-button variant="soft" color="neutral" (clicked)="createOpen = false">Cancel</ui-button>
+      <ui-button color="primary" (clicked)="confirmCreate()">Create</ui-button>
+    </div>
+  </ui-modal>
+
+  <!-- Edit modal -->
+  <ui-modal [isOpen]="editOpen" title="Edit Course" [showFooter]="true" (closed)="editOpen = false">
+    <div class="modal-form">
+      <ui-input label="Teaching unit" [(ngModel)]="draftTeachingUnitName"></ui-input>
+      <ui-input label="Credits" type="number" [(ngModel)]="draftCredits"></ui-input>
+      <ui-input label="Level" [(ngModel)]="draftLevel"></ui-input>
+      <ui-select label="Class" [options]="classOptions()" [(ngModel)]="draftClassAcademicYearId" [searchable]="true"></ui-select>
+      <ui-select label="Teacher" [options]="teacherOptions()" [(ngModel)]="draftTeacherId" [searchable]="true"></ui-select>
+    </div>
+
+    <div slot="footer" class="modal-actions">
+      <ui-button variant="soft" color="neutral" (clicked)="editOpen = false">Cancel</ui-button>
+      <ui-button color="primary" (clicked)="confirmEdit()">Save</ui-button>
+    </div>
+  </ui-modal>
+
+  <!-- Delete modal -->
+  <ui-modal
+    [isOpen]="deleteOpen"
+    title="Delete Course"
+    description="This will remove the course from the list (UI only)."
+    [showFooter]="true"
+    (closed)="deleteOpen = false"
+  >
+    <div class="delete-confirm">
+      @if (selectedRow) {
+        Are you sure you want to delete <strong>{{ selectedRow.teachingUnitName }}</strong>?
+      }
+    </div>
+
+    <div slot="footer" class="modal-actions">
+      <ui-button variant="soft" color="neutral" (clicked)="deleteOpen = false">Cancel</ui-button>
+      <ui-button color="danger" (clicked)="confirmDelete()">Delete</ui-button>
+    </div>
+  </ui-modal>
+</div>
