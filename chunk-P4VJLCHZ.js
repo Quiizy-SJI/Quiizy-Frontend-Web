@@ -1,0 +1,1 @@
+import{P as r,Z as o,e as n,ha as s}from"./chunk-T26DWB6S.js";function w(t){t||(t=o(s));let i=new n(e=>{if(t.destroyed){e.next();return}return t.onDestroy(e.next.bind(e))});return e=>e.pipe(r(i))}export{w as a};
