@@ -167,10 +167,13 @@ export class StatisticsService {
       ? (stats.participation.completed / totalParticipation) * 100
       : 0;
 
+    const notMissed = totalParticipation - 
+      stats.participation.completed
+
     // participationRate as percent of total enrolled students.
     // Clamp to 100% to avoid values >100% when invitations count students multiple times across quizzes.
     const participationRate = stats.totals.students > 0
-      ? Math.min(100, (totalParticipation / stats.totals.students) * 100)
+      ? Math.min(100, (notMissed / totalParticipation) * 100)
       : 0;
 
     return [
