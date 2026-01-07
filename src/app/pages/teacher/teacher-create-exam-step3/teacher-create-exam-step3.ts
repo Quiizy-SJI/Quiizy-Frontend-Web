@@ -102,21 +102,17 @@ interface Step2Data {
       </ui-card>
 
       <!-- Loading State -->
-      @if (isLoading()) {
-        <div class="loading-state">
-          <ui-spinner size="lg" />
-          <p>Loading quiz details...</p>
-        </div>
-      }
+      <div *ngIf="isLoading()" class="loading-state">
+        <ui-spinner size="lg"></ui-spinner>
+        <p>Loading quiz details...</p>
+      </div>
 
       <!-- Error State -->
-      @if (errorMessage()) {
-        <ui-alert variant="filled" color="danger">
-          {{ errorMessage() }}
-        </ui-alert>
-      }
+      <ui-alert *ngIf="errorMessage()" variant="filled" color="danger">
+        {{ errorMessage() }}
+      </ui-alert>
 
-      @if (!isLoading() && !errorMessage()) {
+      <ng-container *ngIf="!isLoading() && !errorMessage()">
         <!-- Quiz Summary -->
         <ui-card variant="elevated" title="Quiz Summary">
           <div class="summary-grid">
@@ -192,8 +188,8 @@ interface Step2Data {
         <!-- Questions Preview -->
         <ui-card variant="elevated" title="Questions Preview">
           <div class="questions-preview">
-            @for (q of questions(); track $index; let i = $index) {
-              <div class="question-preview-item">
+            <div *ngFor="let q of questions(); let i = index" class="question-preview-item">
+              <div class="question-preview-item-inner">
                 <div class="question-preview-header">
                   <span class="question-number">Q{{ i + 1 }}</span>
                   <ui-badge [color]="getQuestionTypeColor(q.type)" size="sm">
@@ -203,37 +199,27 @@ interface Step2Data {
                 </div>
                 <p class="question-text">{{ q.question }}</p>
 
-                @if (q.type !== 'OPEN_ENDED' && q.proposedAnswers.length > 0) {
-                  <div class="answer-preview">
-                    @for (option of q.proposedAnswers; track $index; let j = $index) {
-                      <div class="answer-option" [class.correct]="option === q.correctAnswer">
-                        <span class="option-letter">{{ getOptionLetter(j) }}</span>
-                        <span class="option-text">{{ option }}</span>
-                        @if (option === q.correctAnswer) {
-                          <mat-icon class="correct-icon">check_circle</mat-icon>
-                        }
-                      </div>
-                    }
+                <div *ngIf="q.type !== 'OPEN_ENDED' && q.proposedAnswers?.length > 0" class="answer-preview">
+                  <div *ngFor="let option of q.proposedAnswers; let j = index" class="answer-option" [class.correct]="option === q.correctAnswer">
+                    <span class="option-letter">{{ getOptionLetter(j) }}</span>
+                    <span class="option-text">{{ option }}</span>
+                    <mat-icon *ngIf="option === q.correctAnswer" class="correct-icon">check_circle</mat-icon>
                   </div>
-                }
+                </div>
 
-                @if (q.type === 'TRUE_FALSE') {
-                  <div class="tf-answer">
-                    <span class="answer-label">Answer:</span>
-                    <ui-badge [color]="q.correctAnswer === 'true' ? 'success' : 'danger'" size="sm">
-                      {{ q.correctAnswer === 'true' ? 'True' : 'False' }}
-                    </ui-badge>
-                  </div>
-                }
+                <div *ngIf="q.type === 'TRUE_FALSE'" class="tf-answer">
+                  <span class="answer-label">Answer:</span>
+                  <ui-badge [color]="q.correctAnswer === 'true' ? 'success' : 'danger'" size="sm">
+                    {{ q.correctAnswer === 'true' ? 'True' : 'False' }}
+                  </ui-badge>
+                </div>
 
-                @if (q.type === 'OPEN_ENDED') {
-                  <div class="open-ended-note">
-                    <mat-icon>edit_note</mat-icon>
-                    <span>Open-ended response (for sentiment analysis)</span>
-                  </div>
-                }
+                <div *ngIf="q.type === 'OPEN_ENDED'" class="open-ended-note">
+                  <mat-icon>edit_note</mat-icon>
+                  <span>Open-ended response (for sentiment analysis)</span>
+                </div>
               </div>
-            }
+            </div>
           </div>
         </ui-card>
 
@@ -273,7 +259,7 @@ interface Step2Data {
             {{ isPublishing() ? 'Publishing...' : 'Publish Quiz' }}
           </ui-button>
         </div>
-      }
+      </ng-container>
     </div>
   `,
   styles: [`
@@ -632,9 +618,10 @@ export class TeacherCreateExamStep3 implements OnInit {
     const courseId = this.step1Data()?.courseId;
     if (!courseId) return 'Not selected';
     const course = this.courses().find(c => c.id === courseId);
-    if (!course) return 'Unknown Course';
-    const tuName = course.teachingUnit?.name ?? this.step1Data()?.teachingUnitName ?? '';
-    const className = course.classAcademicYear?.class?.name ?? '';
+    // Prefer the course's teaching unit name when available, otherwise fall back
+    // to the teachingUnitName we persisted from step 2. If neither exist, show a sensible default.
+    const tuName = course?.teachingUnit?.name ?? this.step1Data()?.teachingUnitName ?? 'Unknown Course';
+    const className = course?.classAcademicYear?.class?.name ?? '';
     return className ? `${tuName} — ${className}` : tuName;
   });
 
@@ -816,14 +803,20 @@ export class TeacherCreateExamStep3 implements OnInit {
             markAllocation: Number(q.markAllocation),
           };
         }),
-        // Publish immediately after creation
-        publishImmediately: true,
       };
-
       // Debug: Log the payload
       console.log('Publishing quiz with payload:', JSON.stringify(dto, null, 2));
 
-      await firstValueFrom(this.teacherApi.createQuiz(dto));
+      // Create the quiz (DRAFT)
+      const created = await firstValueFrom(this.teacherApi.createQuiz(dto));
+
+      // If creation succeeded, publish immediately by calling the publish endpoint
+      try {
+        await firstValueFrom(this.teacherApi.publishQuiz(created.id));
+      } catch (pubErr) {
+        console.error('Quiz created but failed to publish:', pubErr);
+        throw pubErr;
+      }
 
       // Clear wizard data
       sessionStorage.removeItem('examFormStep1');
@@ -832,8 +825,21 @@ export class TeacherCreateExamStep3 implements OnInit {
       alert('Quiz published successfully! Students have been invited.');
       this.router.navigate(['/teacher/exam-manager']);
     } catch (err: unknown) {
-      console.error('Failed to publish quiz:', err);
-      const message = err instanceof Error ? err.message : 'Failed to publish quiz. Please try again.';
+      // Improved error logging to surface backend validation or service messages
+      const anyErr = err as any;
+      console.error('Failed to publish quiz:', anyErr);
+
+      // If it's an HTTP error from Angular HttpClient, try to show server body and status
+      const status = anyErr?.status ?? null;
+      const serverBody = anyErr?.error ?? anyErr?.message ?? anyErr;
+
+      if (status) console.error('HTTP status:', status);
+      if (serverBody) console.error('Server response body:', serverBody);
+
+      // Prefer server-provided message when available
+      const message = (serverBody && (serverBody.message || serverBody.error || JSON.stringify(serverBody)))
+        || (anyErr instanceof Error ? anyErr.message : 'Failed to publish quiz. Please try again.');
+
       alert(message);
     } finally {
       this.isPublishing.set(false);
