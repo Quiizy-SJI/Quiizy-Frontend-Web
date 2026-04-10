@@ -26,8 +26,7 @@ export const roleRedirectGuard: CanActivateFn = () => {
       void router.navigateByUrl('/head');
       break;
     case 'STUDENT':
-      // Add student route when implemented
-      void router.navigateByUrl('/showcase');
+      void router.navigateByUrl('/student/chat');
       break;
     default:
       void router.navigateByUrl('/login');

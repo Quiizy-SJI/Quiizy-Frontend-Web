@@ -1,0 +1,141 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  padding: clamp(1rem, 1vw + 0.8rem, 1.8rem);
+  background:
+    radial-gradient(circle at 12% 20%, rgba(30, 136, 229, 0.16), transparent 38%),
+    radial-gradient(circle at 86% 82%, rgba(0, 150, 136, 0.14), transparent 34%),
+    linear-gradient(140deg, #f5fbff 0%, #f2fff9 100%);
+}
+
+.student-chat-page {
+  max-width: 1040px;
+  margin: 0 auto;
+  display: grid;
+  gap: 1rem;
+}
+
+.student-chat-page__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+
+  h1 {
+    margin: 0;
+    font-size: clamp(1.4rem, 1vw + 1.1rem, 2rem);
+    letter-spacing: -0.02em;
+  }
+
+  p {
+    margin: 0.35rem 0 0;
+    color: var(--text-secondary, #5b6471);
+  }
+}
+
+.student-chat-page__header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.student-chat-page__student-name {
+  color: var(--text-secondary, #5b6471);
+  font-weight: 600;
+}
+
+.student-chat-page__card {
+  display: grid;
+  gap: 1rem;
+  min-height: 72vh;
+}
+
+.student-chat-page__messages {
+  display: grid;
+  gap: 0.7rem;
+  align-content: start;
+  max-height: 62vh;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.student-chat-page__message {
+  border-radius: 14px;
+  padding: 0.78rem 0.92rem;
+  border: 1px solid transparent;
+  width: min(90%, 800px);
+}
+
+.student-chat-page__message--assistant {
+  justify-self: start;
+  background: #ffffff;
+  border-color: #dce8f8;
+  box-shadow: 0 8px 18px rgba(29, 73, 140, 0.07);
+}
+
+.student-chat-page__message--student {
+  justify-self: end;
+  background: linear-gradient(135deg, #0a7ccf, #139a8a);
+  color: #fff;
+}
+
+.student-chat-page__message-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  font-size: 0.78rem;
+  opacity: 0.85;
+}
+
+.student-chat-page__message-author {
+  font-weight: 700;
+}
+
+.student-chat-page__message-text {
+  margin: 0.45rem 0 0;
+  white-space: pre-wrap;
+  line-height: 1.46;
+}
+
+.student-chat-page__typing {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--text-secondary, #5b6471);
+  font-size: 0.9rem;
+}
+
+.student-chat-page__composer {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 0.75rem;
+}
+
+@media (max-width: 720px) {
+  :host {
+    padding: 0.8rem;
+  }
+
+  .student-chat-page__header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .student-chat-page__header-actions {
+    justify-content: space-between;
+  }
+
+  .student-chat-page__message {
+    width: 100%;
+  }
+
+  .student-chat-page__messages {
+    max-height: 56vh;
+  }
+
+  .student-chat-page__composer {
+    grid-template-columns: 1fr;
+  }
+}

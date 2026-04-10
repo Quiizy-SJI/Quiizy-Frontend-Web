@@ -1,0 +1,82 @@
+<section class="student-chat-page">
+  <header class="student-chat-page__header">
+    <div>
+      <h1>Student AI Chat</h1>
+      <p>Ask anything about your academic context. Comming soon to your Whatsapp chatalist</p>
+    </div>
+
+    <div class="student-chat-page__header-actions">
+      <span class="student-chat-page__student-name">{{ studentName }}</span>
+      <ui-button
+        variant="ghost"
+        color="danger"
+        [loading]="isLoggingOut"
+        [disabled]="isLoggingOut"
+        (clicked)="logout()"
+      >
+        Logout
+      </ui-button>
+    </div>
+  </header>
+
+  <ui-alert
+    *ngIf="errorMessage"
+    variant="soft"
+    color="danger"
+    [title]="'Chat error'"
+    [dismissible]="true"
+    (dismissed)="errorMessage = ''"
+  >
+    {{ errorMessage }}
+  </ui-alert>
+
+  <ui-card class="student-chat-page__card" variant="elevated" padding="lg">
+    <div class="student-chat-page__messages" role="log" aria-live="polite">
+      <article
+        *ngFor="let message of messages"
+        class="student-chat-page__message"
+        [class.student-chat-page__message--student]="message.role === 'student'"
+        [class.student-chat-page__message--assistant]="message.role === 'assistant'"
+      >
+        <header class="student-chat-page__message-meta">
+          <span class="student-chat-page__message-author">
+            {{ message.role === 'assistant' ? 'Quizzy AI' : 'You' }}
+          </span>
+          <span class="student-chat-page__message-time">
+            {{ message.createdAt | date: 'shortTime' }}
+            <ng-container *ngIf="message.language">
+              · {{ message.language }}
+            </ng-container>
+          </span>
+        </header>
+        <p class="student-chat-page__message-text">{{ message.text }}</p>
+      </article>
+
+      <div *ngIf="isSending" class="student-chat-page__typing" aria-label="Assistant is typing">
+        <ui-spinner size="sm" color="primary"></ui-spinner>
+        <span>Assistant is thinking...</span>
+      </div>
+    </div>
+
+    <form class="student-chat-page__composer" (ngSubmit)="sendMessage()">
+      <ui-input
+        placeholder="Type your question..."
+        [type]="'text'"
+        [(ngModel)]="prompt"
+        name="prompt"
+        [disabled]="isSending"
+      >
+      </ui-input>
+
+      <ui-button
+        type="submit"
+        variant="solid"
+        color="primary"
+        [loading]="isSending"
+        [disabled]="!canSend"
+      >
+        Send
+      </ui-button>
+    </form>
+  </ui-card>
+</section>

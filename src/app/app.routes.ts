@@ -3,6 +3,7 @@ import { deanGuard } from './core/auth/dean.guard';
 import { teacherGuard } from './core/auth/teacher.guard';
 import { roleRedirectGuard } from './core/auth/role-redirect.guard';
 import { headGuard } from './core/auth/head.guard';
+import { studentGuard } from './core/auth/student.guard';
 
 export const routes: Routes = [
   {
@@ -19,6 +20,25 @@ export const routes: Routes = [
     path: 'showcase',
     loadComponent: () => import('./pages/showcase/showcase.component').then(m => m.ShowcaseComponent),
     title: 'UI Component Showcase'
+  },
+  {
+    path: 'student',
+    canActivate: [studentGuard],
+    children: [
+      {
+        path: 'chat',
+        loadComponent: () =>
+          import('./pages/student/ai-chat/ai-chat.component').then(
+            (m) => m.AiChatComponent,
+          ),
+        title: 'Student AI Chat',
+      },
+      {
+        path: '',
+        redirectTo: 'chat',
+        pathMatch: 'full',
+      },
+    ],
   },
   {
     path: 'dean',
