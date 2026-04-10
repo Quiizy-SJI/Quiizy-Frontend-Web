@@ -111,6 +111,7 @@
   grid-template-columns: 1fr auto;
   align-items: end;
   gap: 0.75rem;
+  margin-top: 32px;
 }
 
 @media (max-width: 720px) {
@@ -137,5 +138,6 @@
 
   .student-chat-page__composer {
     grid-template-columns: 1fr;
+    margin-top: 32px;
   }
 }
