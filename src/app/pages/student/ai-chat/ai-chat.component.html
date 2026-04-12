@@ -53,8 +53,8 @@
       </article>
 
       <div *ngIf="isSending" class="student-chat-page__typing" aria-label="Assistant is typing">
-        <ui-spinner size="sm" color="primary"></ui-spinner>
-        <span>Assistant is thinking...</span>
+        <ui-spinner size="sm" color="primary" class="student-chat-page__spinner"></ui-spinner>
+        <span>{{ thinkingMessage() }}</span>
       </div>
     </div>
 

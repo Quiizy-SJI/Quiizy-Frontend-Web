@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, interval } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import {
 	AlertComponent,
 	ButtonComponent,
@@ -56,8 +57,18 @@ export class AiChatComponent {
 	isSending = false;
 	isLoggingOut = false;
 	errorMessage = '';
+	thinkingMessage = signal('');
 
 	private messageId = 1;
+	private readonly thinkingPhrases = [
+		'Assistant is thinking...',
+		'Analyzing your context...',
+		'Generating response...',
+		'Processing your question...',
+		'Almost there...',
+	];
+	private thinkingInterval: any = null;
+	private destroy$ = interval(0);
 
 	messages: ChatMessage[] = [
 		{
@@ -90,6 +101,7 @@ export class AiChatComponent {
 		this.pushMessage('student', question);
 		this.prompt = '';
 		this.isSending = true;
+		this.startThinkingAnimation();
 
 		try {
 			const reply = await firstValueFrom(this.chatService.askQuestion(question));
@@ -101,6 +113,7 @@ export class AiChatComponent {
 					: 'Unable to reach the AI assistant right now.';
 		} finally {
 			this.isSending = false;
+			this.stopThinkingAnimation();
 		}
 	}
 
@@ -151,5 +164,23 @@ export class AiChatComponent {
 		const id = this.messageId;
 		this.messageId += 1;
 		return id;
+	}
+
+	private startThinkingAnimation(): void {
+		let phraseIndex = 0;
+		this.thinkingMessage.set(this.thinkingPhrases[0]);
+
+		this.thinkingInterval = setInterval(() => {
+			phraseIndex = (phraseIndex + 1) % this.thinkingPhrases.length;
+			this.thinkingMessage.set(this.thinkingPhrases[phraseIndex]);
+		}, 1200);
+	}
+
+	private stopThinkingAnimation(): void {
+		if (this.thinkingInterval) {
+			clearInterval(this.thinkingInterval);
+			this.thinkingInterval = null;
+		}
+		this.thinkingMessage.set('');
 	}
 }
