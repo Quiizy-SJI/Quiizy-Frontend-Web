@@ -54,7 +54,7 @@ export class AiChatComponent {
 	readonly session = computed(() => this.authStore.getSession());
 
 	prompt = '';
-	isSending = false;
+	isSending = signal(false);
 	isLoggingOut = false;
 	errorMessage = '';
 	thinkingMessage = signal('');
@@ -88,19 +88,19 @@ export class AiChatComponent {
 	}
 
 	get canSend(): boolean {
-		return !this.isSending && this.prompt.trim().length > 0;
+		return !this.isSending() && this.prompt.trim().length > 0;
 	}
 
 	async sendMessage(): Promise<void> {
 		const question = this.prompt.trim();
-		if (!question || this.isSending) {
+		if (!question || this.isSending()) {
 			return;
 		}
 
 		this.errorMessage = '';
 		this.pushMessage('student', question);
 		this.prompt = '';
-		this.isSending = true;
+		this.isSending.set(true);
 		this.startThinkingAnimation();
 
 		try {
@@ -109,7 +109,7 @@ export class AiChatComponent {
 		} catch (error: unknown) {
 			this.errorMessage = this.getErrorMessage(error);
 		} finally {
-			this.isSending = false;
+			this.isSending.set(false);
 			this.stopThinkingAnimation();
 		}
 	}
