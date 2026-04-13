@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
 import { firstValueFrom, interval } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 import {
 	AlertComponent,
 	ButtonComponent,
@@ -107,10 +107,7 @@ export class AiChatComponent {
 			const reply = await firstValueFrom(this.chatService.askQuestion(question));
 			this.pushAssistantReply(reply);
 		} catch (error: unknown) {
-			this.errorMessage =
-				error instanceof Error
-					? error.message
-					: 'Unable to reach the AI assistant right now.';
+			this.errorMessage = this.getErrorMessage(error);
 		} finally {
 			this.isSending = false;
 			this.stopThinkingAnimation();
@@ -182,5 +179,35 @@ export class AiChatComponent {
 			this.thinkingInterval = null;
 		}
 		this.thinkingMessage.set('');
+	}
+
+	private getErrorMessage(error: unknown): string {
+		if (error instanceof HttpErrorResponse) {
+			const payload = error.error as
+				| { userMessage?: string; message?: string | string[] }
+				| undefined;
+
+			if (payload?.userMessage?.trim()) {
+				return payload.userMessage.trim();
+			}
+
+			if (typeof payload?.message === 'string' && payload.message.trim()) {
+				return payload.message.trim();
+			}
+
+			if (Array.isArray(payload?.message) && payload.message.length > 0) {
+				return payload.message.join(', ');
+			}
+
+			if (typeof error.message === 'string' && error.message.trim()) {
+				return error.message.trim();
+			}
+		}
+
+		if (error instanceof Error && error.message.trim()) {
+			return error.message.trim();
+		}
+
+		return 'Unable to reach the AI assistant right now.';
 	}
 }
