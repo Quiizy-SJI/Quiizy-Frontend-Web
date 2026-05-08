@@ -1,0 +1,1 @@
+import{b as n,k as o}from"./chunk-TI7JU4IV.js";import{U as i,Y as r}from"./chunk-HM5QGTUH.js";var a=class t{constructor(e){this.api=e}endpoint="/students/me/chat";askQuestion(e){return this.api.post(this.endpoint,{question:n(e)})}static \u0275fac=function(p){return new(p||t)(r(o))};static \u0275prov=i({token:t,factory:t.\u0275fac,providedIn:"root"})};export{a};
