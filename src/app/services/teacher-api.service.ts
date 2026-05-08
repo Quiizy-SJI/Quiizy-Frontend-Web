@@ -8,7 +8,6 @@ import {
   toIntRequired,
   toInt,
   toStringArray,
-  removeUndefined,
 } from '../core/utils/payload-sanitizer';
 import type { TeachingUnitDto } from '../domain/dtos/dean/dean-shared.dto';
 import type {
@@ -34,6 +33,11 @@ import type {
   CreateSentimentAnalysisDto,
   SentimentAnalysisResponseDto,
 } from '../domain/dtos/teacher/teacher-sentiment.dto';
+import type {
+  TeacherCourseMaterialDto,
+  UploadTeacherCourseMaterialDto,
+  UploadTeacherCourseMaterialResponseDto,
+} from '../domain/dtos/teacher/teacher-course-material.dto';
 
 /**
  * Service for teacher quiz-related API calls.
@@ -112,6 +116,51 @@ export class TeacherApiService {
    */
   getMyCourses(): Observable<CourseDto[]> {
     return this.api.get<CourseDto[]>(`${this.basePath}/courses`);
+  }
+
+  /**
+   * Get uploaded course materials for a specific teacher-owned course.
+   * Route: GET /teacher/courses/:courseId/materials
+   */
+  getCourseMaterials(courseId: string): Observable<TeacherCourseMaterialDto[]> {
+    return this.api.get<TeacherCourseMaterialDto[]>(`/teacher/courses/${courseId}/materials`);
+  }
+
+  /**
+   * Upload and index a PDF/DOCX course material.
+   * Route: POST /teacher/courses/:courseId/materials
+   */
+  uploadCourseMaterial(
+    courseId: string,
+    dto: UploadTeacherCourseMaterialDto,
+  ): Observable<UploadTeacherCourseMaterialResponseDto> {
+    const formData = new FormData();
+    formData.append('file', dto.file);
+
+    if (dto.title?.trim()) {
+      formData.append('title', dto.title.trim());
+    }
+
+    if (dto.description?.trim()) {
+      formData.append('description', dto.description.trim());
+    }
+
+    if (dto.materialType) {
+      formData.append('materialType', dto.materialType);
+    }
+
+    return this.api.post<UploadTeacherCourseMaterialResponseDto>(
+      `/teacher/courses/${courseId}/materials`,
+      formData,
+    );
+  }
+
+  /**
+   * Delete one uploaded material.
+   * Route: DELETE /teacher/materials/:materialId
+   */
+  deleteCourseMaterial(materialId: string): Observable<{ deleted: boolean }> {
+    return this.api.delete<{ deleted: boolean }>(`/teacher/materials/${materialId}`);
   }
 
   /**

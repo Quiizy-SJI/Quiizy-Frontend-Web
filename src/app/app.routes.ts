@@ -118,6 +118,11 @@ export const routes: Routes = [
         title: 'Question Bank'
       },
       {
+        path: 'materials',
+        loadComponent: () => import('./pages/teacher/teacher-course-materials/teacher-course-materials').then(m => m.TeacherCourseMaterials),
+        title: 'Course Materials'
+      },
+      {
         path: 'statistics',
         loadComponent: () => import('./pages/teacher/teacher-statistics/teacher-statistics').then(m => m.TeacherStatistics),
         title: 'Statistics'
