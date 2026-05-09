@@ -65,6 +65,7 @@
 // ============================================
 .selection-card {
   margin-bottom: 2rem;
+  overflow-y: auto;
 
   .selection-header {
     margin-bottom: 1.5rem;
@@ -322,6 +323,7 @@
   gap: 1rem;
   align-items: start;
   margin-bottom: 1rem;
+  overflow-y: auto;
 
   ui-card {
     width: 100%;
