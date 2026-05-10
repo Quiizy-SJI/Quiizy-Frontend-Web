@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
-import { firstValueFrom, interval } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import {
 	AlertComponent,
 	ButtonComponent,
@@ -29,6 +30,17 @@ interface ChatMessage {
 	language?: string;
 }
 
+const STORAGE_PREFIX = 'quizzy_chat_';
+
+function createDefaultMessage(id: number): ChatMessage {
+	return {
+		id,
+		role: 'assistant',
+		text: 'Hello! I am your Quizzy AI assistant. Ask me about your class, semester, courses, teachers, or exams.',
+		createdAt: new Date(),
+	};
+}
+
 @Component({
 	selector: 'app-ai-chat',
 	standalone: true,
@@ -51,63 +63,92 @@ export class AiChatComponent {
 	private readonly chatService = inject(StudentChatService);
 	private readonly router = inject(Router);
 
-	readonly session = computed(() => this.authStore.getSession());
-
-	prompt = '';
-	isSending = signal(false);
-	isLoggingOut = false;
-	errorMessage = '';
-	thinkingMessage = signal('');
-
 	private messageId = 1;
+
 	private readonly thinkingPhrases = [
 		'Assistant is thinking...',
 		'Analyzing your context...',
-		'Generating response...',
+		'Generating your response...',
 		'Processing your question...',
 		'Almost there...',
 	];
-	private thinkingInterval: any = null;
-	private destroy$ = interval(0);
 
-	messages: ChatMessage[] = [
-		{
-			id: this.nextMessageId(),
-			role: 'assistant',
-			text: 'Hello! I am your Quizzy AI assistant. Ask me about your class, semester, courses, teachers, or exams.',
-			createdAt: new Date(),
-		},
-	];
+	private thinkingInterval: ReturnType<typeof setInterval> | null = null;
 
-	get studentName(): string {
+	readonly session = toSignal(this.authStore.session$, { initialValue: null });
+
+	private readonly userId = computed(() => this.session()?.user?.id ?? null);
+
+	private readonly storageKey = computed(() =>
+		this.userId() ? `${STORAGE_PREFIX}${this.userId()}` : null,
+	);
+
+	readonly prompt = signal('');
+	readonly isSending = signal(false);
+	readonly isLoggingOut = signal(false);
+	readonly errorMessage = signal('');
+	readonly thinkingMessage = signal('');
+
+	readonly canSend = computed(
+		() => !this.isSending() && this.prompt().trim().length > 0,
+	);
+
+	readonly studentName = computed(() => {
 		const user = this.session()?.user;
 		if (!user) return 'Student';
 
 		const fullName = `${user.name ?? ''} ${user.surname ?? ''}`.trim();
 		return fullName || user.email || 'Student';
-	}
+	});
 
-	get canSend(): boolean {
-		return !this.isSending() && this.prompt.trim().length > 0;
+	readonly hasMessages = computed(() => this.messages().length > 0);
+
+	readonly messages = signal<ChatMessage[]>([]);
+
+	constructor() {
+		this.loadFromStorage();
+
+		effect((onCleanup) => {
+			const msgs = this.messages();
+			const id = setTimeout(() => this.saveToStorage(msgs), 200);
+			onCleanup(() => clearTimeout(id));
+		});
 	}
 
 	async sendMessage(): Promise<void> {
-		const question = this.prompt.trim();
-		if (!question || this.isSending()) {
-			return;
-		}
+		const question = this.prompt().trim();
+		if (!question || this.isSending()) return;
 
-		this.errorMessage = '';
-		this.pushMessage('student', question);
-		this.prompt = '';
+		this.errorMessage.set('');
+		this.messages.update((m) => [
+			...m,
+			{
+				id: this.nextMessageId(),
+				role: 'student',
+				text: question,
+				createdAt: new Date(),
+			},
+		]);
+		this.prompt.set('');
 		this.isSending.set(true);
 		this.startThinkingAnimation();
 
 		try {
-			const reply = await firstValueFrom(this.chatService.askQuestion(question));
-			this.pushAssistantReply(reply);
+			const reply = await firstValueFrom(
+				this.chatService.askQuestion(question),
+			);
+			this.messages.update((m) => [
+				...m,
+				{
+					id: this.nextMessageId(),
+					role: 'assistant',
+					text: reply.answer,
+					createdAt: new Date(reply.generatedAt),
+					language: reply.detectedLanguage,
+				},
+			]);
 		} catch (error: unknown) {
-			this.errorMessage = this.getErrorMessage(error);
+			this.errorMessage.set(this.getErrorMessage(error));
 		} finally {
 			this.isSending.set(false);
 			this.stopThinkingAnimation();
@@ -115,52 +156,66 @@ export class AiChatComponent {
 	}
 
 	async logout(): Promise<void> {
-		if (this.isLoggingOut) {
-			return;
-		}
+		if (this.isLoggingOut()) return;
 
-		this.isLoggingOut = true;
-		this.errorMessage = '';
+		this.isLoggingOut.set(true);
+		this.errorMessage.set('');
 
 		try {
 			await firstValueFrom(this.authService.logout());
 		} catch {
 			// Local logout still happens through auth service finalize logic.
 		} finally {
-			this.isLoggingOut = false;
+			this.isLoggingOut.set(false);
 			await this.router.navigateByUrl('/login');
 		}
 	}
 
-	private pushAssistantReply(reply: StudentChatReply): void {
-		this.messages = [
-			...this.messages,
-			{
-				id: this.nextMessageId(),
-				role: 'assistant',
-				text: reply.answer,
-				createdAt: new Date(reply.generatedAt),
-				language: reply.detectedLanguage,
-			},
-		];
+	clearChat(): void {
+		this.messages.set([createDefaultMessage(this.nextMessageId())]);
 	}
 
-	private pushMessage(role: ChatRole, text: string): void {
-		this.messages = [
-			...this.messages,
-			{
-				id: this.nextMessageId(),
-				role,
-				text,
-				createdAt: new Date(),
-			},
-		];
+	private loadFromStorage(): void {
+		const key = this.storageKey();
+
+		if (!key) {
+			this.messages.set([createDefaultMessage(this.nextMessageId())]);
+			return;
+		}
+
+		try {
+			const raw = localStorage.getItem(key);
+			if (raw) {
+				const parsed: ChatMessage[] = JSON.parse(raw, (_, value) =>
+					typeof value === 'string' &&
+					/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(value)
+						? new Date(value)
+						: value,
+				);
+
+				if (Array.isArray(parsed) && parsed.length > 0) {
+					const maxId = parsed.reduce((max, m) => Math.max(max, m.id), 0);
+					this.messageId = maxId + 1;
+					this.messages.set(parsed);
+					return;
+				}
+			}
+		} catch {
+			// Corrupt storage — reset
+		}
+
+		this.messages.set([createDefaultMessage(this.nextMessageId())]);
 	}
 
-	private nextMessageId(): number {
-		const id = this.messageId;
-		this.messageId += 1;
-		return id;
+	private saveToStorage(msgs: ChatMessage[]): void {
+		const key = this.storageKey();
+		if (!key) return;
+
+		try {
+			localStorage.setItem(key, JSON.stringify(msgs));
+		} catch {
+			// Storage full or unavailable
+		}
 	}
 
 	private startThinkingAnimation(): void {
@@ -179,6 +234,12 @@ export class AiChatComponent {
 			this.thinkingInterval = null;
 		}
 		this.thinkingMessage.set('');
+	}
+
+	private nextMessageId(): number {
+		const id = this.messageId;
+		this.messageId += 1;
+		return id;
 	}
 
 	private getErrorMessage(error: unknown): string {
